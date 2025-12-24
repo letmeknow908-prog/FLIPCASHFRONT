@@ -1,20 +1,245 @@
-.dashboard { min-height: 100vh; }
-.dash-nav { background: white; padding: 1rem 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-.logout { padding: 0.5rem 1.5rem; background: #EF4444; color: white; border-radius: 8px; }
-.back { padding: 0.5rem 1.5rem; background: #E5E7EB; border-radius: 8px; }
-.wallets { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
-.wallet-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.wallet-card h3 { color: #6B7280; margin-bottom: 0.5rem; }
-.balance { font-size: 2rem; font-weight: bold; color: #10B981; }
-.rates { background: white; padding: 1.5rem; border-radius: 12px; margin: 2rem 0; }
-.actions { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
-.action-btn { flex: 1; padding: 1.5rem; background: #10B981; color: white; border-radius: 12px; text-align: center; font-weight: bold; font-size: 1.25rem; }
-.form-box { background: white; padding: 2rem; border-radius: 12px; max-width: 500px; margin: 2rem auto; }
-.form-box input, .form-box select { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 2px solid #E5E7EB; border-radius: 8px; }
-.form-box button { width: 100%; padding: 1rem; background: #10B981; color: white; border-radius: 8px; font-weight: bold; }
-.swap-icon { text-align: center; font-size: 2rem; margin: 1rem 0; }
-.transactions { margin-top: 2rem; }
-.tx-card { background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
-.tx-type { font-weight: bold; text-transform: uppercase; color: #10B981; }
-.tx-status { padding: 0.25rem 0.75rem; background: #D1FAE5; color: #059669; border-radius: 4px; font-size: 0.875rem; }
-.empty { text-align: center; padding: 3rem; color: #6B7280; }
+/* FIXED DASHBOARD - NO BLACK SCREEN */
+.dashboard { 
+  min-height: 100vh; 
+  background: #F9FAFB;
+}
+
+.dash-nav { 
+  background: white; 
+  padding: 1rem 2rem; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dash-nav .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #10B981;
+}
+
+.logout { 
+  padding: 0.5rem 1.5rem; 
+  background: #EF4444; 
+  color: white; 
+  border-radius: 8px; 
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.back { 
+  padding: 0.5rem 1.5rem; 
+  background: #E5E7EB; 
+  border-radius: 8px; 
+  color: #1F2937;
+  font-weight: 600;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.container h1 {
+  color: #1F2937;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.wallets { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 1rem; 
+  margin: 2rem 0; 
+}
+
+.wallet-card { 
+  background: white; 
+  padding: 2rem; 
+  border-radius: 12px; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+}
+
+.wallet-card h3 { 
+  color: #6B7280; 
+  margin-bottom: 0.5rem; 
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.balance { 
+  font-size: 2rem; 
+  font-weight: bold; 
+  color: #10B981; 
+}
+
+.rates { 
+  background: white; 
+  padding: 1.5rem; 
+  border-radius: 12px; 
+  margin: 2rem 0; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rates h3 {
+  color: #1F2937;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.rates p {
+  color: #6B7280;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.actions { 
+  display: flex; 
+  gap: 1rem; 
+  margin: 2rem 0; 
+  flex-wrap: wrap; 
+}
+
+.action-btn { 
+  flex: 1; 
+  padding: 1.5rem; 
+  background: #10B981; 
+  color: white; 
+  border-radius: 12px; 
+  text-align: center; 
+  font-weight: bold; 
+  font-size: 1.25rem; 
+  min-width: 200px;
+  transition: transform 0.3s;
+}
+
+.action-btn:hover {
+  transform: translateY(-3px);
+}
+
+.form-box { 
+  background: white; 
+  padding: 2rem; 
+  border-radius: 12px; 
+  max-width: 500px; 
+  margin: 2rem auto; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-box h2 {
+  color: #1F2937;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-box input, .form-box select { 
+  width: 100%; 
+  padding: 1rem; 
+  margin-bottom: 1rem; 
+  border: 2px solid #E5E7EB; 
+  border-radius: 8px; 
+  font-size: 1rem;
+  background: white;
+  color: #1F2937;
+}
+
+.form-box button { 
+  width: 100%; 
+  padding: 1rem; 
+  background: #10B981; 
+  color: white; 
+  border-radius: 8px; 
+  font-weight: bold; 
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.form-box button:disabled {
+  background: #9CA3AF;
+  cursor: not-allowed;
+}
+
+.swap-icon { 
+  text-align: center; 
+  font-size: 2rem; 
+  margin: 1rem 0; 
+  color: #10B981;
+}
+
+.transactions { 
+  margin-top: 2rem; 
+}
+
+.tx-card { 
+  background: white; 
+  padding: 1rem; 
+  border-radius: 8px; 
+  margin-bottom: 1rem; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tx-type { 
+  font-weight: bold; 
+  text-transform: uppercase; 
+  color: #10B981; 
+}
+
+.tx-amount {
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.tx-status { 
+  padding: 0.25rem 0.75rem; 
+  background: #D1FAE5; 
+  color: #059669; 
+  border-radius: 4px; 
+  font-size: 0.875rem; 
+  font-weight: 600;
+}
+
+.tx-date {
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+.empty { 
+  text-align: center; 
+  padding: 3rem; 
+  color: #6B7280; 
+  background: white;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  color: #10B981;
+  background: #F9FAFB;
+}
+
+/* MOBILE FIXES */
+@media (max-width: 768px) {
+  .dash-nav { padding: 1rem; }
+  .container { padding: 1rem; }
+  .wallets { grid-template-columns: 1fr; }
+  .actions { flex-direction: column; }
+  .action-btn { min-width: 100%; }
+  .tx-card { flex-direction: column; align-items: flex-start; }
+}
