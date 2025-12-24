@@ -2,16 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FlipCash - Currency Exchange</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: #F9FAFB;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
         
+        /* HEADER - FIXED AND STABLE */
         .header {
             background: white;
             padding: 15px 20px;
@@ -24,10 +32,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 60px;
         }
         
-        .logo { font-size: 24px; font-weight: bold; color: #10B981; }
-        .nav-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #10B981;
+            cursor: pointer;
+        }
+        
+        .nav-btns { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
+        }
         
         .btn {
             padding: 8px 16px;
@@ -39,28 +58,172 @@
             display: inline-block;
             border: none;
             white-space: nowrap;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
         }
         
-        .btn-login { border: 2px solid #10B981; background: transparent; color: #10B981; }
-        .btn-register { background: #10B981; color: white; }
-        .btn-logout { background: #EF4444; color: white; }
-        .btn-primary { background: #10B981; color: white; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; }
+        .btn:active {
+            transform: scale(0.95);
+        }
         
-        .page { padding-top: 80px; min-height: 100vh; padding-bottom: 40px; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .hidden { display: none !important; }
+        .btn-login { 
+            border: 2px solid #10B981; 
+            background: transparent; 
+            color: #10B981; 
+        }
         
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
-        .form-group input, .form-group select, .form-group textarea {
+        .btn-register { 
+            background: #10B981; 
+            color: white; 
+        }
+        
+        .btn-logout { 
+            background: #EF4444; 
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary { 
+            background: #10B981; 
+            color: white; 
+            width: 100%; 
+            padding: 15px; 
+            font-size: 16px; 
+            margin-top: 10px;
+        }
+        
+        .btn-primary:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+        
+        /* NOTIFICATION BELL */
+        .notif-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 24px;
+            color: #6B7280;
+            margin-right: 10px;
+        }
+        
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* NOTIFICATION PANEL */
+        .notif-panel {
+            position: fixed;
+            top: 60px;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 9998;
+            overflow-y: auto;
+        }
+        
+        .notif-panel.open {
+            transform: translateX(0);
+        }
+        
+        .notif-header {
+            padding: 20px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notif-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .notif-item:hover {
+            background: #F9FAFB;
+        }
+        
+        .notif-item.unread {
+            background: #F0FDF4;
+        }
+        
+        .notif-close {
+            cursor: pointer;
+            font-size: 24px;
+            color: #6B7280;
+        }
+        
+        /* PAGE CONTAINER - CENTERED */
+        .page { 
+            padding-top: 80px; 
+            min-height: 100vh; 
+            padding-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .container { 
+            width: 100%;
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
+        
+        /* FORM ELEMENTS - STABLE */
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: 600; 
+            color: #374151; 
+        }
+        
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #E5E7EB;
             border-radius: 8px;
             font-size: 16px;
             background: white;
+            transition: border-color 0.3s;
         }
         
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #10B981;
+        }
+        
+        /* WALLETS */
         .wallets {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -75,9 +238,20 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .wallet-card h3 { color: #6B7280; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; }
-        .wallet-card .balance { font-size: 2.5rem; font-weight: bold; color: #10B981; }
+        .wallet-card h3 { 
+            color: #6B7280; 
+            font-size: 14px; 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+        }
         
+        .wallet-card .balance { 
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            color: #10B981; 
+        }
+        
+        /* RATES */
         .rates {
             background: white;
             padding: 20px;
@@ -86,9 +260,17 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .rates h3 { color: #1F2937; margin-bottom: 15px; }
-        .rates p { color: #6B7280; margin: 8px 0; }
+        .rates h3 { 
+            color: #1F2937; 
+            margin-bottom: 15px; 
+        }
         
+        .rates p { 
+            color: #6B7280; 
+            margin: 8px 0; 
+        }
+        
+        /* ACTION BUTTONS */
         .actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -109,22 +291,68 @@
             text-decoration: none;
             display: block;
             transition: all 0.3s;
+            touch-action: manipulation;
         }
         
-        .action-btn:hover { background: #059669; transform: translateY(-2px); }
+        .action-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
         
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* ALERTS - AUTO-DISMISS */
         .alert {
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
         }
         
-        .alert-error { background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; }
-        .alert-success { background: #D1FAE5; color: #059669; border: 1px solid #6EE7B7; }
-        .alert-info { background: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; }
-        .alert-warning { background: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         
-        .transaction-list { background: white; border-radius: 12px; padding: 20px; }
+        .alert-error { 
+            background: #FEE2E2; 
+            color: #DC2626; 
+            border: 1px solid #FCA5A5; 
+        }
+        
+        .alert-success { 
+            background: #D1FAE5; 
+            color: #059669; 
+            border: 1px solid #6EE7B7; 
+        }
+        
+        .alert-info { 
+            background: #DBEAFE; 
+            color: #1D4ED8; 
+            border: 1px solid #93C5FD; 
+        }
+        
+        .alert-warning { 
+            background: #FEF3C7; 
+            color: #D97706; 
+            border: 1px solid #FCD34D; 
+        }
+        
+        /* TRANSACTION LIST */
+        .transaction-list { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 20px; 
+        }
+        
         .transaction-item {
             padding: 15px;
             border-bottom: 1px solid #E5E7EB;
@@ -135,8 +363,11 @@
             gap: 10px;
         }
         
-        .transaction-item:last-child { border-bottom: none; }
+        .transaction-item:last-child { 
+            border-bottom: none; 
+        }
         
+        /* KYC STEPS */
         .kyc-step {
             background: white;
             padding: 30px;
@@ -145,8 +376,12 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .kyc-step h3 { color: #10B981; margin-bottom: 20px; }
+        .kyc-step h3 { 
+            color: #10B981; 
+            margin-bottom: 20px; 
+        }
         
+        /* ACCOUNT DETAILS */
         .account-details {
             background: white;
             padding: 25px;
@@ -155,10 +390,22 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .account-details h3 { color: #1F2937; margin-bottom: 15px; }
-        .account-details p { margin: 10px 0; color: #6B7280; }
-        .account-details strong { color: #10B981; font-size: 1.2rem; }
+        .account-details h3 { 
+            color: #1F2937; 
+            margin-bottom: 15px; 
+        }
         
+        .account-details p { 
+            margin: 10px 0; 
+            color: #6B7280; 
+        }
+        
+        .account-details strong { 
+            color: #10B981; 
+            font-size: 1.2rem; 
+        }
+        
+        /* SUMMARY BOX */
         .summary-box {
             background: linear-gradient(135deg, #10B981, #059669);
             color: white;
@@ -167,15 +414,25 @@
             margin: 20px 0;
         }
         
-        .summary-box h3 { margin-bottom: 15px; font-size: 1.3rem; }
+        .summary-box h3 { 
+            margin-bottom: 15px; 
+            font-size: 1.3rem; 
+        }
+        
         .summary-row {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-        .summary-row:last-child { border-bottom: none; font-size: 1.2rem; font-weight: bold; }
         
+        .summary-row:last-child { 
+            border-bottom: none; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+        }
+        
+        /* HERO SECTION */
         .hero {
             background: linear-gradient(135deg, #10B981, #059669);
             color: white;
@@ -187,10 +444,25 @@
             justify-content: center;
         }
         
-        .hero h1 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
-        .hero p { font-size: 1.2rem; margin-bottom: 40px; }
+        .hero h1 { 
+            font-size: 2.5rem; 
+            margin-bottom: 20px; 
+            line-height: 1.2; 
+        }
         
-        .app-btns { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .hero p { 
+            font-size: 1.2rem; 
+            margin-bottom: 40px; 
+        }
+        
+        /* APP BUTTONS */
+        .app-btns { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            margin-top: 20px; 
+        }
         
         .app-btn {
             display: flex;
@@ -202,12 +474,29 @@
             border-radius: 12px;
             text-decoration: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
         }
         
-        .app-icon { font-size: 40px; }
-        .app-text small { display: block; font-size: 12px; color: #6B7280; }
-        .app-text strong { font-size: 20px; color: #1F2937; }
+        .app-btn:hover {
+            transform: translateY(-2px);
+        }
         
+        .app-icon { 
+            font-size: 40px; 
+        }
+        
+        .app-text small { 
+            display: block; 
+            font-size: 12px; 
+            color: #6B7280; 
+        }
+        
+        .app-text strong { 
+            font-size: 20px; 
+            color: #1F2937; 
+        }
+        
+        /* LOADING SPINNER */
         .loading { 
             display: inline-block;
             width: 20px;
@@ -218,11 +507,45 @@
             animation: spin 1s ease-in-out infinite;
         }
         
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
         
+        /* TOAST NOTIFICATIONS */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .toast-success { border-left: 4px solid #10B981; }
+        .toast-error { border-left: 4px solid #EF4444; }
+        .toast-info { border-left: 4px solid #3B82F6; }
+        
+        /* MOBILE OPTIMIZATIONS */
         @media (max-width: 768px) {
-            .logo { font-size: 18px; }
-            .btn { padding: 6px 10px; font-size: 12px; }
+            .logo { font-size: 20px; }
+            .btn { padding: 8px 12px; font-size: 13px; }
             .wallet-card .balance { font-size: 2rem; }
             .hero h1 { font-size: 1.8rem; }
             .hero p { font-size: 1rem; }
@@ -230,18 +553,71 @@
             .app-icon { font-size: 30px; }
             .app-text strong { font-size: 16px; }
             .actions { grid-template-columns: 1fr 1fr; }
+            .notif-panel { max-width: 100%; }
+            .container { padding: 15px; }
+            
+            /* Prevent zoom on input focus */
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* SMOOTH TRANSITIONS */
+        * {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* PREVENT LAYOUT SHIFT */
+        .page {
+            min-height: calc(100vh - 60px);
+        }
+        
+        /* OVERLAY FOR NOTIFICATION */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9997;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
 <body>
 
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeNotifications()"></div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notif-panel">
+    <div class="notif-header">
+        <h3>Notifications</h3>
+        <span class="notif-close" onclick="closeNotifications()">✕</span>
+    </div>
+    <div id="notif-list">
+        <div style="padding: 40px; text-align: center; color: #6B7280;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔔</div>
+            <p>No new notifications</p>
+        </div>
+    </div>
+</div>
+
 <!-- LANDING PAGE -->
 <div id="landing-page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('landing')">💰 FlipCash</div>
         <div class="nav-btns">
-            <a href="#" class="btn btn-login" onclick="showPage('login'); return false;">Login</a>
-            <a href="#" class="btn btn-register" onclick="showPage('register'); return false;">Get Started</a>
+            <a href="#" class="btn btn-login" onclick="event.preventDefault(); showPage('login');">Login</a>
+            <a href="#" class="btn btn-register" onclick="event.preventDefault(); showPage('register');">Get Started</a>
         </div>
     </header>
     <div class="hero">
@@ -269,9 +645,9 @@
 <!-- LOGIN PAGE -->
 <div id="login-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('landing')">💰 FlipCash</div>
         <div class="nav-btns">
-            <a href="#" class="btn btn-login" onclick="showPage('landing'); return false;">← Back</a>
+            <a href="#" class="btn btn-login" onclick="event.preventDefault(); showPage('landing');">← Back</a>
         </div>
     </header>
     <div class="container" style="max-width: 400px;">
@@ -279,15 +655,15 @@
         <div id="login-alert"></div>
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="login-email" placeholder="Enter your email">
+            <input type="email" id="login-email" placeholder="Enter your email" autocomplete="email">
         </div>
         <div class="form-group">
             <label>Password</label>
-            <input type="password" id="login-password" placeholder="Enter your password">
+            <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password">
         </div>
-        <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+        <button class="btn btn-primary" onclick="handleLogin()" id="login-btn">Login</button>
         <p style="text-align: center; margin-top: 20px;">
-            Don't have an account? <a href="#" onclick="showPage('register'); return false;" style="color: #10B981; font-weight: bold;">Register</a>
+            Don't have an account? <a href="#" onclick="event.preventDefault(); showPage('register');" style="color: #10B981; font-weight: bold;">Register</a>
         </p>
     </div>
 </div>
@@ -295,9 +671,9 @@
 <!-- REGISTER PAGE -->
 <div id="register-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('landing')">💰 FlipCash</div>
         <div class="nav-btns">
-            <a href="#" class="btn btn-login" onclick="showPage('landing'); return false;">← Back</a>
+            <a href="#" class="btn btn-login" onclick="event.preventDefault(); showPage('landing');">← Back</a>
         </div>
     </header>
     <div class="container" style="max-width: 400px;">
@@ -305,27 +681,27 @@
         <div id="register-alert"></div>
         <div class="form-group">
             <label>First Name</label>
-            <input type="text" id="reg-firstname" placeholder="Enter first name">
+            <input type="text" id="reg-firstname" placeholder="Enter first name" autocomplete="given-name">
         </div>
         <div class="form-group">
             <label>Last Name</label>
-            <input type="text" id="reg-lastname" placeholder="Enter last name">
+            <input type="text" id="reg-lastname" placeholder="Enter last name" autocomplete="family-name">
         </div>
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="reg-email" placeholder="Enter email">
+            <input type="email" id="reg-email" placeholder="Enter email" autocomplete="email">
         </div>
         <div class="form-group">
             <label>Phone</label>
-            <input type="tel" id="reg-phone" placeholder="+254... or +234...">
+            <input type="tel" id="reg-phone" placeholder="+254... or +234..." autocomplete="tel">
         </div>
         <div class="form-group">
             <label>Password</label>
-            <input type="password" id="reg-password" placeholder="At least 6 characters">
+            <input type="password" id="reg-password" placeholder="At least 6 characters" autocomplete="new-password">
         </div>
-        <button class="btn btn-primary" onclick="handleRegister()">Create Account</button>
+        <button class="btn btn-primary" onclick="handleRegister()" id="register-btn">Create Account</button>
         <p style="text-align: center; margin-top: 20px;">
-            Have an account? <a href="#" onclick="showPage('login'); return false;" style="color: #10B981; font-weight: bold;">Login</a>
+            Have an account? <a href="#" onclick="event.preventDefault(); showPage('login');" style="color: #10B981; font-weight: bold;">Login</a>
         </p>
     </div>
 </div>
@@ -333,9 +709,13 @@
 <!-- DASHBOARD PAGE -->
 <div id="dashboard-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
-            <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+            <div class="notif-bell" onclick="toggleNotifications()">
+                🔔
+                <span class="notif-badge" id="notif-badge" style="display: none;">0</span>
+            </div>
+            <button class="btn btn-logout" onclick="event.preventDefault(); handleLogout();">Logout</button>
         </div>
     </header>
     <div class="container">
@@ -343,7 +723,7 @@
         
         <div class="alert alert-info" id="kyc-alert" style="display: none;">
             <strong>⚠️ KYC Required:</strong> Complete verification to unlock all features.
-            <a href="#" onclick="showPage('kyc'); return false;" style="color: #1D4ED8; font-weight: bold; text-decoration: underline; margin-left: 10px;">Verify Now</a>
+            <a href="#" onclick="event.preventDefault(); showPage('kyc');" style="color: #1D4ED8; font-weight: bold; text-decoration: underline; margin-left: 10px;">Verify Now</a>
         </div>
         
         <div class="wallets">
@@ -361,7 +741,7 @@
             <h3>Live Exchange Rates 📈</h3>
             <p>1 NGN = <span id="ngn-to-ksh-rate">...</span> KSH</p>
             <p>1 KSH = <span id="ksh-to-ngn-rate">...</span> NGN</p>
-            <small style="color: #9CA3AF;">Updated every 30 seconds</small>
+            <small style="color: #9CA3AF;">Updates every 30 seconds</small>
         </div>
 
         <div class="actions">
@@ -378,7 +758,7 @@
 <!-- DEPOSIT PAGE -->
 <div id="deposit-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
             <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
         </div>
@@ -399,7 +779,6 @@
                 <span id="gen-btn-text">Generate Account Number</span>
                 <span id="gen-btn-loading" class="loading" style="display: none;"></span>
             </button>
-            <div id="gen-account-alert" style="margin-top: 15px;"></div>
         </div>
         
         <div class="alert alert-success" style="margin-top: 20px;">
@@ -411,7 +790,7 @@
 <!-- SWAP PAGE -->
 <div id="swap-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
             <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
         </div>
@@ -462,14 +841,14 @@
             </div>
         </div>
         
-        <button class="btn btn-primary" onclick="handleSwap()">Confirm Swap</button>
+        <button class="btn btn-primary" onclick="handleSwap()" id="swap-btn">Confirm Swap</button>
     </div>
 </div>
 
 <!-- WITHDRAW PAGE -->
 <div id="withdraw-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
             <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
         </div>
@@ -479,7 +858,7 @@
         <div id="withdraw-alert"></div>
         
         <div class="alert alert-info">
-            <strong>ℹ️ Withdrawal Info:</strong> Currently supports KSH withdrawals to M-Pesa and Airtel Money only. NGN withdrawals coming soon!
+            <strong>ℹ️ Withdrawal Info:</strong> Currently supports KSH withdrawals to M-Pesa and Airtel Money only.
         </div>
         
         <div class="form-group">
@@ -522,14 +901,14 @@
             </div>
         </div>
         
-        <button class="btn btn-primary" onclick="handleWithdraw()">Withdraw Now</button>
+        <button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn">Withdraw Now</button>
     </div>
 </div>
 
 <!-- HISTORY PAGE -->
 <div id="history-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
             <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
         </div>
@@ -550,7 +929,7 @@
 <!-- KYC PAGE -->
 <div id="kyc-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
             <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
         </div>
@@ -560,7 +939,7 @@
         <div id="kyc-alert-page"></div>
         
         <div class="alert alert-info">
-            <strong>ℹ️ Why KYC?</strong> We verify your identity to comply with regulations and protect your account. Your information is encrypted and secure.
+            <strong>ℹ️ Why KYC?</strong> We verify your identity to comply with regulations and protect your account.
         </div>
         
         <div class="kyc-step">
@@ -606,14 +985,14 @@
             </div>
         </div>
         
-        <button class="btn btn-primary" onclick="submitKYC()">Submit for Verification</button>
+        <button class="btn btn-primary" onclick="submitKYC()" id="kyc-btn">Submit for Verification</button>
     </div>
 </div>
 
 <!-- SETTINGS PAGE -->
 <div id="settings-page" class="hidden page">
     <header class="header">
-        <div class="logo">💰 FlipCash</div>
+        <div class="logo" onclick="showPage('dashboard')">💰 FlipCash</div>
         <div class="nav-btns">
             <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
         </div>
@@ -673,12 +1052,24 @@ let userData = null;
 let walletsData = { NGN: 0, KSH: 0 };
 let exchangeRates = { ngnToKsh: 0.18, kshToNgn: 5.5 };
 let rateUpdateInterval;
+let notifications = [];
 
+// SMART PAGE NAVIGATION WITH ALERT CLEANUP
 function showPage(page) {
+    // Clear all alerts when changing pages
+    clearAllAlerts();
+    
+    // Hide all pages
     document.querySelectorAll('[id$="-page"]').forEach(el => el.classList.add('hidden'));
+    
+    // Show requested page
     document.getElementById(page + '-page').classList.remove('hidden');
     window.scrollTo(0, 0);
     
+    // Close notifications if open
+    closeNotifications();
+    
+    // Page-specific loading
     if (page === 'dashboard') loadDashboard();
     if (page === 'history') loadHistory();
     if (page === 'settings') loadSettings();
@@ -692,7 +1083,134 @@ function showPage(page) {
     }
 }
 
+// CLEAR ALL ALERTS
+function clearAllAlerts() {
+    const alertIds = [
+        'login-alert', 'register-alert', 'swap-alert', 'withdraw-alert',
+        'kyc-alert-page', 'settings-alert'
+    ];
+    alertIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+    });
+}
+
+// SMART ALERT WITH AUTO-DISMISS
+function showAlert(id, message, type, autoDismiss = true) {
+    const alertDiv = document.getElementById(id);
+    if (!alertDiv) return;
+    
+    if (!message || type === 'clear') {
+        alertDiv.innerHTML = '';
+        return;
+    }
+    
+    const className = type === 'error' ? 'alert-error' : 
+                     type === 'success' ? 'alert-success' : 
+                     type === 'warning' ? 'alert-warning' : 'alert-info';
+    
+    alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
+    
+    // Auto-dismiss success messages after 3 seconds
+    if (autoDismiss && type === 'success') {
+        setTimeout(() => {
+            alertDiv.innerHTML = '';
+        }, 3000);
+    }
+}
+
+// TOAST NOTIFICATIONS
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    toast.innerHTML = `
+        <span style="font-size: 20px;">${icon}</span>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideUp 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// NOTIFICATION SYSTEM
+function toggleNotifications() {
+    const panel = document.getElementById('notif-panel');
+    const overlay = document.getElementById('overlay');
+    
+    if (panel.classList.contains('open')) {
+        closeNotifications();
+    } else {
+        panel.classList.add('open');
+        overlay.classList.add('active');
+        loadNotifications();
+    }
+}
+
+function closeNotifications() {
+    document.getElementById('notif-panel').classList.remove('open');
+    document.getElementById('overlay').classList.remove('active');
+}
+
+function loadNotifications() {
+    // Load notifications from backend
+    const list = document.getElementById('notif-list');
+    
+    if (notifications.length === 0) {
+        list.innerHTML = `
+            <div style="padding: 40px; text-align: center; color: #6B7280;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔔</div>
+                <p>No new notifications</p>
+            </div>
+        `;
+    } else {
+        list.innerHTML = notifications.map(notif => `
+            <div class="notif-item ${notif.read ? '' : 'unread'}" onclick="markAsRead('${notif.id}')">
+                <strong>${notif.title}</strong>
+                <p style="color: #6B7280; margin-top: 5px;">${notif.message}</p>
+                <small style="color: #9CA3AF;">${notif.time}</small>
+            </div>
+        `).join('');
+    }
+    
+    // Update badge
+    const unread = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById('notif-badge');
+    if (unread > 0) {
+        badge.textContent = unread;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function addNotification(title, message) {
+    notifications.unshift({
+        id: Date.now().toString(),
+        title,
+        message,
+        time: new Date().toLocaleTimeString(),
+        read: false
+    });
+    
+    loadNotifications();
+    showToast(title, 'info');
+}
+
+function markAsRead(id) {
+    const notif = notifications.find(n => n.id === id);
+    if (notif) notif.read = true;
+    loadNotifications();
+}
+
+// LOGIN
 async function handleLogin() {
+    const btn = document.getElementById('login-btn');
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     
@@ -700,6 +1218,9 @@ async function handleLogin() {
         showAlert('login-alert', 'Please enter email and password', 'error');
         return;
     }
+    
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
     
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
@@ -714,17 +1235,24 @@ async function handleLogin() {
             localStorage.setItem('accessToken', data.data.accessToken);
             localStorage.setItem('user', JSON.stringify(data.data.user));
             userData = data.data.user;
-            showPage('dashboard');
+            
+            showToast('Login successful!', 'success');
+            setTimeout(() => showPage('dashboard'), 500);
         } else {
             showAlert('login-alert', data.message || 'Login failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Login';
         }
     } catch (error) {
         showAlert('login-alert', 'Connection error. Please check your internet.', 'error');
-        console.error('Login error:', error);
+        btn.disabled = false;
+        btn.textContent = 'Login';
     }
 }
 
+// REGISTER
 async function handleRegister() {
+    const btn = document.getElementById('register-btn');
     const firstName = document.getElementById('reg-firstname').value.trim();
     const lastName = document.getElementById('reg-lastname').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -741,6 +1269,9 @@ async function handleRegister() {
         return;
     }
     
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+    
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
@@ -751,17 +1282,21 @@ async function handleRegister() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            showAlert('register-alert', '✅ Account created successfully! Please login.', 'success');
+            showAlert('register-alert', '✅ Account created successfully! Redirecting to login...', 'success');
             setTimeout(() => showPage('login'), 2000);
         } else {
             showAlert('register-alert', data.message || 'Registration failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
         }
     } catch (error) {
         showAlert('register-alert', 'Connection error. Please try again.', 'error');
-        console.error('Registration error:', error);
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
     }
 }
 
+// LOAD DASHBOARD
 async function loadDashboard() {
     try {
         const token = localStorage.getItem('accessToken');
@@ -809,6 +1344,7 @@ async function loadDashboard() {
     }
 }
 
+// LOAD LIVE RATES
 async function loadLiveRates() {
     try {
         const ratesRes = await fetch(`${API_URL}/rates`);
@@ -827,6 +1363,7 @@ async function loadLiveRates() {
     }
 }
 
+// LOAD DEPOSIT
 function loadDeposit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user.firstName && user.lastName) {
@@ -834,6 +1371,7 @@ function loadDeposit() {
     }
 }
 
+// GENERATE ACCOUNT
 async function generateAccount() {
     const btn = document.getElementById('gen-account-btn');
     const btnText = document.getElementById('gen-btn-text');
@@ -863,7 +1401,6 @@ async function generateAccount() {
         });
         
         const data = await response.json();
-        console.log('Account generation response:', data);
         
         if (data.status === 'success' && data.data && data.data.accountNumber) {
             document.getElementById('account-name').textContent = data.data.accountName || `${user.firstName} ${user.lastName}`;
@@ -872,7 +1409,9 @@ async function generateAccount() {
             btnText.style.display = 'inline';
             btnLoading.style.display = 'none';
             btn.style.background = '#059669';
-            showAlert('gen-account-alert', '✅ Virtual account created! You can now deposit funds.', 'success');
+            
+            showToast('Virtual account created successfully!', 'success');
+            addNotification('Account Created', 'Your virtual account number has been generated');
         } else {
             throw new Error(data.message || 'Account generation failed');
         }
@@ -882,16 +1421,16 @@ async function generateAccount() {
         btnText.style.display = 'inline';
         btnLoading.style.display = 'none';
         btn.disabled = false;
-        showAlert('gen-account-alert', '⚠️ Could not generate account. Please ensure your KYC is verified and try again. If issue persists, contact support.', 'warning');
+        showToast('Could not generate account. Please ensure KYC is verified.', 'error');
     }
 }
 
+// CALCULATE SWAP
 function calculateSwap() {
     const from = document.getElementById('swap-from').value;
     const to = document.getElementById('swap-to').value;
     const amount = parseFloat(document.getElementById('swap-amount').value);
     
-    // Update available balance display
     const available = walletsData[from] || 0;
     document.getElementById('swap-available').textContent = available.toFixed(2);
     document.getElementById('swap-from-curr').textContent = from;
@@ -902,28 +1441,28 @@ function calculateSwap() {
     }
     
     if (amount > available) {
-        showAlert('swap-alert', `⚠️ Insufficient ${from} balance. You have ${available.toFixed(2)} ${from}. Please deposit first.`, 'error');
+        showAlert('swap-alert', `⚠️ Insufficient ${from} balance. You have ${available.toFixed(2)} ${from}.`, 'error', false);
         document.getElementById('swap-summary').style.display = 'none';
         return;
     }
     
-    // Calculate using live rates
     const rate = from === 'NGN' ? exchangeRates.ngnToKsh : exchangeRates.kshToNgn;
-    const fee = amount * 0.01; // 1% fee
+    const fee = amount * 0.01;
     const grossAmount = amount * rate;
-    const netAmount = grossAmount - (grossAmount * 0.01); // Deduct 1% from result
+    const netAmount = grossAmount - (grossAmount * 0.01);
     
-    // Display summary
     document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
     document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
     document.getElementById('summary-fee').textContent = `${fee.toFixed(2)} ${from}`;
     document.getElementById('summary-receive-amount').textContent = `${netAmount.toFixed(2)} ${to}`;
     
     document.getElementById('swap-summary').style.display = 'block';
-    showAlert('swap-alert', '', 'clear');
+    clearAllAlerts();
 }
 
+// HANDLE SWAP
 async function handleSwap() {
+    const btn = document.getElementById('swap-btn');
     const from = document.getElementById('swap-from').value;
     const to = document.getElementById('swap-to').value;
     const amount = parseFloat(document.getElementById('swap-amount').value);
@@ -936,9 +1475,12 @@ async function handleSwap() {
     const available = walletsData[from] || 0;
     
     if (amount > available) {
-        showAlert('swap-alert', `⚠️ Insufficient ${from} balance. You have ${available.toFixed(2)} ${from}.`, 'error');
+        showAlert('swap-alert', `⚠️ Insufficient ${from} balance.`, 'error');
         return;
     }
+    
+    btn.disabled = true;
+    btn.textContent = 'Processing swap...';
     
     try {
         const token = localStorage.getItem('accessToken');
@@ -954,17 +1496,22 @@ async function handleSwap() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            showAlert('swap-alert', '✅ Swap successful! Updating balance...', 'success');
-            setTimeout(() => showPage('dashboard'), 2000);
+            showToast('Swap successful!', 'success');
+            addNotification('Swap Completed', `Successfully swapped ${amount} ${from} to ${to}`);
+            setTimeout(() => showPage('dashboard'), 1500);
         } else {
             showAlert('swap-alert', data.message || 'Swap failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Confirm Swap';
         }
     } catch (error) {
         showAlert('swap-alert', 'Connection error. Please try again.', 'error');
-        console.error('Swap error:', error);
+        btn.disabled = false;
+        btn.textContent = 'Confirm Swap';
     }
 }
 
+// CALCULATE WITHDRAW
 function calculateWithdraw() {
     const amount = parseFloat(document.getElementById('withdraw-amount').value);
     const available = walletsData.KSH || 0;
@@ -976,27 +1523,28 @@ function calculateWithdraw() {
         return;
     }
     
-    const fee = amount * 0.02; // 2% fee
+    const fee = amount * 0.02;
     const totalDeducted = amount + fee;
-    const receiveAmount = amount; // User receives the amount they entered, fee is extra
+    const receiveAmount = amount;
     
     if (totalDeducted > available) {
-        showAlert('withdraw-alert', `⚠️ Insufficient balance. You need ${totalDeducted.toFixed(2)} KSH (${amount.toFixed(2)} + ${fee.toFixed(2)} fee). You have ${available.toFixed(2)} KSH.`, 'error');
+        showAlert('withdraw-alert', `⚠️ Insufficient balance. Need ${totalDeducted.toFixed(2)} KSH (including fee).`, 'error', false);
         document.getElementById('withdraw-summary').style.display = 'none';
         return;
     }
     
-    // Display summary
     document.getElementById('w-summary-amount').textContent = `${amount.toFixed(2)} KSH`;
     document.getElementById('w-summary-fee').textContent = `${fee.toFixed(2)} KSH`;
     document.getElementById('w-summary-total').textContent = `${totalDeducted.toFixed(2)} KSH`;
     document.getElementById('w-summary-receive').textContent = `${receiveAmount.toFixed(2)} KSH`;
     
     document.getElementById('withdraw-summary').style.display = 'block';
-    showAlert('withdraw-alert', '', 'clear');
+    clearAllAlerts();
 }
 
+// HANDLE WITHDRAW
 async function handleWithdraw() {
+    const btn = document.getElementById('withdraw-btn');
     const amount = parseFloat(document.getElementById('withdraw-amount').value);
     const phone = document.getElementById('withdraw-phone').value.trim();
     const method = document.getElementById('withdraw-method').value;
@@ -1006,19 +1554,17 @@ async function handleWithdraw() {
         return;
     }
     
-    if (amount <= 0) {
-        showAlert('withdraw-alert', 'Please enter a valid amount', 'error');
-        return;
-    }
-    
     const available = walletsData.KSH || 0;
     const fee = amount * 0.02;
     const totalDeducted = amount + fee;
     
     if (totalDeducted > available) {
-        showAlert('withdraw-alert', `⚠️ Insufficient balance. You need ${totalDeducted.toFixed(2)} KSH (including 2% fee). Available: ${available.toFixed(2)} KSH`, 'error');
+        showAlert('withdraw-alert', `⚠️ Insufficient balance.`, 'error');
         return;
     }
+    
+    btn.disabled = true;
+    btn.textContent = 'Processing withdrawal...';
     
     try {
         const token = localStorage.getItem('accessToken');
@@ -1028,28 +1574,28 @@ async function handleWithdraw() {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                currency: 'KSH', 
-                amount, 
-                phone, 
-                method 
-            })
+            body: JSON.stringify({ currency: 'KSH', amount, phone, method })
         });
         
         const data = await response.json();
         
         if (data.status === 'success') {
-            showAlert('withdraw-alert', `✅ Withdrawal initiated! ${amount.toFixed(2)} KSH will be sent to ${phone} via ${method}.`, 'success');
-            setTimeout(() => showPage('dashboard'), 3000);
+            showToast(`Withdrawal of ${amount} KSH initiated!`, 'success');
+            addNotification('Withdrawal Initiated', `${amount} KSH will be sent to ${phone} via ${method}`);
+            setTimeout(() => showPage('dashboard'), 1500);
         } else {
             showAlert('withdraw-alert', data.message || 'Withdrawal failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Withdraw Now';
         }
     } catch (error) {
         showAlert('withdraw-alert', 'Connection error. Please try again.', 'error');
-        console.error('Withdrawal error:', error);
+        btn.disabled = false;
+        btn.textContent = 'Withdraw Now';
     }
 }
 
+// LOAD HISTORY
 async function loadHistory() {
     try {
         const token = localStorage.getItem('accessToken');
@@ -1078,25 +1624,19 @@ async function loadHistory() {
                 <div style="text-align: center; padding: 60px 20px; color: #6B7280;">
                     <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
                     <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">No transactions yet</p>
-                    <p>Start by depositing funds to see your transaction history here.</p>
+                    <p>Start by depositing funds.</p>
                     <button class="btn btn-primary" onclick="showPage('deposit')" style="max-width: 200px; margin: 20px auto;">Deposit Now</button>
                 </div>
             `;
         }
     } catch (error) {
-        console.error('History load error:', error);
-        document.getElementById('transaction-list').innerHTML = `
-            <div style="text-align: center; padding: 60px 20px; color: #6B7280;">
-                <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
-                <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">No transactions yet</p>
-                <p>Start by depositing funds to see your transaction history here.</p>
-                <button class="btn btn-primary" onclick="showPage('deposit')" style="max-width: 200px; margin: 20px auto;">Deposit Now</button>
-            </div>
-        `;
+        console.error('History error:', error);
     }
 }
 
+// SUBMIT KYC
 async function submitKYC() {
+    const btn = document.getElementById('kyc-btn');
     const fullname = document.getElementById('kyc-fullname').value.trim();
     const dob = document.getElementById('kyc-dob').value;
     const address = document.getElementById('kyc-address').value.trim();
@@ -1109,16 +1649,17 @@ async function submitKYC() {
         return;
     }
     
-    // Validate age (must be 18+)
     const birthDate = new Date(dob);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
     
-    if (age < 18 || (age === 18 && monthDiff < 0)) {
-        showAlert('kyc-alert-page', 'You must be at least 18 years old to use FlipCash', 'error');
+    if (age < 18) {
+        showAlert('kyc-alert-page', 'You must be at least 18 years old', 'error');
         return;
     }
+    
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
     
     try {
         const token = localStorage.getItem('accessToken');
@@ -1128,42 +1669,40 @@ async function submitKYC() {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                fullname, 
-                dob, 
-                address, 
-                idType, 
-                idNumber, 
-                bvn: bvn || undefined 
-            })
+            body: JSON.stringify({ fullname, dob, address, idType, idNumber, bvn: bvn || undefined })
         });
         
         const data = await response.json();
         
         if (data.status === 'success') {
-            showAlert('kyc-alert-page', '✅ KYC submitted successfully! Your verification is under review. We will notify you via email once approved (typically within 24 hours).', 'success');
+            showToast('KYC submitted successfully!', 'success');
+            addNotification('KYC Submitted', 'Your verification is under review (typically 24 hours)');
             
-            // Update local user data
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             user.kycStatus = 'pending';
             localStorage.setItem('user', JSON.stringify(user));
             
-            setTimeout(() => showPage('dashboard'), 3000);
+            setTimeout(() => showPage('dashboard'), 1500);
         } else {
-            showAlert('kyc-alert-page', data.message || 'KYC submission failed. Please check your information and try again.', 'error');
+            showAlert('kyc-alert-page', data.message || 'KYC submission failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Submit for Verification';
         }
     } catch (error) {
-        showAlert('kyc-alert-page', 'Submission error. Please check your connection and try again.', 'error');
-        console.error('KYC error:', error);
+        showAlert('kyc-alert-page', 'Connection error. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Submit for Verification';
     }
 }
 
+// LOAD SETTINGS
 function loadSettings() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     document.getElementById('settings-email').value = user.email || '';
     document.getElementById('settings-phone').value = user.phone || '';
 }
 
+// UPDATE PROFILE
 async function updateProfile() {
     const phone = document.getElementById('settings-phone').value.trim();
     
@@ -1186,19 +1725,19 @@ async function updateProfile() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            showAlert('settings-alert', '✅ Profile updated successfully!', 'success');
+            showToast('Profile updated successfully!', 'success');
             localStorage.setItem('user', JSON.stringify(data.data));
             userData = data.data;
         } else {
             showAlert('settings-alert', data.message || 'Update failed', 'error');
         }
     } catch (error) {
-        showAlert('settings-alert', 'Update error. Please try again.', 'error');
-        console.error('Profile update error:', error);
+        showAlert('settings-alert', 'Update error.', 'error');
     }
 }
 
-async function changePassword() {
+// CHANGE PASSWORD
+function changePassword() {
     const currentPassword = document.getElementById('settings-current-password').value;
     const newPassword = document.getElementById('settings-new-password').value;
     const confirmPassword = document.getElementById('settings-confirm-password').value;
@@ -1218,44 +1757,45 @@ async function changePassword() {
         return;
     }
     
-    showAlert('settings-alert', 'Password change feature coming soon! For security, please contact support@flipcash.app to change your password.', 'info');
+    showToast('Password change feature coming soon!', 'info');
 }
 
+// SAVE NOTIFICATION SETTINGS
 function saveNotificationSettings() {
     const emailNotif = document.getElementById('settings-email-notif').checked;
     const smsNotif = document.getElementById('settings-sms-notif').checked;
     
     localStorage.setItem('notifications', JSON.stringify({ email: emailNotif, sms: smsNotif }));
-    showAlert('settings-alert', '✅ Notification preferences saved!', 'success');
+    showToast('Notification preferences saved!', 'success');
 }
 
-function showAlert(id, message, type) {
-    const alertDiv = document.getElementById(id);
-    if (!alertDiv) return;
-    
-    if (!message || type === 'clear') {
-        alertDiv.innerHTML = '';
-        return;
-    }
-    
-    const className = type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : type === 'warning' ? 'alert-warning' : 'alert-info';
-    alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
-}
-
+// LOGOUT - FIXED FOR MOBILE
 function handleLogout() {
     if (confirm('Are you sure you want to logout?')) {
         if (rateUpdateInterval) clearInterval(rateUpdateInterval);
         localStorage.clear();
         userData = null;
         walletsData = { NGN: 0, KSH: 0 };
+        notifications = [];
         showPage('landing');
+        showToast('Logged out successfully', 'success');
     }
 }
 
-// Auto-login if token exists
+// AUTO-LOGIN
 if (localStorage.getItem('accessToken')) {
     showPage('dashboard');
 }
+
+// PREVENT DOUBLE-TAP ZOOM ON MOBILE
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
 </script>
 
 </body>
