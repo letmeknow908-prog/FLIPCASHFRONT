@@ -3,51 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FlipCash - Professional Currency Exchange</title>
+    <title>FlipCash - Currency Exchange</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F9FAFB; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-        .header { background: white; padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; justify-content: space-between; align-items: center; height: 60px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F9FAFB; }
+        .header { background: white; padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 24px; font-weight: bold; color: #10B981; cursor: pointer; }
-        .nav-btns { display: flex; gap: 10px; align-items: center; }
-        .btn { padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; border: none; transition: all 0.3s; touch-action: manipulation; }
-        .btn:active { transform: scale(0.95); }
-        .btn-login { border: 2px solid #10B981; background: transparent; color: #10B981; }
+        .nav-btns { display: flex; gap: 10px; }
+        .btn { padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; border: none; transition: all 0.3s; }
+        .btn-login { border: 2px solid #10B981; background: white; color: #10B981; }
         .btn-register { background: #10B981; color: white; }
         .btn-logout { background: #EF4444; color: white; }
-        .btn-primary { background: #10B981; color: white; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; }
-        .btn-primary:disabled { background: #9CA3AF; cursor: not-allowed; opacity: 0.6; }
-        .notif-bell { position: relative; cursor: pointer; font-size: 24px; color: #6B7280; margin-right: 10px; }
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: #EF4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .notif-panel { position: fixed; top: 60px; right: 0; width: 100%; max-width: 400px; max-height: 80vh; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s; z-index: 9998; overflow-y: auto; }
-        .notif-panel.open { transform: translateX(0); }
-        .notif-header { padding: 20px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; }
-        .notif-item { padding: 15px 20px; border-bottom: 1px solid #E5E7EB; cursor: pointer; }
-        .notif-item:hover { background: #F9FAFB; }
-        .notif-item.unread { background: #F0FDF4; }
-        .page { padding-top: 80px; min-height: calc(100vh - 60px); padding-bottom: 40px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .btn-primary { background: #10B981; color: white; width: 100%; padding: 15px; font-size: 16px; }
+        .btn-primary:disabled { background: #9CA3AF; opacity: 0.6; }
+        .page { padding-top: 80px; min-height: 100vh; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 1200px; padding: 20px; }
         .hidden { display: none !important; }
+        .hero { background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 100px 20px; text-align: center; min-height: 90vh; display: flex; flex-direction: column; justify-content: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.2rem; margin-bottom: 40px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 16px; background: white; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #10B981; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 16px; }
         .password-toggle { position: relative; }
         .password-toggle input { padding-right: 45px; }
-        .password-toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; color: #6B7280; }
+        .password-toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; }
         .phone-input-group { display: flex; gap: 10px; }
         .phone-input-group select { flex: 0 0 130px; }
         .phone-input-group input { flex: 1; }
+        .password-strength { height: 4px; background: #E5E7EB; margin-top: 5px; }
+        .password-strength-bar { height: 100%; transition: all 0.3s; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
         .wallets { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .wallet-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .wallet-card h3 { color: #6B7280; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; }
+        .wallet-card h3 { color: #6B7280; font-size: 14px; text-transform: uppercase; }
         .wallet-card .balance { font-size: 2.5rem; font-weight: bold; color: #10B981; }
         .rates { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .action-btn { background: #10B981; color: white; padding: 20px 10px; border-radius: 12px; text-align: center; font-size: 1rem; font-weight: bold; cursor: pointer; border: none; display: block; transition: all 0.3s; }
-        .action-btn:hover { background: #059669; transform: translateY(-2px); }
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .action-btn { background: #10B981; color: white; padding: 20px; border-radius: 12px; text-align: center; font-weight: bold; cursor: pointer; border: none; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .alert-error { background: #FEE2E2; color: #DC2626; }
         .alert-success { background: #D1FAE5; color: #059669; }
         .alert-info { background: #DBEAFE; color: #1D4ED8; }
@@ -58,62 +52,422 @@
         .kyc-status.rejected { background: #FEE2E2; color: #DC2626; }
         .summary-box { background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 20px; border-radius: 12px; margin: 20px 0; }
         .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .summary-row:last-child { border-bottom: none; font-size: 1.2rem; font-weight: bold; }
         .mpesa-name { background: #F0FDF4; padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid #10B981; }
-        .hero { background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 100px 20px 60px; text-align: center; min-height: 90vh; display: flex; flex-direction: column; justify-content: center; }
-        .hero h1 { font-size: 2.5rem; margin-bottom: 20px; }
-        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 10000; animation: slideUp 0.3s; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; }
         .toast-success { border-left: 4px solid #10B981; }
         .toast-error { border-left: 4px solid #EF4444; }
-        .password-strength { height: 4px; background: #E5E7EB; border-radius: 2px; margin-top: 5px; }
-        .password-strength-bar { height: 100%; transition: all 0.3s; }
-        .checkbox-group { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
-        .blur-text { filter: blur(4px); user-select: none; }
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9997; opacity: 0; visibility: hidden; }
-        .overlay.active { opacity: 1; visibility: visible; }
-        @media (max-width: 768px) { .logo { font-size: 20px; } .wallet-card .balance { font-size: 2rem; } .hero h1 { font-size: 1.8rem; } .actions { grid-template-columns: 1fr 1fr; } input, select, textarea { font-size: 16px !important; } }
+        .blur-text { filter: blur(4px); }
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .hero h1 { font-size: 1.8rem; } .actions { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
 
-<div class="overlay" id="overlay" onclick="closeNotifications()"></div>
-<div class="notif-panel" id="notif-panel"><div class="notif-header"><h3>Notifications</h3><span onclick="closeNotifications()" style="cursor:pointer;font-size:24px">✕</span></div><div id="notif-list"><div style="padding:40px;text-align:center;color:#6B7280"><div style="font-size:3rem">🔔</div><p>No notifications</p></div></div></div>
-
 <!-- LANDING -->
-<div id="landing-page"><header class="header"><div class="logo" onclick="showPage('landing')">💰 FlipCash</div><div class="nav-btns"><a href="#" class="btn btn-login" onclick="event.preventDefault();showPage('login')">Login</a><a href="#" class="btn btn-register" onclick="event.preventDefault();showPage('register')">Get Started</a></div></header><div class="hero"><h1>Exchange Currency Between Nigeria & Kenya Instantly</h1><p>Fast, secure, and reliable currency conversion with live exchange rates</p></div></div>
+<div id="landing-page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('login')">Login</button>
+            <button class="btn btn-register" onclick="showPage('register')">Get Started</button>
+        </div>
+    </header>
+    <div class="hero">
+        <h1>Exchange Currency Between Nigeria & Kenya Instantly</h1>
+        <p>Fast, secure, and reliable currency conversion with live exchange rates</p>
+    </div>
+</div>
 
 <!-- LOGIN -->
-<div id="login-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><a href="#" class="btn btn-login" onclick="event.preventDefault();showPage('landing')">← Back</a></div></header><div class="container" style="max-width:400px"><h2 style="text-align:center;margin-bottom:30px">Login to FlipCash</h2><div id="login-alert"></div><div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="Enter email" autocomplete="email"></div><div class="form-group"><label>Password</label><div class="password-toggle"><input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password"><button type="button" class="password-toggle-btn" onclick="togglePassword('login-password',this)">👁️</button></div></div><div class="checkbox-group"><input type="checkbox" id="remember-me"><label for="remember-me" style="margin:0;font-weight:normal">Remember me</label></div><button class="btn btn-primary" onclick="handleLogin()" id="login-btn">Login</button><p style="text-align:center;margin-top:15px"><a href="#" onclick="event.preventDefault();showPage('forgot-password')" style="color:#10B981;font-weight:bold">Forgot Password?</a></p><p style="text-align:center;margin-top:10px">Don't have an account? <a href="#" onclick="event.preventDefault();showPage('register')" style="color:#10B981;font-weight:bold">Register</a></p></div></div>
+<div id="login-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('landing')">← Back</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:400px">
+        <h2 style="text-align:center;margin-bottom:30px">Login</h2>
+        <div id="login-alert"></div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <div class="password-toggle">
+                <input type="password" id="login-password" placeholder="Enter password">
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('login-password',this)">👁️</button>
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="remember-me">
+            <label for="remember-me">Remember me</label>
+        </div>
+        <button class="btn btn-primary" onclick="handleLogin()" id="login-btn">Login</button>
+        <p style="text-align:center;margin-top:15px">
+            <a href="#" onclick="event.preventDefault();showPage('forgot-password')" style="color:#10B981">Forgot Password?</a>
+        </p>
+        <p style="text-align:center;margin-top:10px">
+            Don't have account? <a href="#" onclick="event.preventDefault();showPage('register')" style="color:#10B981">Register</a>
+        </p>
+    </div>
+</div>
 
 <!-- FORGOT PASSWORD -->
-<div id="forgot-password-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><a href="#" class="btn btn-login" onclick="event.preventDefault();showPage('login')">← Login</a></div></header><div class="container" style="max-width:400px"><h2 style="text-align:center;margin-bottom:30px">Reset Password</h2><div id="forgot-alert"></div><div class="form-group"><label>Email</label><input type="email" id="forgot-email" placeholder="Enter registered email"></div><button class="btn btn-primary" onclick="handleForgotPassword()" id="forgot-btn">Send Reset Link</button></div></div>
+<div id="forgot-password-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('login')">← Login</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:400px">
+        <h2 style="text-align:center;margin-bottom:30px">Reset Password</h2>
+        <div id="forgot-alert"></div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="forgot-email" placeholder="Enter email">
+        </div>
+        <button class="btn btn-primary" onclick="handleForgotPassword()" id="forgot-btn">Send Reset Link</button>
+    </div>
+</div>
 
 <!-- REGISTER -->
-<div id="register-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><a href="#" class="btn btn-login" onclick="event.preventDefault();showPage('landing')">← Back</a></div></header><div class="container" style="max-width:450px"><h2 style="text-align:center;margin-bottom:30px">Create Account</h2><div id="register-alert"></div><div class="form-group"><label>First Name *</label><input type="text" id="reg-firstname" placeholder="Enter first name" required></div><div class="form-group"><label>Last Name *</label><input type="text" id="reg-lastname" placeholder="Enter last name" required></div><div class="form-group"><label>Email *</label><input type="email" id="reg-email" placeholder="Enter email" required></div><div class="form-group"><label>Phone Number *</label><div class="phone-input-group"><select id="reg-country-code"><option value="+234">🇳🇬 +234</option><option value="+254">🇰🇪 +254</option></select><input type="tel" id="reg-phone" placeholder="7XXXXXXXX" required></div><small style="color:#6B7280;display:block;margin-top:5px">9 digits for Kenya, 10 for Nigeria</small></div><div class="form-group"><label>Password * <small style="color:#6B7280">(Min 8 chars, 1 uppercase, 1 number, 1 special)</small></label><div class="password-toggle"><input type="password" id="reg-password" placeholder="Create strong password" oninput="checkPasswordStrength(this.value)" required><button type="button" class="password-toggle-btn" onclick="togglePassword('reg-password',this)">👁️</button></div><div class="password-strength"><div class="password-strength-bar" id="password-strength-bar"></div></div><div id="password-strength-text" style="font-size:12px;margin-top:5px;font-weight:600"></div></div><div class="form-group"><label>Confirm Password *</label><div class="password-toggle"><input type="password" id="reg-password-confirm" placeholder="Re-enter password" required><button type="button" class="password-toggle-btn" onclick="togglePassword('reg-password-confirm',this)">👁️</button></div></div><button class="btn btn-primary" onclick="handleRegister()" id="register-btn">Create Account</button><p style="text-align:center;margin-top:20px">Have an account? <a href="#" onclick="event.preventDefault();showPage('login')" style="color:#10B981;font-weight:bold">Login</a></p></div></div>
+<div id="register-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('landing')">← Back</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:450px">
+        <h2 style="text-align:center;margin-bottom:30px">Create Account</h2>
+        <div id="register-alert"></div>
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="reg-firstname" placeholder="First name">
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="reg-lastname" placeholder="Last name">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="reg-email" placeholder="Email">
+        </div>
+        <div class="form-group">
+            <label>Phone</label>
+            <div class="phone-input-group">
+                <select id="reg-country-code">
+                    <option value="+234">🇳🇬 +234</option>
+                    <option value="+254">🇰🇪 +254</option>
+                </select>
+                <input type="tel" id="reg-phone" placeholder="7XXXXXXXX">
+            </div>
+            <small style="color:#6B7280">9 digits for Kenya, 10 for Nigeria</small>
+        </div>
+        <div class="form-group">
+            <label>Password <small>(Min 8, 1 upper, 1 number, 1 special)</small></label>
+            <div class="password-toggle">
+                <input type="password" id="reg-password" placeholder="Password" oninput="checkPasswordStrength(this.value)">
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('reg-password',this)">👁️</button>
+            </div>
+            <div class="password-strength">
+                <div class="password-strength-bar" id="password-strength-bar"></div>
+            </div>
+            <div id="password-strength-text" style="font-size:12px;margin-top:5px;font-weight:600"></div>
+        </div>
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="password-toggle">
+                <input type="password" id="reg-password-confirm" placeholder="Confirm">
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('reg-password-confirm',this)">👁️</button>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="handleRegister()" id="register-btn">Create Account</button>
+        <p style="text-align:center;margin-top:20px">
+            Have account? <a href="#" onclick="event.preventDefault();showPage('login')" style="color:#10B981">Login</a>
+        </p>
+    </div>
+</div>
 
 <!-- DASHBOARD -->
-<div id="dashboard-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><div class="notif-bell" onclick="toggleNotifications()">🔔<span class="notif-badge" id="notif-badge" style="display:none">0</span></div><button class="btn btn-logout" onclick="handleLogout()">Logout</button></div></header><div class="container"><h1 style="color:#1F2937;margin-bottom:20px">Dashboard</h1><div class="alert alert-info" id="kyc-alert" style="display:none"><strong>⚠️ KYC Required:</strong> Complete verification to unlock all features. <a href="#" onclick="event.preventDefault();showPage('kyc')" style="color:#1D4ED8;font-weight:bold;text-decoration:underline">Verify Now</a></div><div class="wallets"><div class="wallet-card"><h3>NGN</h3><div class="balance" id="ngn-balance">0.00</div></div><div class="wallet-card"><h3>KSH</h3><div class="balance" id="ksh-balance">0.00</div></div></div><div class="rates"><h3>Live Exchange Rates 📈</h3><p>1 NGN = <span id="ngn-to-ksh-rate">...</span> KSH</p><p>1 KSH = <span id="ksh-to-ngn-rate">...</span> NGN</p><small style="color:#9CA3AF">Updates every 30 seconds</small></div><div class="actions"><button class="action-btn" onclick="showPage('deposit')">💳 Deposit</button><button class="action-btn" onclick="showPage('swap')">💱 Swap</button><button class="action-btn" onclick="showPage('withdraw')">💸 Withdraw</button><button class="action-btn" onclick="showPage('history')">📊 History</button><button class="action-btn" onclick="showPage('settings')">⚙️ Settings</button><button class="action-btn" onclick="showPage('kyc')">✅ KYC</button></div></div></div>
+<div id="dashboard-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <h1>Dashboard</h1>
+        <div class="alert alert-info" id="kyc-alert" style="display:none">
+            <strong>⚠️ KYC Required</strong> 
+            <a href="#" onclick="event.preventDefault();showPage('kyc')" style="color:#1D4ED8">Verify Now</a>
+        </div>
+        <div class="wallets">
+            <div class="wallet-card">
+                <h3>NGN</h3>
+                <div class="balance" id="ngn-balance">0.00</div>
+            </div>
+            <div class="wallet-card">
+                <h3>KSH</h3>
+                <div class="balance" id="ksh-balance">0.00</div>
+            </div>
+        </div>
+        <div class="rates">
+            <h3>Live Rates 📈</h3>
+            <p>1 NGN = <span id="ngn-to-ksh-rate">...</span> KSH</p>
+            <p>1 KSH = <span id="ksh-to-ngn-rate">...</span> NGN</p>
+        </div>
+        <div class="actions">
+            <button class="action-btn" onclick="showPage('deposit')">💳 Deposit</button>
+            <button class="action-btn" onclick="showPage('swap')">💱 Swap</button>
+            <button class="action-btn" onclick="showPage('withdraw')">💸 Withdraw</button>
+            <button class="action-btn" onclick="showPage('history')">📊 History</button>
+            <button class="action-btn" onclick="showPage('settings')">⚙️ Settings</button>
+            <button class="action-btn" onclick="showPage('kyc')">✅ KYC</button>
+        </div>
+    </div>
+</div>
 
 <!-- DEPOSIT -->
-<div id="deposit-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button></div></header><div class="container" style="max-width:600px"><h2 style="color:#1F2937;margin-bottom:20px">Deposit Funds</h2><div class="alert alert-info"><strong>ℹ️ How to Deposit:</strong> Generate your Flutterwave account and transfer from any Nigerian bank. Funds reflect in 5-10 minutes.</div><div style="background:white;padding:25px;border-radius:12px;margin:20px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><h3 style="color:#1F2937;margin-bottom:15px">Your Virtual Account</h3><p style="margin:10px 0;color:#6B7280"><strong>Bank:</strong> Wema Bank (Flutterwave)</p><p style="margin:10px 0;color:#6B7280"><strong>Account Name:</strong> <span id="account-name">Click generate</span></p><p style="margin:10px 0;color:#6B7280"><strong>Account Number:</strong> <strong id="account-number" style="font-size:1.5rem;color:#10B981">---------</strong></p><button class="btn btn-primary" onclick="generateAccount()" id="gen-account-btn"><span id="gen-btn-text">Generate Account</span><span id="gen-btn-loading" class="loading" style="display:none"></span></button></div></div></div>
+<div id="deposit-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:600px">
+        <h2>Deposit</h2>
+        <div class="alert alert-info">Generate account, transfer from any Nigerian bank. Funds in 5-10 mins.</div>
+        <div style="background:white;padding:25px;border-radius:12px;margin:20px 0">
+            <h3>Virtual Account</h3>
+            <p><strong>Bank:</strong> Wema Bank</p>
+            <p><strong>Name:</strong> <span id="account-name">Click generate</span></p>
+            <p><strong>Number:</strong> <strong id="account-number" style="font-size:1.5rem;color:#10B981">---------</strong></p>
+            <button class="btn btn-primary" onclick="generateAccount()" id="gen-account-btn">
+                <span id="gen-btn-text">Generate</span>
+                <span id="gen-btn-loading" class="loading" style="display:none"></span>
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- SWAP -->
-<div id="swap-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button></div></header><div class="container" style="max-width:500px"><h2 style="color:#1F2937;margin-bottom:20px">Currency Swap</h2><div id="swap-alert"></div><div class="form-group"><label>From</label><select id="swap-from" onchange="calculateSwap()"><option value="NGN">NGN - Nigerian Naira</option><option value="KSH">KSH - Kenyan Shilling</option></select></div><div class="form-group"><label>To</label><select id="swap-to" onchange="calculateSwap()"><option value="KSH">KSH - Kenyan Shilling</option><option value="NGN">NGN - Nigerian Naira</option></select></div><div class="form-group"><label>Amount</label><input type="number" id="swap-amount" placeholder="Enter amount" step="0.01" oninput="calculateSwap()"><small style="color:#6B7280;margin-top:5px;display:block">Available: <span id="swap-available">0.00</span> <span id="swap-from-curr">NGN</span></small></div><div class="summary-box" id="swap-summary" style="display:none"><h3>💱 Swap Summary</h3><div class="summary-row"><span>You Send:</span><strong id="summary-send-amount">0.00</strong></div><div class="summary-row"><span>Rate:</span><strong id="summary-rate">0.00</strong></div><div class="summary-row"><span>Fee (1%):</span><strong id="summary-fee">0.00</strong></div><div class="summary-row"><span>You Receive:</span><strong id="summary-receive-amount">0.00</strong></div></div><button class="btn btn-primary" onclick="handleSwap()" id="swap-btn">Confirm Swap</button></div></div>
+<div id="swap-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:500px">
+        <h2>Swap</h2>
+        <div id="swap-alert"></div>
+        <div class="form-group">
+            <label>From</label>
+            <select id="swap-from" onchange="calculateSwap()">
+                <option value="NGN">NGN</option>
+                <option value="KSH">KSH</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>To</label>
+            <select id="swap-to" onchange="calculateSwap()">
+                <option value="KSH">KSH</option>
+                <option value="NGN">NGN</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Amount</label>
+            <input type="number" id="swap-amount" placeholder="Amount" step="0.01" oninput="calculateSwap()">
+            <small>Available: <span id="swap-available">0.00</span> <span id="swap-from-curr">NGN</span></small>
+        </div>
+        <div class="summary-box" id="swap-summary" style="display:none">
+            <h3>💱 Summary</h3>
+            <div class="summary-row"><span>Send:</span><strong id="summary-send-amount">0</strong></div>
+            <div class="summary-row"><span>Rate:</span><strong id="summary-rate">0</strong></div>
+            <div class="summary-row"><span>Fee (1%):</span><strong id="summary-fee">0</strong></div>
+            <div class="summary-row"><span>Receive:</span><strong id="summary-receive-amount">0</strong></div>
+        </div>
+        <button class="btn btn-primary" onclick="handleSwap()" id="swap-btn">Confirm</button>
+    </div>
+</div>
 
 <!-- WITHDRAW -->
-<div id="withdraw-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button></div></header><div class="container" style="max-width:500px"><h2 style="color:#1F2937;margin-bottom:20px">Withdraw to M-Pesa/Airtel</h2><div id="withdraw-alert"></div><div class="alert alert-info"><strong>ℹ️ Info:</strong> KSH withdrawals only to M-Pesa/Airtel Money</div><div class="form-group"><label>Amount (KSH)</label><input type="number" id="withdraw-amount" placeholder="Enter amount" step="0.01" oninput="calculateWithdraw()"><small style="color:#6B7280;margin-top:5px;display:block">Available: <span id="withdraw-available">0.00</span> KSH</small></div><div class="form-group"><label>Phone (+254XXXXXXXXX)</label><input type="tel" id="withdraw-phone" placeholder="+254712345678" oninput="verifyMpesaNumber()"><small style="color:#6B7280;margin-top:5px;display:block">Must be 9 digits after +254</small></div><div id="mpesa-name-display" style="display:none"></div><div class="form-group"><label>Method</label><select id="withdraw-method"><option value="MPESA">M-Pesa</option><option value="AIRTEL">Airtel Money</option></select></div><div class="summary-box" id="withdraw-summary" style="display:none"><h3>💸 Withdrawal Summary</h3><div class="summary-row"><span>Amount:</span><strong id="w-summary-amount">0.00</strong></div><div class="summary-row"><span>Fee (2%):</span><strong id="w-summary-fee">0.00</strong></div><div class="summary-row"><span>Total Deducted:</span><strong id="w-summary-total">0.00</strong></div><div class="summary-row"><span>You Receive:</span><strong id="w-summary-receive">0.00</strong></div></div><button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn">Withdraw Now</button></div></div>
+<div id="withdraw-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:500px">
+        <h2>Withdraw</h2>
+        <div id="withdraw-alert"></div>
+        <div class="alert alert-info">KSH only to M-Pesa/Airtel</div>
+        <div class="form-group">
+            <label>Amount (KSH)</label>
+            <input type="number" id="withdraw-amount" placeholder="Amount" step="0.01" oninput="calculateWithdraw()">
+            <small>Available: <span id="withdraw-available">0.00</span> KSH</small>
+        </div>
+        <div class="form-group">
+            <label>Phone (+254XXXXXXXXX)</label>
+            <input type="tel" id="withdraw-phone" placeholder="+254712345678" oninput="verifyMpesaNumber()">
+            <small>9 digits after +254</small>
+        </div>
+        <div id="mpesa-name-display" style="display:none"></div>
+        <div class="form-group">
+            <label>Method</label>
+            <select id="withdraw-method">
+                <option value="MPESA">M-Pesa</option>
+                <option value="AIRTEL">Airtel</option>
+            </select>
+        </div>
+        <div class="summary-box" id="withdraw-summary" style="display:none">
+            <h3>💸 Summary</h3>
+            <div class="summary-row"><span>Amount:</span><strong id="w-summary-amount">0</strong></div>
+            <div class="summary-row"><span>Fee (2%):</span><strong id="w-summary-fee">0</strong></div>
+            <div class="summary-row"><span>Deducted:</span><strong id="w-summary-total">0</strong></div>
+            <div class="summary-row"><span>Receive:</span><strong id="w-summary-receive">0</strong></div>
+        </div>
+        <button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn">Withdraw</button>
+    </div>
+</div>
 
 <!-- HISTORY -->
-<div id="history-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button></div></header><div class="container"><h2 style="color:#1F2937;margin-bottom:20px">Transaction History</h2><div style="background:white;border-radius:12px;padding:20px" id="transaction-list"><div style="text-align:center;padding:60px 20px;color:#6B7280"><div style="font-size:3rem;margin-bottom:20px">📊</div><p style="font-size:1.2rem;font-weight:600;margin-bottom:10px">No transactions yet</p><p>Start by depositing funds</p><button class="btn btn-primary" onclick="showPage('deposit')" style="max-width:200px;margin:20px auto">Deposit Now</button></div></div></div></div>
+<div id="history-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
+        </div>
+    </header>
+    <div class="container">
+        <h2>History</h2>
+        <div style="background:white;border-radius:12px;padding:20px" id="transaction-list"></div>
+    </div>
+</div>
 
 <!-- KYC -->
-<div id="kyc-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button></div></header><div class="container" style="max-width:600px"><h2 style="color:#1F2937;margin-bottom:20px">KYC Verification</h2><div id="kyc-alert-page"></div><div class="alert alert-info"><strong>ℹ️ Why KYC?</strong> Identity verification to comply with regulations</div><div class="kyc-step"><h3>Step 1: Personal Info</h3><div class="form-group"><label>Full Name (as on ID)</label><input type="text" id="kyc-fullname" placeholder="John Doe"></div><div class="form-group"><label>Date of Birth</label><input type="date" id="kyc-dob"></div><div class="form-group"><label>Address</label><textarea id="kyc-address" rows="3" placeholder="Full address"></textarea></div></div><div class="kyc-step"><h3>Step 2: ID Verification</h3><div class="form-group"><label>ID Type</label><select id="kyc-idtype"><option value="">Select</option><option value="PASSPORT">Passport</option><option value="NATIONAL_ID">National ID</option><option value="DRIVERS_LICENSE">Driver's License</option></select></div><div class="form-group"><label>ID Number</label><input type="text" id="kyc-idnumber" placeholder="ID number"></div></div><div class="kyc-step"><h3>Step 3: BVN (Optional)</h3><div class="form-group"><label>BVN (Nigerians)</label><input type="text" id="kyc-bvn" placeholder="11 digits" maxlength="11"><small style="color:#6B7280;display:block;margin-top:5px">Faster verification</small></div></div><button class="btn btn-primary" onclick="submitKYC()" id="kyc-btn">Submit</button></div></div>
+<div id="kyc-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:600px">
+        <h2>KYC</h2>
+        <div id="kyc-alert-page"></div>
+        <div class="alert alert-info">Verify identity</div>
+        <div class="kyc-step">
+            <h3>Personal</h3>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="kyc-fullname" placeholder="As on ID">
+            </div>
+            <div class="form-group">
+                <label>DOB</label>
+                <input type="date" id="kyc-dob">
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea id="kyc-address" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="kyc-step">
+            <h3>ID</h3>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="kyc-idtype">
+                    <option value="">Select</option>
+                    <option value="PASSPORT">Passport</option>
+                    <option value="NATIONAL_ID">National ID</option>
+                    <option value="DRIVERS_LICENSE">License</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Number</label>
+                <input type="text" id="kyc-idnumber">
+            </div>
+        </div>
+        <div class="kyc-step">
+            <h3>BVN (Optional)</h3>
+            <div class="form-group">
+                <label>BVN</label>
+                <input type="text" id="kyc-bvn" maxlength="11">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="submitKYC()" id="kyc-btn">Submit</button>
+    </div>
+</div>
 
 <!-- SETTINGS -->
-<div id="settings-page" class="hidden page"><header class="header"><div class="logo">💰 FlipCash</div><div class="nav-btns"><button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button></div></header><div class="container" style="max-width:600px"><h2 style="color:#1F2937;margin-bottom:20px">Settings</h2><div id="settings-alert"></div><div class="kyc-step"><h3>Profile</h3><div class="form-group"><label>Email</label><input type="email" id="settings-email" disabled style="background:#F3F4F6"></div><div class="form-group"><label>Phone</label><input type="tel" id="settings-phone"></div><button class="btn btn-primary" onclick="updateProfile()">Update</button></div><div class="kyc-step"><h3>KYC Status</h3><div id="kyc-status-display"><p>Loading...</p></div></div><div class="kyc-step"><h3>Personal Details</h3><div id="personal-details-display"><p>Loading...</p></div></div><div class="kyc-step"><h3>Security</h3><div class="form-group"><label>Current Password</label><input type="password" id="settings-current-password"></div><div class="form-group"><label>New Password</label><input type="password" id="settings-new-password"></div><div class="form-group"><label>Confirm Password</label><input type="password" id="settings-confirm-password"></div><button class="btn btn-primary" onclick="changePassword()">Change Password</button></div><div class="kyc-step"><h3>Notifications</h3><div class="checkbox-group"><input type="checkbox" id="settings-email-notif" checked><label for="settings-email-notif" style="margin:0">Email Notifications</label></div><div class="checkbox-group"><input type="checkbox" id="settings-sms-notif" checked><label for="settings-sms-notif" style="margin:0">SMS Notifications</label></div><button class="btn btn-primary" onclick="saveNotifications()">Save</button></div></div></div>
+<div id="settings-page" class="hidden page">
+    <header class="header">
+        <div class="logo">💰 FlipCash</div>
+        <div class="nav-btns">
+            <button class="btn btn-login" onclick="showPage('dashboard')">← Dashboard</button>
+        </div>
+    </header>
+    <div class="container" style="max-width:600px">
+        <h2>Settings</h2>
+        <div id="settings-alert"></div>
+        <div class="kyc-step">
+            <h3>Profile</h3>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="settings-email" disabled style="background:#F3F4F6">
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="settings-phone">
+            </div>
+            <button class="btn btn-primary" onclick="updateProfile()">Update</button>
+        </div>
+        <div class="kyc-step">
+            <h3>KYC Status</h3>
+            <div id="kyc-status-display"></div>
+        </div>
+        <div class="kyc-step">
+            <h3>Details</h3>
+            <div id="personal-details-display"></div>
+        </div>
+        <div class="kyc-step">
+            <h3>Security</h3>
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" id="settings-current-password">
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="settings-new-password">
+            </div>
+            <div class="form-group">
+                <label>Confirm</label>
+                <input type="password" id="settings-confirm-password">
+            </div>
+            <button class="btn btn-primary" onclick="changePassword()">Change</button>
+        </div>
+        <div class="kyc-step">
+            <h3>Notifications</h3>
+            <div class="checkbox-group">
+                <input type="checkbox" id="settings-email-notif" checked>
+                <label>Email</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="settings-sms-notif" checked>
+                <label>SMS</label>
+            </div>
+            <button class="btn btn-primary" onclick="saveNotifications()">Save</button>
+        </div>
+    </div>
+</div>
 
 <script>
 const API_URL = 'https://flipcash-production.up.railway.app/api/v1';
@@ -121,58 +475,48 @@ let userData = null;
 let walletsData = { NGN: 0, KSH: 0 };
 let exchangeRates = { ngnToKsh: 0.18, kshToNgn: 5.5 };
 let rateUpdateInterval;
-let notifications = [];
 
-// PART 2 WILL CONTAIN ALL JAVASCRIPT FUNCTIONS
-// This is a placeholder - complete JavaScript coming in next message
-console.log('FlipCash HTML Structure Complete - JavaScript functions loading...');
-</script>
-</body>
-</html>
-
-// ===== CORE FUNCTIONS =====
 function showPage(page) {
-    clearAllAlerts();
     document.querySelectorAll('[id$="-page"]').forEach(el => el.classList.add('hidden'));
     document.getElementById(page + '-page').classList.remove('hidden');
     window.scrollTo(0, 0);
-    closeNotifications();
     if (page === 'dashboard') loadDashboard();
     if (page === 'history') loadHistory();
     if (page === 'settings') loadSettings();
     if (page === 'deposit') loadDeposit();
-    if (page === 'swap') { document.getElementById('swap-available').textContent = walletsData.NGN.toFixed(2); document.getElementById('swap-from-curr').textContent = 'NGN'; }
+    if (page === 'swap') {
+        document.getElementById('swap-available').textContent = walletsData.NGN.toFixed(2);
+        document.getElementById('swap-from-curr').textContent = 'NGN';
+    }
     if (page === 'withdraw') document.getElementById('withdraw-available').textContent = walletsData.KSH.toFixed(2);
 }
 
-function clearAllAlerts() {
-    ['login-alert', 'register-alert', 'forgot-alert', 'swap-alert', 'withdraw-alert', 'kyc-alert-page', 'settings-alert'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '';
-    });
-}
-
-function showAlert(id, message, type, autoDismiss = true) {
-    const alertDiv = document.getElementById(id);
-    if (!alertDiv || !message) return;
-    const className = type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : type === 'warning' ? 'alert-warning' : 'alert-info';
-    alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
-    if (autoDismiss && type === 'success') setTimeout(() => alertDiv.innerHTML = '', 3000);
+function showAlert(id, message, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const className = type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : 'alert-info';
+    el.innerHTML = `<div class="alert ${className}">${message}</div>`;
+    if (type === 'success') setTimeout(() => el.innerHTML = '', 3000);
 }
 
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-    toast.innerHTML = `<span style="font-size:20px">${icon}</span><span>${message}</span>`;
+    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
     document.body.appendChild(toast);
-    setTimeout(() => { toast.style.animation = 'slideUp 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
+    setTimeout(() => toast.remove(), 3000);
 }
 
 function togglePassword(inputId, button) {
     const input = document.getElementById(inputId);
-    if (input.type === 'password') { input.type = 'text'; button.textContent = '🙈'; }
-    else { input.type = 'password'; button.textContent = '👁️'; }
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+    }
 }
 
 function checkPasswordStrength(password) {
@@ -181,72 +525,67 @@ function checkPasswordStrength(password) {
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
     if (/[@$!%*?&]/.test(password)) strength++;
+    
     const bar = document.getElementById('password-strength-bar');
     const text = document.getElementById('password-strength-text');
-    if (strength === 0) { bar.style.width = '0%'; text.textContent = ''; }
-    else if (strength <= 2) { bar.style.width = '33%'; bar.style.background = '#EF4444'; text.textContent = 'Weak'; text.style.color = '#EF4444'; }
-    else if (strength === 3) { bar.style.width = '66%'; bar.style.background = '#F59E0B'; text.textContent = 'Medium'; text.style.color = '#F59E0B'; }
-    else { bar.style.width = '100%'; bar.style.background = '#10B981'; text.textContent = 'Strong'; text.style.color = '#10B981'; }
+    
+    if (strength === 0) {
+        bar.style.width = '0%';
+        text.textContent = '';
+    } else if (strength <= 2) {
+        bar.style.width = '33%';
+        bar.style.background = '#EF4444';
+        text.textContent = 'Weak';
+        text.style.color = '#EF4444';
+    } else if (strength === 3) {
+        bar.style.width = '66%';
+        bar.style.background = '#F59E0B';
+        text.textContent = 'Medium';
+        text.style.color = '#F59E0B';
+    } else {
+        bar.style.width = '100%';
+        bar.style.background = '#10B981';
+        text.textContent = 'Strong';
+        text.style.color = '#10B981';
+    }
 }
 
-// ===== NOTIFICATIONS =====
-function toggleNotifications() {
-    const panel = document.getElementById('notif-panel');
-    const overlay = document.getElementById('overlay');
-    if (panel.classList.contains('open')) closeNotifications();
-    else { panel.classList.add('open'); overlay.classList.add('active'); loadNotifications(); }
-}
-
-function closeNotifications() {
-    document.getElementById('notif-panel').classList.remove('open');
-    document.getElementById('overlay').classList.remove('active');
-}
-
-function loadNotifications() {
-    const list = document.getElementById('notif-list');
-    if (notifications.length === 0) list.innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280"><div style="font-size:3rem;margin-bottom:10px">🔔</div><p>No notifications</p></div>';
-    else list.innerHTML = notifications.map(n => `<div class="notif-item ${n.read ? '' : 'unread'}" onclick="markAsRead('${n.id}')"><strong>${n.title}</strong><p style="color:#6B7280;margin-top:5px">${n.message}</p><small style="color:#9CA3AF">${n.time}</small></div>`).join('');
-    const unread = notifications.filter(n => !n.read).length;
-    const badge = document.getElementById('notif-badge');
-    if (unread > 0) { badge.textContent = unread; badge.style.display = 'flex'; } else badge.style.display = 'none';
-}
-
-function addNotification(title, message) {
-    notifications.unshift({ id: Date.now().toString(), title, message, time: new Date().toLocaleTimeString(), read: false });
-    loadNotifications();
-}
-
-function markAsRead(id) {
-    const n = notifications.find(n => n.id === id);
-    if (n) n.read = true;
-    loadNotifications();
-}
-
-// ===== AUTH =====
 async function handleLogin() {
     const btn = document.getElementById('login-btn');
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    const remember = document.getElementById('remember-me').checked;
-    if (!email || !password) { showAlert('login-alert', 'Please enter email and password', 'error'); return; }
-    btn.disabled = true; btn.textContent = 'Logging in...';
+    
+    if (!email || !password) {
+        showAlert('login-alert', 'Enter email and password', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+    
     try {
-        const response = await fetch(`${API_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+        const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
         const data = await response.json();
+        
         if (data.status === 'success') {
             localStorage.setItem('accessToken', data.data.accessToken);
-            if (remember) localStorage.setItem('rememberedEmail', email);
             localStorage.setItem('user', JSON.stringify(data.data.user));
             userData = data.data.user;
             showToast('Login successful!', 'success');
             setTimeout(() => showPage('dashboard'), 500);
         } else {
-            showAlert('login-alert', data.message || 'Invalid email or password', 'error');
-            btn.disabled = false; btn.textContent = 'Login';
+            showAlert('login-alert', data.message || 'Invalid credentials', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Login';
         }
     } catch (error) {
-        showAlert('login-alert', 'Connection error. Please check your internet', 'error');
-        btn.disabled = false; btn.textContent = 'Login';
+        showAlert('login-alert', 'Connection error', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Login';
     }
 }
 
@@ -261,113 +600,145 @@ async function handleRegister() {
     const passwordConfirm = document.getElementById('reg-password-confirm').value;
     
     if (!firstName || !lastName || !email || !phoneNumber || !password || !passwordConfirm) {
-        showAlert('register-alert', 'Please fill all fields', 'error'); return;
+        showAlert('register-alert', 'Fill all fields', 'error');
+        return;
     }
     
     const requiredLength = countryCode === '+254' ? 9 : 10;
     if (phoneNumber.length !== requiredLength || !/^\d+$/.test(phoneNumber)) {
-        showAlert('register-alert', `Phone must be ${requiredLength} digits after ${countryCode}`, 'error'); return;
+        showAlert('register-alert', `Phone: ${requiredLength} digits after ${countryCode}`, 'error');
+        return;
     }
     
-    const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!strongRegex.test(password)) {
-        showAlert('register-alert', 'Password must be min 8 chars with 1 uppercase, 1 number, 1 special char', 'error'); return;
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+        showAlert('register-alert', 'Password: min 8, 1 upper, 1 number, 1 special', 'error');
+        return;
     }
     
     if (password !== passwordConfirm) {
-        showAlert('register-alert', 'Passwords do not match', 'error'); return;
+        showAlert('register-alert', 'Passwords mismatch', 'error');
+        return;
     }
     
     const phone = countryCode + phoneNumber;
-    btn.disabled = true; btn.textContent = 'Creating account...';
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
     
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ firstName, lastName, email, phone, password })
         });
         const data = await response.json();
+        
         if (data.status === 'success') {
-            showAlert('register-alert', '✅ Account created! Redirecting to login...', 'success');
+            showAlert('register-alert', '✅ Account created! Redirecting...', 'success');
             setTimeout(() => showPage('login'), 2000);
         } else {
             showAlert('register-alert', data.message || 'Registration failed', 'error');
-            btn.disabled = false; btn.textContent = 'Create Account';
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
         }
     } catch (error) {
-        showAlert('register-alert', 'Connection error. Please try again', 'error');
-        btn.disabled = false; btn.textContent = 'Create Account';
+        showAlert('register-alert', 'Connection error', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
     }
 }
 
 async function handleForgotPassword() {
     const btn = document.getElementById('forgot-btn');
     const email = document.getElementById('forgot-email').value.trim();
-    if (!email) { showAlert('forgot-alert', 'Please enter email', 'error'); return; }
-    btn.disabled = true; btn.textContent = 'Sending...';
+    
+    if (!email) {
+        showAlert('forgot-alert', 'Enter email', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    
     try {
         const response = await fetch(`${API_URL}/auth/forgot-password`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
         });
         const data = await response.json();
+        
         if (data.status === 'success') {
-            showAlert('forgot-alert', '✅ Reset link sent to your phone via SMS!', 'success');
+            showAlert('forgot-alert', '✅ Reset link sent!', 'success');
             setTimeout(() => showPage('login'), 3000);
         } else {
-            showAlert('forgot-alert', data.message || 'Failed to send reset link', 'error');
-            btn.disabled = false; btn.textContent = 'Send Reset Link';
+            showAlert('forgot-alert', data.message || 'Failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Send Reset Link';
         }
     } catch (error) {
         showAlert('forgot-alert', 'Connection error', 'error');
-        btn.disabled = false; btn.textContent = 'Send Reset Link';
+        btn.disabled = false;
+        btn.textContent = 'Send Reset Link';
     }
 }
 
 function handleLogout() {
-    if (confirm('Are you sure you want to logout?')) {
+    if (confirm('Logout?')) {
         if (rateUpdateInterval) clearInterval(rateUpdateInterval);
-        localStorage.clear(); sessionStorage.clear();
-        userData = null; walletsData = { NGN: 0, KSH: 0 }; notifications = [];
-        const logoutBtn = document.querySelector('.btn-logout');
-        if (logoutBtn) { logoutBtn.textContent = 'Logout'; logoutBtn.disabled = false; }
+        localStorage.clear();
+        userData = null;
+        walletsData = { NGN: 0, KSH: 0 };
         showPage('landing');
-        showToast('Logged out successfully', 'success');
+        showToast('Logged out', 'success');
     }
 }
 
-// ===== DASHBOARD =====
 async function loadDashboard() {
     try {
         const token = localStorage.getItem('accessToken');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         userData = user;
-        if (!user.kycVerified) document.getElementById('kyc-alert').style.display = 'block';
-        else document.getElementById('kyc-alert').style.display = 'none';
+        
+        document.getElementById('kyc-alert').style.display = user.kycVerified ? 'none' : 'block';
         
         try {
-            const walletsRes = await fetch(`${API_URL}/wallets`, { headers: { 'Authorization': `Bearer ${token}` } });
-            const walletsResponse = await walletsRes.json();
-            if (walletsResponse.data && Array.isArray(walletsResponse.data)) {
-                walletsResponse.data.forEach(wallet => {
-                    if (wallet.currency === 'NGN') { document.getElementById('ngn-balance').textContent = wallet.balance.toFixed(2); walletsData.NGN = wallet.balance; }
-                    if (wallet.currency === 'KSH') { document.getElementById('ksh-balance').textContent = wallet.balance.toFixed(2); walletsData.KSH = wallet.balance; }
+            const res = await fetch(`${API_URL}/wallets`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            
+            if (data.data && Array.isArray(data.data)) {
+                data.data.forEach(wallet => {
+                    if (wallet.currency === 'NGN') {
+                        document.getElementById('ngn-balance').textContent = wallet.balance.toFixed(2);
+                        walletsData.NGN = wallet.balance;
+                    }
+                    if (wallet.currency === 'KSH') {
+                        document.getElementById('ksh-balance').textContent = wallet.balance.toFixed(2);
+                        walletsData.KSH = wallet.balance;
+                    }
                 });
             }
-        } catch (err) { console.error('Wallets error:', err); }
+        } catch (err) {
+            console.error(err);
+        }
         
         await loadLiveRates();
         if (rateUpdateInterval) clearInterval(rateUpdateInterval);
         rateUpdateInterval = setInterval(loadLiveRates, 30000);
-    } catch (error) { console.error('Dashboard error:', error); }
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 async function loadLiveRates() {
     try {
-        const ratesRes = await fetch(`${API_URL}/rates`);
-        const ratesResponse = await ratesRes.json();
-        if (ratesResponse.data) {
-            exchangeRates.ngnToKsh = ratesResponse.data.ngnToKsh || 0.18;
-            exchangeRates.kshToNgn = ratesResponse.data.kshToNgn || 5.5;
+        const res = await fetch(`${API_URL}/rates`);
+        const data = await res.json();
+        
+        if (data.data) {
+            exchangeRates.ngnToKsh = data.data.ngnToKsh || 0.18;
+            exchangeRates.kshToNgn = data.data.kshToNgn || 5.5;
             document.getElementById('ngn-to-ksh-rate').textContent = exchangeRates.ngnToKsh.toFixed(4);
             document.getElementById('ksh-to-ngn-rate').textContent = exchangeRates.kshToNgn.toFixed(4);
         }
@@ -377,69 +748,90 @@ async function loadLiveRates() {
     }
 }
 
-// ===== DEPOSIT =====
 function loadDeposit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.firstName && user.lastName) document.getElementById('account-name').textContent = `${user.firstName} ${user.lastName}`;
+    if (user.firstName && user.lastName) {
+        document.getElementById('account-name').textContent = `${user.firstName} ${user.lastName}`;
+    }
 }
 
 async function generateAccount() {
     const btn = document.getElementById('gen-account-btn');
     const btnText = document.getElementById('gen-btn-text');
     const btnLoading = document.getElementById('gen-btn-loading');
-    btnText.style.display = 'none'; btnLoading.style.display = 'inline-block'; btn.disabled = true;
+    
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline-block';
+    btn.disabled = true;
     
     try {
         const token = localStorage.getItem('accessToken');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
         const response = await fetch(`${API_URL}/rates/account/generate`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currency: 'NGN', email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone })
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                currency: 'NGN',
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone
+            })
         });
         const data = await response.json();
+        
         if (data.status === 'success' && data.data && data.data.accountNumber) {
             document.getElementById('account-name').textContent = data.data.accountName || `${user.firstName} ${user.lastName}`;
             document.getElementById('account-number').textContent = data.data.accountNumber;
-            btnText.textContent = '✓ Generated'; btnText.style.display = 'inline'; btnLoading.style.display = 'none';
+            btnText.textContent = '✓ Generated';
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
             btn.style.background = '#059669';
-            showToast('Virtual account created!', 'success');
-            addNotification('Account Created', 'Your virtual account number is ready');
-        } else throw new Error(data.message || 'Failed');
+            showToast('Account created!', 'success');
+        } else {
+            throw new Error(data.message || 'Failed');
+        }
     } catch (error) {
-        btnText.textContent = 'Try Again'; btnText.style.display = 'inline'; btnLoading.style.display = 'none'; btn.disabled = false;
-        showToast('Could not generate account. Ensure KYC is verified', 'error');
+        btnText.textContent = 'Try Again';
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        btn.disabled = false;
+        showToast('Failed. Verify KYC', 'error');
     }
 }
 
-
-// ===== SWAP =====
 function calculateSwap() {
     const from = document.getElementById('swap-from').value;
     const to = document.getElementById('swap-to').value;
     const amount = parseFloat(document.getElementById('swap-amount').value);
     const available = walletsData[from] || 0;
+    
     document.getElementById('swap-available').textContent = available.toFixed(2);
     document.getElementById('swap-from-curr').textContent = from;
     
-    if (!amount || amount <= 0) { document.getElementById('swap-summary').style.display = 'none'; return; }
+    if (!amount || amount <= 0) {
+        document.getElementById('swap-summary').style.display = 'none';
+        return;
+    }
     
     if (amount > available) {
-        showAlert('swap-alert', `⚠️ Insufficient ${from} balance. You have ${available.toFixed(2)} ${from}`, 'error', false);
-        document.getElementById('swap-summary').style.display = 'none'; return;
+        showAlert('swap-alert', `⚠️ Insufficient ${from}. Have ${available.toFixed(2)}`, 'error');
+        document.getElementById('swap-summary').style.display = 'none';
+        return;
     }
     
     const rate = from === 'NGN' ? exchangeRates.ngnToKsh : exchangeRates.kshToNgn;
-    const fee = amount * 0.01;
-    const grossAmount = amount * rate;
-    const netAmount = grossAmount - (grossAmount * 0.01);
+    const netAmount = (amount * rate) * 0.99;
     
     document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
     document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
-    document.getElementById('summary-fee').textContent = `${fee.toFixed(2)} ${from}`;
+    document.getElementById('summary-fee').textContent = `${(amount * 0.01).toFixed(2)} ${from}`;
     document.getElementById('summary-receive-amount').textContent = `${netAmount.toFixed(2)} ${to}`;
     document.getElementById('swap-summary').style.display = 'block';
-    clearAllAlerts();
 }
 
 async function handleSwap() {
@@ -448,54 +840,70 @@ async function handleSwap() {
     const to = document.getElementById('swap-to').value;
     const amount = parseFloat(document.getElementById('swap-amount').value);
     
-    if (!amount || amount <= 0) { showAlert('swap-alert', 'Please enter valid amount', 'error'); return; }
-    const available = walletsData[from] || 0;
-    if (amount > available) { showAlert('swap-alert', `⚠️ Insufficient ${from} balance`, 'error'); return; }
+    if (!amount || amount <= 0) {
+        showAlert('swap-alert', 'Enter amount', 'error');
+        return;
+    }
     
-    btn.disabled = true; btn.textContent = 'Processing...';
+    if (amount > (walletsData[from] || 0)) {
+        showAlert('swap-alert', '⚠️ Insufficient', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+    
     try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_URL}/transactions/swap`, {
-            method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ fromCurrency: from, toCurrency: to, amount })
         });
         const data = await response.json();
+        
         if (data.status === 'success') {
             showToast('Swap successful!', 'success');
-            addNotification('Swap Completed', `Swapped ${amount} ${from} to ${to}`);
             setTimeout(() => showPage('dashboard'), 1500);
         } else {
-            showAlert('swap-alert', data.message || 'Swap failed', 'error');
-            btn.disabled = false; btn.textContent = 'Confirm Swap';
+            showAlert('swap-alert', data.message || 'Failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Confirm';
         }
     } catch (error) {
         showAlert('swap-alert', 'Connection error', 'error');
-        btn.disabled = false; btn.textContent = 'Confirm Swap';
+        btn.disabled = false;
+        btn.textContent = 'Confirm';
     }
 }
 
-// ===== WITHDRAW =====
 function calculateWithdraw() {
     const amount = parseFloat(document.getElementById('withdraw-amount').value);
     const available = walletsData.KSH || 0;
+    
     document.getElementById('withdraw-available').textContent = available.toFixed(2);
     
-    if (!amount || amount <= 0) { document.getElementById('withdraw-summary').style.display = 'none'; return; }
+    if (!amount || amount <= 0) {
+        document.getElementById('withdraw-summary').style.display = 'none';
+        return;
+    }
     
-    const fee = amount * 0.02;
-    const totalDeducted = amount + fee;
+    const totalDeducted = amount + (amount * 0.02);
     
     if (totalDeducted > available) {
-        showAlert('withdraw-alert', `⚠️ Insufficient balance. Need ${totalDeducted.toFixed(2)} KSH (including 2% fee). Available: ${available.toFixed(2)} KSH`, 'error', false);
-        document.getElementById('withdraw-summary').style.display = 'none'; return;
+        showAlert('withdraw-alert', `⚠️ Need ${totalDeducted.toFixed(2)} KSH (incl fee). Have ${available.toFixed(2)}`, 'error');
+        document.getElementById('withdraw-summary').style.display = 'none';
+        return;
     }
     
     document.getElementById('w-summary-amount').textContent = `${amount.toFixed(2)} KSH`;
-    document.getElementById('w-summary-fee').textContent = `${fee.toFixed(2)} KSH`;
+    document.getElementById('w-summary-fee').textContent = `${(amount * 0.02).toFixed(2)} KSH`;
     document.getElementById('w-summary-total').textContent = `${totalDeducted.toFixed(2)} KSH`;
     document.getElementById('w-summary-receive').textContent = `${amount.toFixed(2)} KSH`;
     document.getElementById('withdraw-summary').style.display = 'block';
-    clearAllAlerts();
 }
 
 function verifyMpesaNumber() {
@@ -504,25 +912,24 @@ function verifyMpesaNumber() {
     
     if (!phone.startsWith('+254')) {
         display.style.display = 'none';
-        showAlert('withdraw-alert', 'Number must start with +254', 'error', false);
+        showAlert('withdraw-alert', 'Must start +254', 'error');
         return;
     }
     
     const digits = phone.substring(4);
     if (digits.length !== 9 || !/^\d{9}$/.test(digits)) {
         display.style.display = 'none';
-        showAlert('withdraw-alert', 'Must be exactly 9 digits after +254', 'error', false);
+        showAlert('withdraw-alert', '9 digits after +254', 'error');
         return;
     }
     
     if (!['7', '1'].includes(digits[0])) {
         display.style.display = 'none';
-        showAlert('withdraw-alert', 'Invalid M-Pesa number format', 'error', false);
+        showAlert('withdraw-alert', 'Invalid format', 'error');
         return;
     }
     
-    clearAllAlerts();
-    display.innerHTML = '<div class="mpesa-name"><strong>✅ Valid M-Pesa Number</strong><p style="color:#059669;margin-top:5px">Account verification available on withdrawal</p></div>';
+    display.innerHTML = '<div class="mpesa-name"><strong>✅ Valid</strong><p style="color:#059669">Verified on withdrawal</p></div>';
     display.style.display = 'block';
 }
 
@@ -532,39 +939,51 @@ async function handleWithdraw() {
     const phone = document.getElementById('withdraw-phone').value.trim();
     const method = document.getElementById('withdraw-method').value;
     
-    if (!amount || !phone) { showAlert('withdraw-alert', 'Please fill all fields', 'error'); return; }
-    if (!phone.startsWith('+254') || phone.substring(4).length !== 9) {
-        showAlert('withdraw-alert', 'Invalid phone number format', 'error'); return;
+    if (!amount || !phone) {
+        showAlert('withdraw-alert', 'Fill all fields', 'error');
+        return;
     }
     
-    const available = walletsData.KSH || 0;
-    const fee = amount * 0.02;
-    const totalDeducted = amount + fee;
-    if (totalDeducted > available) { showAlert('withdraw-alert', '⚠️ Insufficient balance', 'error'); return; }
+    if (!phone.startsWith('+254') || phone.substring(4).length !== 9) {
+        showAlert('withdraw-alert', 'Invalid phone', 'error');
+        return;
+    }
     
-    btn.disabled = true; btn.textContent = 'Processing...';
+    if ((amount + amount * 0.02) > (walletsData.KSH || 0)) {
+        showAlert('withdraw-alert', '⚠️ Insufficient', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+    
     try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_URL}/transactions/withdraw`, {
-            method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ currency: 'KSH', amount, phone, method })
         });
         const data = await response.json();
+        
         if (data.status === 'success') {
-            showToast(`Withdrawal of ${amount} KSH initiated!`, 'success');
-            addNotification('Withdrawal Initiated', `${amount} KSH to ${phone} via ${method}`);
+            showToast(`${amount} KSH initiated!`, 'success');
             setTimeout(() => showPage('dashboard'), 1500);
         } else {
-            showAlert('withdraw-alert', data.message || 'Withdrawal failed', 'error');
-            btn.disabled = false; btn.textContent = 'Withdraw Now';
+            showAlert('withdraw-alert', data.message || 'Failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Withdraw';
         }
     } catch (error) {
         showAlert('withdraw-alert', 'Connection error', 'error');
-        btn.disabled = false; btn.textContent = 'Withdraw Now';
+        btn.disabled = false;
+        btn.textContent = 'Withdraw';
     }
 }
 
-// ===== HISTORY =====
 async function loadHistory() {
     try {
         const token = localStorage.getItem('accessToken');
@@ -576,26 +995,25 @@ async function loadHistory() {
         
         if (data.data && data.data.length > 0) {
             list.innerHTML = data.data.map(tx => `
-                <div style="padding:15px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                <div style="padding:15px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between">
                     <div>
-                        <strong style="text-transform:uppercase;color:#10B981">${tx.type}</strong><br>
-                        <small style="color:#6B7280">${new Date(tx.createdAt).toLocaleDateString()} ${new Date(tx.createdAt).toLocaleTimeString()}</small>
+                        <strong style="color:#10B981">${tx.type.toUpperCase()}</strong><br>
+                        <small style="color:#6B7280">${new Date(tx.createdAt).toLocaleDateString()}</small>
                     </div>
                     <div style="text-align:right">
-                        <strong style="font-size:1.1rem">${tx.amount} ${tx.currency}</strong><br>
-                        <small style="color:${tx.status === 'completed' ? '#10B981' : '#EAB308'};font-weight:600;text-transform:uppercase">${tx.status}</small>
+                        <strong>${tx.amount} ${tx.currency}</strong><br>
+                        <small style="color:${tx.status === 'completed' ? '#10B981' : '#EAB308'}">${tx.status.toUpperCase()}</small>
                     </div>
                 </div>
             `).join('');
         } else {
-            list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#6B7280"><div style="font-size:3rem;margin-bottom:20px">📊</div><p style="font-size:1.2rem;font-weight:600;margin-bottom:10px">No transactions yet</p><p>Start by depositing funds</p><button class="btn btn-primary" onclick="showPage(\'deposit\')" style="max-width:200px;margin:20px auto">Deposit Now</button></div>';
+            list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#6B7280"><div style="font-size:3rem">📊</div><p>No transactions</p><button class="btn btn-primary" onclick="showPage(\'deposit\')" style="max-width:200px;margin:20px auto">Deposit</button></div>';
         }
     } catch (error) {
-        console.error('History error:', error);
+        console.error(error);
     }
 }
 
-// ===== KYC =====
 async function submitKYC() {
     const btn = document.getElementById('kyc-btn');
     const fullname = document.getElementById('kyc-fullname').value.trim();
@@ -606,40 +1024,49 @@ async function submitKYC() {
     const bvn = document.getElementById('kyc-bvn').value.trim();
     
     if (!fullname || !dob || !address || !idType || !idNumber) {
-        showAlert('kyc-alert-page', 'Please fill all required fields', 'error'); return;
+        showAlert('kyc-alert-page', 'Fill required fields', 'error');
+        return;
     }
     
-    const birthDate = new Date(dob);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    if (age < 18) { showAlert('kyc-alert-page', 'You must be at least 18 years old', 'error'); return; }
+    const age = new Date().getFullYear() - new Date(dob).getFullYear();
+    if (age < 18) {
+        showAlert('kyc-alert-page', 'Must be 18+', 'error');
+        return;
+    }
     
-    btn.disabled = true; btn.textContent = 'Submitting...';
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    
     try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_URL}/users/kyc`, {
-            method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ fullname, dob, address, idType, idNumber, bvn: bvn || undefined })
         });
         const data = await response.json();
+        
         if (data.status === 'success') {
-            showToast('KYC submitted successfully!', 'success');
-            addNotification('KYC Submitted', 'Verification under review (typically 24hrs)');
+            showToast('KYC submitted!', 'success');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             user.kycStatus = 'pending';
             localStorage.setItem('user', JSON.stringify(user));
             setTimeout(() => showPage('dashboard'), 1500);
         } else {
-            showAlert('kyc-alert-page', data.message || 'KYC submission failed', 'error');
-            btn.disabled = false; btn.textContent = 'Submit';
+            showAlert('kyc-alert-page', data.message || 'Failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Submit';
         }
     } catch (error) {
         showAlert('kyc-alert-page', 'Connection error', 'error');
-        btn.disabled = false; btn.textContent = 'Submit';
+        btn.disabled = false;
+        btn.textContent = 'Submit';
     }
 }
 
-// ===== SETTINGS =====
 function loadSettings() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     document.getElementById('settings-email').value = user.email || '';
@@ -647,72 +1074,75 @@ function loadSettings() {
     
     const kycDisplay = document.getElementById('kyc-status-display');
     const kycStatus = user.kycStatus || 'not_submitted';
-    if (kycStatus === 'approved') kycDisplay.innerHTML = '<div class="kyc-status approved">✅ KYC Approved</div><p style="color:#6B7280;margin-top:10px">Your account is fully verified</p>';
-    else if (kycStatus === 'pending') kycDisplay.innerHTML = '<div class="kyc-status pending">⏳ KYC Pending</div><p style="color:#6B7280;margin-top:10px">Verification under review (typically 24hrs)</p>';
-    else if (kycStatus === 'rejected') kycDisplay.innerHTML = '<div class="kyc-status rejected">❌ KYC Rejected</div><p style="color:#6B7280;margin-top:10px">Please resubmit with correct information</p><button class="btn btn-primary" onclick="showPage(\'kyc\')" style="max-width:200px;margin-top:15px">Resubmit KYC</button>';
-    else kycDisplay.innerHTML = '<p style="color:#6B7280">KYC Not Submitted</p><button class="btn btn-primary" onclick="showPage(\'kyc\')" style="max-width:200px;margin-top:15px">Submit KYC</button>';
+    
+    if (kycStatus === 'approved') {
+        kycDisplay.innerHTML = '<div class="kyc-status approved">✅ Approved</div><p>Verified</p>';
+    } else if (kycStatus === 'pending') {
+        kycDisplay.innerHTML = '<div class="kyc-status pending">⏳ Pending</div><p>Review 24hrs</p>';
+    } else if (kycStatus === 'rejected') {
+        kycDisplay.innerHTML = '<div class="kyc-status rejected">❌ Rejected</div><button class="btn btn-primary" onclick="showPage(\'kyc\')" style="max-width:200px;margin-top:15px">Resubmit</button>';
+    } else {
+        kycDisplay.innerHTML = '<p>Not submitted</p><button class="btn btn-primary" onclick="showPage(\'kyc\')" style="max-width:200px;margin-top:15px">Submit</button>';
+    }
     
     const detailsDisplay = document.getElementById('personal-details-display');
     if (user.fullname) {
         detailsDisplay.innerHTML = `
-            <p style="margin:10px 0"><strong>Full Name:</strong> ${user.fullname || 'Not provided'}</p>
-            <p style="margin:10px 0"><strong>Date of Birth:</strong> <span class="blur-text">${user.dob || 'Not provided'}</span></p>
-            <p style="margin:10px 0"><strong>Address:</strong> ${user.address ? user.address.substring(0, 20) + '...' : 'Not provided'} <span class="blur-text">${user.address ? user.address.substring(20) : ''}</span></p>
-            <p style="margin:10px 0"><strong>ID Type:</strong> ${user.idType || 'Not provided'}</p>
-            <p style="margin:10px 0"><strong>ID Number:</strong> <span class="blur-text">${user.idNumber || 'Not provided'}</span></p>
-            ${user.bvn ? `<p style="margin:10px 0"><strong>BVN:</strong> <span class="blur-text">${user.bvn}</span></p>` : ''}
+            <p><strong>Name:</strong> ${user.fullname}</p>
+            <p><strong>DOB:</strong> <span class="blur-text">${user.dob || 'N/A'}</span></p>
+            <p><strong>Address:</strong> ${user.address ? user.address.substring(0, 20) + '...' : 'N/A'} <span class="blur-text">${user.address ? user.address.substring(20) : ''}</span></p>
+            <p><strong>ID:</strong> ${user.idType || 'N/A'}</p>
+            <p><strong>ID#:</strong> <span class="blur-text">${user.idNumber || 'N/A'}</span></p>
+            ${user.bvn ? `<p><strong>BVN:</strong> <span class="blur-text">${user.bvn}</span></p>` : ''}
         `;
     } else {
-        detailsDisplay.innerHTML = '<p style="color:#6B7280">No personal details submitted yet. Complete KYC to add details.</p>';
+        detailsDisplay.innerHTML = '<p>No details. Complete KYC.</p>';
     }
 }
 
 async function updateProfile() {
     const phone = document.getElementById('settings-phone').value.trim();
-    if (!phone) { showAlert('settings-alert', 'Please enter phone number', 'error'); return; }
+    if (!phone) {
+        showAlert('settings-alert', 'Enter phone', 'error');
+        return;
+    }
+    
     try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_URL}/users/me`, {
-            method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ phone })
         });
         const data = await response.json();
+        
         if (data.status === 'success') {
-            showToast('Profile updated!', 'success');
+            showToast('Updated!', 'success');
             localStorage.setItem('user', JSON.stringify(data.data));
             userData = data.data;
-        } else showAlert('settings-alert', data.message || 'Update failed', 'error');
-    } catch (error) { showAlert('settings-alert', 'Update error', 'error'); }
+        } else {
+            showAlert('settings-alert', data.message || 'Failed', 'error');
+        }
+    } catch (error) {
+        showAlert('settings-alert', 'Error', 'error');
+    }
 }
 
 function changePassword() {
-    const current = document.getElementById('settings-current-password').value;
-    const newPass = document.getElementById('settings-new-password').value;
-    const confirm = document.getElementById('settings-confirm-password').value;
-    if (!current || !newPass || !confirm) { showAlert('settings-alert', 'Please fill all password fields', 'error'); return; }
-    if (newPass.length < 6) { showAlert('settings-alert', 'New password must be min 6 chars', 'error'); return; }
-    if (newPass !== confirm) { showAlert('settings-alert', 'Passwords do not match', 'error'); return; }
-    showToast('Password change coming soon! Contact support@flipcash.app', 'info');
+    showToast('Contact support@flipcash.app', 'info');
 }
 
 function saveNotifications() {
     const email = document.getElementById('settings-email-notif').checked;
     const sms = document.getElementById('settings-sms-notif').checked;
     localStorage.setItem('notificationPrefs', JSON.stringify({ email, sms }));
-    showToast('Notification preferences saved!', 'success');
+    showToast('Saved!', 'success');
 }
 
-// ===== AUTO-LOGIN =====
 if (localStorage.getItem('accessToken')) showPage('dashboard');
-
-// ===== PREVENT DOUBLE-TAP ZOOM =====
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(event) {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) event.preventDefault();
-    lastTouchEnd = now;
-}, false);
-
 </script>
 </body>
 </html>
