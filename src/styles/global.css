@@ -1,9 +1,85 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F9FAFB; color: #1F2937; }
-button { cursor: pointer; font-family: inherit; border: none; }
-input, select { font-family: inherit; }
-a { text-decoration: none; color: inherit; }
-.loading { display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 1.5rem; }
-.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-.error { background: #FEE2E2; color: #DC2626; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-.success { background: #D1FAE5; color: #059669; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+/* GLOBAL FIXES - PREVENT BLACK SCREENS */
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #F9FAFB;
+}
+
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+  background: #F9FAFB; 
+  color: #1F2937; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  background: #F9FAFB;
+}
+
+button { 
+  cursor: pointer; 
+  font-family: inherit; 
+  border: none; 
+}
+
+input, select { 
+  font-family: inherit; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+a { 
+  text-decoration: none; 
+  color: inherit; 
+}
+
+.loading { 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh; 
+  font-size: 1.5rem; 
+  color: #10B981;
+  background: #F9FAFB;
+}
+
+.container { 
+  max-width: 1200px; 
+  margin: 0 auto; 
+  padding: 2rem; 
+}
+
+.error { 
+  background: #FEE2E2; 
+  color: #DC2626; 
+  padding: 1rem; 
+  border-radius: 8px; 
+  margin-bottom: 1rem; 
+  border: 1px solid #FCA5A5;
+}
+
+.success { 
+  background: #D1FAE5; 
+  color: #059669; 
+  padding: 1rem; 
+  border-radius: 8px; 
+  margin-bottom: 1rem; 
+  border: 1px solid #6EE7B7;
+}
+
+/* Ensure all pages have proper background */
+.landing,
+.auth-page,
+.dashboard {
+  background: #F9FAFB;
+  min-height: 100vh;
+}
