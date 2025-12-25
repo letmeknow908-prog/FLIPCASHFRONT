@@ -740,8 +740,11 @@ async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     
+    // Clear any previous errors
+    document.getElementById('login-alert').innerHTML = '';
+    
     if (!email || !password) {
-        showAlert('login-alert', 'Please enter email and password', 'error');
+        showAlert('login-alert', '❌ Please enter email and password', 'error');
         return;
     }
     
@@ -749,25 +752,36 @@ async function handleLogin() {
     btn.innerHTML = '<span class="loading"></span> Logging in...';
     
     try {
+        console.log('🔐 Attempting login for:', email);
+        
         const response = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        const data = await response.json();
         
-        if (data.status === 'success') {
+        console.log('📡 Response status:', response.status);
+        
+        const data = await response.json();
+        console.log('📦 Response data:', data);
+        
+        // CRITICAL: Check BOTH response.ok AND data.status
+        if (response.ok && data.status === 'success') {
+            console.log('✅ Login successful!');
             localStorage.setItem('accessToken', data.data.accessToken);
             localStorage.setItem('user', JSON.stringify(data.data.user));
             userData = data.data.user;
             showToast('Login successful! Welcome back!', 'success');
             setTimeout(() => showPage('dashboard'), 1000);
         } else {
+            // Login FAILED
+            console.log('❌ Login failed:', data.message);
             showAlert('login-alert', data.message || 'Invalid email or password', 'error');
             btn.disabled = false;
             btn.textContent = 'Login';
         }
     } catch (error) {
+        console.error('❌ Login error:', error);
         showAlert('login-alert', 'Connection error. Please check your internet', 'error');
         btn.disabled = false;
         btn.textContent = 'Login';
