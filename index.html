@@ -383,15 +383,16 @@
     <div class="container" style="max-width:600px">
         <h2>Deposit</h2>
         <div class="alert alert-info">Generate account, transfer from any Nigerian bank. Funds in 5-10 mins.</div>
-        <div style="background:white;padding:25px;border-radius:12px;margin:20px 0">
-            <h3>Virtual Account</h3>
-            <p><strong>Bank:</strong> Wema Bank</p>
-            <p><strong>Name:</strong> <span id="account-name">Click generate</span></p>
-            <p><strong>Number:</strong> <strong id="account-number" style="font-size:1.5rem;color:#10B981">---------</strong></p>
-            <button class="btn btn-primary" onclick="generateAccount()" id="gen-account-btn">
-                <span id="gen-btn-text">Generate</span>
-                <span id="gen-btn-loading" class="loading" style="display:none"></span>
-            </button>
+<div style="background:white;padding:25px;border-radius:12px;margin:20px 0">
+    <h3>Virtual Account</h3>
+    <p><strong>Bank:</strong> <span id="account-bank">Click generate to see bank</span></p>
+    <p><strong>Name:</strong> <span id="account-name">Click generate</span></p>
+    <p><strong>Number:</strong> <strong id="account-number" style="font-size:1.5rem;color:#10B981">---------</strong></p>
+    <button class="btn btn-primary" onclick="generateAccount()" id="gen-account-btn">
+        <span id="gen-btn-text">Generate</span>
+        <span id="gen-btn-loading" class="loading" style="display:none"></span>
+    </button>
+</div>
         </div>
     </div>
 </div>
