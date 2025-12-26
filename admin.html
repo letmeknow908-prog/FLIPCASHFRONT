@@ -1152,10 +1152,65 @@ async function loadUsers() {
     const table = document.getElementById('users-table');
     table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading users...</p>';
     
-    // TODO: API call
-    usersData = [];
-    
-    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No users found</p>';
+    try {
+        const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        
+        const response = await fetch(`${API_URL}/admin/users`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        if (response.status === 401) {
+            window.location.href = 'admin-login.html';
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('👥 Users data:', data);
+        
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+            usersData = data.data;
+            
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>KYC Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${usersData.map(user => `
+                            <tr>
+                                <td>${user.id}</td>
+                                <td>${user.first_name} ${user.last_name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.phone}</td>
+                                <td><span class="badge badge-${user.kyc_status === 'approved' ? 'success' : user.kyc_status === 'rejected' ? 'danger' : 'warning'}">${user.kyc_status || 'not_submitted'}</span></td>
+                                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="viewUser(${user.id})">View</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No users found</p>';
+        }
+    } catch (error) {
+        console.error('Users load error:', error);
+        table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load users</p>';
+    }
+}
+
+function viewUser(userId) {
+    alert('User details for ID: ' + userId + '\n\nFull user management coming soon!');
 }
 
 // Load Transactions
@@ -1163,10 +1218,59 @@ async function loadTransactions() {
     const table = document.getElementById('transactions-table');
     table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading transactions...</p>';
     
-    // TODO: API call
-    transactionsData = [];
-    
-    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No transactions found</p>';
+    try {
+        const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        
+        const response = await fetch(`${API_URL}/admin/transactions`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        if (response.status === 401) {
+            window.location.href = 'admin-login.html';
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('💳 Transactions data:', data);
+        
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+            transactionsData = data.data;
+            
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Currency</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${transactionsData.map(tx => `
+                            <tr>
+                                <td>${tx.id}</td>
+                                <td>${tx.user_email || tx.user_id}</td>
+                                <td><span class="badge badge-info">${tx.type}</span></td>
+                                <td>${tx.amount.toFixed(2)}</td>
+                                <td>${tx.currency}</td>
+                                <td><span class="badge badge-${tx.status === 'completed' ? 'success' : tx.status === 'pending' ? 'warning' : 'danger'}">${tx.status}</span></td>
+                                <td>${new Date(tx.created_at).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No transactions found</p>';
+        }
+    } catch (error) {
+        console.error('Transactions load error:', error);
+        table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load transactions</p>';
+    }
 }
 
 // Update Rates
