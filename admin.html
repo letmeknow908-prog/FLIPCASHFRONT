@@ -889,6 +889,47 @@ async function loadDashboard() {
     }
 }
 
+// Add to admin.html in the KYC review section
+async function verifyBVN(userId) {
+    try {
+        showToast('Verifying BVN...', 'info');
+        
+        const response = await fetch(`${API_URL}/admin/kyc/${userId}/verify-bvn`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            if (data.data.match) {
+                showToast('✅ BVN Verified! Names match perfectly.', 'success');
+            } else {
+                showAlert('kyc-alert', 
+                    `⚠️ BVN Mismatch!<br>
+                    BVN Name: ${data.data.bvnFirstName} ${data.data.bvnLastName}<br>
+                    User Name: ${data.data.userFirstName} ${data.data.userLastName}`, 
+                    'error'
+                );
+            }
+            
+            // Reload KYC submissions
+            loadKYCSubmissions();
+        } else {
+            showAlert('kyc-alert', data.message, 'error');
+        }
+    } catch (error) {
+        showAlert('kyc-alert', 'Failed to verify BVN', 'error');
+    }
+}
+
+// Add button in KYC submission display
+<button onclick="verifyBVN(${submission.user_id})" class="btn btn-primary">
+    🔍 Verify BVN
+</button>
+    
 // Load KYC
 async function loadKYC() {
     const table = document.getElementById('kyc-table');
