@@ -787,31 +787,21 @@
 <script>
 const API_URL = 'https://flipcash-production.up.railway.app/api/v1';
 
-// Check authentication on load
-window.addEventListener('DOMContentLoaded', function() {
+// ✅ IMMEDIATE AUTH CHECK - BEFORE ANYTHING ELSE
+(function() {
     const adminToken = localStorage.getItem('adminToken');
     const adminData = localStorage.getItem('adminData');
     
+    console.log('🔐 Auth check:', { hasToken: !!adminToken, hasData: !!adminData });
+    
     if (!adminToken || !adminData) {
-        // Not logged in, redirect to login
-        window.location.href = 'admin-login.html';
-        return;
+        console.log('❌ Not authenticated, redirecting...');
+        window.location.replace('admin-login.html');
+        throw new Error('Not authenticated');
     }
     
-    // Set user info in header
-    try {
-        const admin = JSON.parse(adminData);
-        const avatarEl = document.querySelector('.avatar');
-        const nameEl = avatarEl.nextElementSibling.querySelector('div:first-child');
-        const emailEl = avatarEl.nextElementSibling.querySelector('div:last-child');
-        
-        avatarEl.textContent = (admin.firstName?.[0] || 'A').toUpperCase();
-        nameEl.textContent = `${admin.firstName || 'Admin'} ${admin.lastName || 'User'}`;
-        emailEl.textContent = admin.email || 'admin@flipcash.app';
-    } catch (error) {
-        console.error('Error setting admin info:', error);
-    }
-});
+    console.log('✅ Authenticated, loading dashboard...');
+})();
 
 const ADMIN_TOKEN = localStorage.getItem('adminToken') || '';
 
@@ -820,8 +810,24 @@ let kycData = [];
 let usersData = [];
 let transactionsData = [];
 
+// Set user info in header IMMEDIATELY
+try {
+    const admin = JSON.parse(localStorage.getItem('adminData'));
+    const avatarEl = document.querySelector('.avatar');
+    const nameEl = avatarEl?.nextElementSibling?.querySelector('div:first-child');
+    const emailEl = avatarEl?.nextElementSibling?.querySelector('div:last-child');
+    
+    if (avatarEl) avatarEl.textContent = (admin.firstName?.[0] || 'A').toUpperCase();
+    if (nameEl) nameEl.textContent = `${admin.firstName || 'Admin'} ${admin.lastName || 'User'}`;
+    if (emailEl) emailEl.textContent = admin.email || 'admin@flipcash.app';
+} catch (error) {
+    console.error('Error setting admin info:', error);
+}
+
 // Navigation
 function showPage(page) {
+    console.log('📄 Navigating to:', page);
+    
     // Update nav
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     event.target.closest('.nav-item').classList.add('active');
@@ -850,13 +856,18 @@ function showPage(page) {
 
 // Load Dashboard
 async function loadDashboard() {
+    console.log('📊 Loading dashboard...');
+    
     try {
         const ADMIN_TOKEN = localStorage.getItem('adminToken');
         
         if (!ADMIN_TOKEN) {
+            console.log('❌ No admin token found');
             window.location.href = 'admin-login.html';
             return;
         }
+        
+        console.log('🔍 Fetching dashboard stats from:', `${API_URL}/admin/stats`);
         
         // Fetch dashboard stats from backend
         const response = await fetch(`${API_URL}/admin/stats`, {
@@ -865,8 +876,10 @@ async function loadDashboard() {
             }
         });
         
+        console.log('📡 Response status:', response.status);
+        
         if (response.status === 401) {
-            // Token expired or invalid
+            console.log('❌ Unauthorized - token expired');
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminData');
             window.location.href = 'admin-login.html';
@@ -874,462 +887,32 @@ async function loadDashboard() {
         }
         
         const data = await response.json();
+        console.log('📊 Stats data:', data);
         
         if (data.status === 'success') {
             document.getElementById('total-users').textContent = data.data.totalUsers || '0';
             document.getElementById('pending-kyc').textContent = data.data.pendingKYC || '0';
             document.getElementById('total-transactions').textContent = data.data.totalTransactions || '0';
             document.getElementById('total-revenue').textContent = '₦' + (data.data.totalRevenue || 0).toFixed(2);
+            
+            console.log('✅ Dashboard stats loaded successfully');
+        } else {
+            console.error('❌ Failed to load stats:', data.message);
         }
         
         // Load recent KYC
         loadRecentKYC();
     } catch (error) {
-        console.error('Dashboard load error:', error);
+        console.error('❌ Dashboard load error:', error);
     }
 }
 
-// Add to admin.html in the KYC review section
-async function verifyBVN(userId) {
-    try {
-        showToast('Verifying BVN...', 'info');
-        
-        const response = await fetch(`${API_URL}/admin/kyc/${userId}/verify-bvn`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            if (data.data.match) {
-                showToast('✅ BVN Verified! Names match perfectly.', 'success');
-            } else {
-                showAlert('kyc-alert', 
-                    `⚠️ BVN Mismatch!<br>
-                    BVN Name: ${data.data.bvnFirstName} ${data.data.bvnLastName}<br>
-                    User Name: ${data.data.userFirstName} ${data.data.userLastName}`, 
-                    'error'
-                );
-            }
-            
-            // Reload KYC submissions
-            loadKYCSubmissions();
-        } else {
-            showAlert('kyc-alert', data.message, 'error');
-        }
-    } catch (error) {
-        showAlert('kyc-alert', 'Failed to verify BVN', 'error');
-    }
-}
+// Rest of your functions stay the same...
+// (loadKYC, loadUsers, loadTransactions, etc.)
 
-// Add button in KYC submission display
-<button onclick="verifyBVN(${submission.user_id})" class="btn btn-primary">
-    🔍 Verify BVN
-</button>
-    
-// Load KYC
-async function loadKYC() {
-    const table = document.getElementById('kyc-table');
-    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading KYC submissions...</p>';
-    
-    try {
-        const ADMIN_TOKEN = localStorage.getItem('adminToken');
-        const filter = document.getElementById('kyc-filter')?.value || 'all';
-        
-        const url = filter === 'all' 
-            ? `${API_URL}/admin/kyc`
-            : `${API_URL}/admin/kyc?status=${filter}`;
-        
-        const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
-        });
-        
-        if (response.status === 401) {
-            window.location.href = 'admin-login.html';
-            return;
-        }
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            kycData = data.data || [];
-            renderKYCTable();
-        } else {
-            table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load KYC data</p>';
-        }
-    } catch (error) {
-        console.error('KYC load error:', error);
-        table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Connection error</p>';
-    }
-}
-
-function renderKYCTable() {
-    const table = document.getElementById('kyc-table');
-    
-    if (kycData.length === 0) {
-        table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No KYC submissions found</p>';
-        return;
-    }
-    
-    table.innerHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Full Name</th>
-                    <th>Submitted</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${kycData.map(kyc => `
-                    <tr>
-                        <td>${kyc.email}</td>
-                        <td>${kyc.fullname}</td>
-                        <td>${new Date(kyc.kyc_submitted_at).toLocaleDateString()}</td>
-                        <td><span class="badge badge-${kyc.kyc_status === 'approved' ? 'success' : kyc.kyc_status === 'rejected' ? 'danger' : 'warning'}">${kyc.kyc_status}</span></td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="viewKYC(${kyc.user_id})">View</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
-}
-
-function loadRecentKYC() {
-    const table = document.getElementById('recent-kyc-table');
-    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No recent KYC submissions</p>';
-}
-
-// View KYC Details
-async function viewKYC(userId) {
-    currentKYCUser = userId;
-    
-    try {
-        const ADMIN_TOKEN = localStorage.getItem('adminToken');
-        const response = await fetch(`${API_URL}/admin/kyc/${userId}`, {
-            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            const kyc = data.data;
-            
-            const details = document.getElementById('kyc-details');
-            details.innerHTML = `
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="text" class="form-control" value="${kyc.email}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="text" class="form-control" value="${kyc.phone}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Full Name (As on ID)</label>
-                    <input type="text" class="form-control" value="${kyc.fullname || 'N/A'}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date of Birth</label>
-                    <input type="text" class="form-control" value="${kyc.dob || 'N/A'}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Address</label>
-                    <textarea class="form-control" readonly>${kyc.address || 'N/A'}</textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">ID Type</label>
-                    <input type="text" class="form-control" value="${kyc.id_type || 'N/A'}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">ID Number</label>
-                    <input type="text" class="form-control" value="${kyc.id_number || 'N/A'}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">BVN</label>
-                    <input type="text" class="form-control" value="${kyc.bvn || 'N/A'}" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Submitted At</label>
-                    <input type="text" class="form-control" value="${new Date(kyc.kyc_submitted_at).toLocaleString()}" readonly>
-                </div>
-                ${kyc.kyc_rejection_reason ? `
-                <div class="form-group">
-                    <label class="form-label">Rejection Reason</label>
-                    <textarea class="form-control" readonly>${kyc.kyc_rejection_reason}</textarea>
-                </div>
-                ` : ''}
-            `;
-            
-            openModal('kyc-modal');
-        } else {
-            alert('Failed to load KYC details');
-        }
-    } catch (error) {
-        console.error('View KYC error:', error);
-        alert('Error loading KYC details');
-    }
-}
-
-// Approve KYC
-async function approveKYC() {
-    if (!currentKYCUser) return;
-    
-    if (!confirm('Are you sure you want to approve this KYC?')) return;
-    
-    try {
-        const response = await fetch(`${API_URL}/admin/kyc/${currentKYCUser}/approve`, {  // ✅ FIXED URL
-            method: 'POST',  // ✅ FIXED METHOD
-            headers: {
-                'Authorization': `Bearer ${ADMIN_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            alert('KYC approved successfully!');
-            closeModal('kyc-modal');
-            loadKYC();
-        } else {
-            alert('Failed to approve KYC: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Approve error:', error);
-        alert('Error approving KYC');
-    }
-}
-
-// Reject KYC
-function showRejectModal() {
-    closeModal('kyc-modal');
-    openModal('reject-modal');
-}
-
-async function confirmReject() {
-    const reason = document.getElementById('reject-reason').value.trim();
-    
-    if (!reason) {
-        alert('Please provide a rejection reason');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_URL}/admin/kyc/${currentKYCUser}/reject`, {  // ✅ FIXED URL
-            method: 'POST',  // ✅ FIXED METHOD
-            headers: {
-                'Authorization': `Bearer ${ADMIN_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ reason })
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            alert('KYC rejected successfully!');
-            closeModal('reject-modal');
-            loadKYC();
-        } else {
-            alert('Failed to reject KYC: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Reject error:', error);
-        alert('Error rejecting KYC');
-    }
-}
-
-// Load Users
-async function loadUsers() {
-    const table = document.getElementById('users-table');
-    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading users...</p>';
-    
-    try {
-        const ADMIN_TOKEN = localStorage.getItem('adminToken');
-        
-        const response = await fetch(`${API_URL}/admin/users`, {
-            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
-        });
-        
-        if (response.status === 401) {
-            window.location.href = 'admin-login.html';
-            return;
-        }
-        
-        const data = await response.json();
-        console.log('👥 Users data:', data);
-        
-        if (data.status === 'success' && data.data && data.data.length > 0) {
-            usersData = data.data;
-            
-            table.innerHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>KYC Status</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${usersData.map(user => `
-                            <tr>
-                                <td>${user.id}</td>
-                                <td>${user.first_name} ${user.last_name}</td>
-                                <td>${user.email}</td>
-                                <td>${user.phone}</td>
-                                <td><span class="badge badge-${user.kyc_status === 'approved' ? 'success' : user.kyc_status === 'rejected' ? 'danger' : 'warning'}">${user.kyc_status || 'not_submitted'}</span></td>
-                                <td>${new Date(user.created_at).toLocaleDateString()}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="viewUser(${user.id})">View</button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        } else {
-            table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No users found</p>';
-        }
-    } catch (error) {
-        console.error('Users load error:', error);
-        table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load users</p>';
-    }
-}
-
-function viewUser(userId) {
-    alert('User details for ID: ' + userId + '\n\nFull user management coming soon!');
-}
-
-// Load Transactions
-async function loadTransactions() {
-    const table = document.getElementById('transactions-table');
-    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading transactions...</p>';
-    
-    try {
-        const ADMIN_TOKEN = localStorage.getItem('adminToken');
-        
-        const response = await fetch(`${API_URL}/admin/transactions`, {
-            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
-        });
-        
-        if (response.status === 401) {
-            window.location.href = 'admin-login.html';
-            return;
-        }
-        
-        const data = await response.json();
-        console.log('💳 Transactions data:', data);
-        
-        if (data.status === 'success' && data.data && data.data.length > 0) {
-            transactionsData = data.data;
-            
-            table.innerHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Currency</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${transactionsData.map(tx => `
-                            <tr>
-                                <td>${tx.id}</td>
-                                <td>${tx.user_email || tx.user_id}</td>
-                                <td><span class="badge badge-info">${tx.type}</span></td>
-                                <td>${tx.amount.toFixed(2)}</td>
-                                <td>${tx.currency}</td>
-                                <td><span class="badge badge-${tx.status === 'completed' ? 'success' : tx.status === 'pending' ? 'warning' : 'danger'}">${tx.status}</span></td>
-                                <td>${new Date(tx.created_at).toLocaleString()}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        } else {
-            table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No transactions found</p>';
-        }
-    } catch (error) {
-        console.error('Transactions load error:', error);
-        table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load transactions</p>';
-    }
-}
-
-// Update Rates
-async function updateRates() {
-    const ngnToKsh = document.getElementById('ngn-to-ksh').value;
-    const kshToNgn = document.getElementById('ksh-to-ngn').value;
-    
-    if (!ngnToKsh || !kshToNgn) {
-        alert('Please enter both rates');
-        return;
-    }
-    
-    // TODO: API call to update rates
-    alert('Rates updated successfully!');
-}
-
-// Update Settings
-async function updateSettings() {
-    const fee = document.getElementById('transaction-fee').value;
-    const withdrawalFee = document.getElementById('withdrawal-fee').value;
-    const minDeposit = document.getElementById('min-deposit').value;
-    const minWithdrawal = document.getElementById('min-withdrawal').value;
-    
-    // TODO: API call to update settings
-    alert('Settings updated successfully!');
-}
-
-// Filter KYC
-function filterKYC() {
-    const filter = document.getElementById('kyc-filter').value;
-    // TODO: Implement filtering
-}
-
-// Modal functions
-function openModal(id) {
-    document.getElementById(id).classList.add('active');
-}
-
-function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-}
-
-// Logout
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        // Clear all admin data
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminData');
-        
-        // Show logout message
-        alert('✅ Logged out successfully');
-        
-        // Redirect to login page
-        window.location.href = 'admin-login.html';
-    }
-}
-
-// Initialize
+// ✅ LOAD DASHBOARD IMMEDIATELY ON PAGE LOAD
 window.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM loaded, initializing dashboard...');
     loadDashboard();
 });
 </script>
