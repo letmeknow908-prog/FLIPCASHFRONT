@@ -661,6 +661,7 @@ function showPage(page) {
     if (page === 'history') loadHistory();
     if (page === 'settings') loadSettings();
     if (page === 'deposit') loadDeposit();
+    if (page === 'kyc') loadKYCForm();  // ✅ ADD THIS LINE
     if (page === 'swap') {
         document.getElementById('swap-available').textContent = walletsData.NGN.toFixed(2);
         document.getElementById('swap-from-curr').textContent = 'NGN';
@@ -1389,21 +1390,102 @@ async function loadSettings() {
         kycDisplay.innerHTML = '<p>KYC not submitted</p><button class="btn btn-primary" onclick="showPage(\'kyc\')" style="max-width:200px;margin-top:15px">Submit KYC</button>';
     }
     
-    const detailsDisplay = document.getElementById('personal-details-display');
-    if (user.fullname) {
-        detailsDisplay.innerHTML = `
-            <p><strong>Full Name:</strong> ${user.fullname || 'Not provided'}</p>
-            <p><strong>Date of Birth:</strong> <span class="blur-text">${user.dob || 'Not provided'}</span></p>
-            <p><strong>Address:</strong> ${user.address ? user.address.substring(0, 20) + '...' : 'Not provided'} <span class="blur-text">${user.address ? user.address.substring(20) : ''}</span></p>
-            <p><strong>ID Type:</strong> ${user.id_type || user.idType || 'Not provided'}</p>
-            <p><strong>ID Number:</strong> <span class="blur-text">${user.id_number || user.idNumber || 'Not provided'}</span></p>
-            ${user.bvn ? `<p><strong>BVN:</strong> <span class="blur-text">${user.bvn}</span></p>` : '<p><strong>BVN:</strong> Not provided</p>'}
-        `;
-    } else {
-        detailsDisplay.innerHTML = '<p>No KYC details available. Please complete KYC verification.</p>';
-    }
+const detailsDisplay = document.getElementById('personal-details-display');
+// Check if user has ANY KYC data (fullname OR from kyc_data table)
+const hasKycData = user.fullname || (user.kyc_data && user.kyc_data.fullname);
+
+if (hasKycData) {
+    // Use data from wherever it exists
+    const kycData = user.kyc_data || user;
+    detailsDisplay.innerHTML = `
+        <p><strong>Full Name:</strong> ${kycData.fullname || 'Not provided'}</p>
+        <p><strong>Date of Birth:</strong> <span class="blur-text">${kycData.dob ? new Date(kycData.dob).toLocaleDateString() : 'Not provided'}</span></p>
+        <p><strong>Address:</strong> ${kycData.address ? kycData.address.substring(0, 20) + '...' : 'Not provided'} <span class="blur-text">${kycData.address ? kycData.address.substring(20) : ''}</span></p>
+        <p><strong>ID Type:</strong> ${kycData.id_type || kycData.idType || 'Not provided'}</p>
+        <p><strong>ID Number:</strong> <span class="blur-text">${kycData.id_number || kycData.idNumber || 'Not provided'}</span></p>
+        ${kycData.bvn ? `<p><strong>BVN:</strong> <span class="blur-text">${kycData.bvn}</span></p>` : '<p><strong>BVN:</strong> Not provided</p>'}
+    `;
+} else {
+    detailsDisplay.innerHTML = '<p>No KYC details available. Please complete KYC verification.</p>';
+}
 }
 
+async function loadKYCForm() {
+    const token = localStorage.getItem('accessToken');
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    // Fetch fresh user data
+    try {
+        const response = await fetch(`${API_URL}/users/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            user = data.data;
+            localStorage.setItem('user', JSON.stringify(user));
+        }
+    } catch (err) {
+        console.error('Error fetching user:', err);
+    }
+    
+    // Get KYC data from wherever it exists
+    const kycData = user.kyc_data || user;
+    
+    // Pre-fill form if user has KYC data
+    if (kycData.fullname || kycData.dob || kycData.address) {
+        console.log('📋 Pre-filling KYC form with existing data');
+        
+        document.getElementById('kyc-fullname').value = kycData.fullname || '';
+        
+        // Format date properly (remove time portion if exists)
+        if (kycData.dob) {
+            const dobDate = kycData.dob.split('T')[0]; // Gets YYYY-MM-DD
+            document.getElementById('kyc-dob').value = dobDate;
+        }
+        
+        document.getElementById('kyc-address').value = kycData.address || '';
+        document.getElementById('kyc-idtype').value = kycData.id_type || kycData.idType || '';
+        document.getElementById('kyc-idnumber').value = kycData.id_number || kycData.idNumber || '';
+        document.getElementById('kyc-bvn').value = kycData.bvn || '';
+        document.getElementById('kyc-country').value = kycData.country || '';
+        document.getElementById('kyc-occupation').value = kycData.occupation || '';
+        document.getElementById('kyc-source-funds').value = kycData.source_funds || kycData.sourceFunds || '';
+        
+        // Show status message
+        const kycStatus = user.kyc_status || 'not_submitted';
+        
+        if (kycStatus === 'pending') {
+            showAlert('kyc-alert-page', 
+                'ℹ️ Your KYC is currently <strong>PENDING REVIEW</strong>. You can update your information below if needed.', 
+                'info'
+            );
+        } else if (kycStatus === 'approved') {
+            showAlert('kyc-alert-page', 
+                '✅ Your KYC is <strong>APPROVED</strong>! You can update your information below if needed.', 
+                'success'
+            );
+        } else if (kycStatus === 'rejected') {
+            showAlert('kyc-alert-page', 
+                '⚠️ Your previous KYC submission was <strong>REJECTED</strong>. Please correct the information and resubmit.', 
+                'error'
+            );
+        }
+    } else {
+        console.log('📋 No existing KYC data - showing blank form');
+        // Clear all form fields
+        document.getElementById('kyc-fullname').value = '';
+        document.getElementById('kyc-dob').value = '';
+        document.getElementById('kyc-address').value = '';
+        document.getElementById('kyc-idtype').value = '';
+        document.getElementById('kyc-idnumber').value = '';
+        document.getElementById('kyc-bvn').value = '';
+        document.getElementById('kyc-country').value = '';
+        document.getElementById('kyc-occupation').value = '';
+        document.getElementById('kyc-source-funds').value = '';
+    }
+}
+    
 async function updateProfile() {
     const phone = document.getElementById('settings-phone').value.trim();
     if (!phone) {
