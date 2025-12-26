@@ -897,7 +897,7 @@ async function loadDashboard() {
     try {
         const token = localStorage.getItem('accessToken');
         
-        // FETCH FRESH USER DATA FROM BACKEND
+        // Load user data
         try {
             const userResponse = await fetch(`${API_URL}/users/me`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -905,11 +905,9 @@ async function loadDashboard() {
             const userData = await userResponse.json();
             
             if (userData.status === 'success') {
-                // Update localStorage with fresh data
                 const user = userData.data;
                 localStorage.setItem('user', JSON.stringify(user));
                 
-                // Check KYC status
                 if (!user.kyc_verified && user.kyc_status !== 'approved') {
                     document.getElementById('kyc-alert').style.display = 'block';
                 } else {
@@ -918,15 +916,9 @@ async function loadDashboard() {
             }
         } catch (err) {
             console.error('Error fetching user data:', err);
-            // Fallback to localStorage
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            if (!user.kycVerified) {
-                document.getElementById('kyc-alert').style.display = 'block';
-            } else {
-                document.getElementById('kyc-alert').style.display = 'none';
-            }
         }
         
+        // Load wallets
         try {
             const res = await fetch(`${API_URL}/wallets`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -949,9 +941,19 @@ async function loadDashboard() {
             console.error('Wallet load error:', err);
         }
         
+        // ✅ FIX: Load rates immediately
         await loadLiveRates();
-        if (rateUpdateInterval) clearInterval(rateUpdateInterval);
+        
+        // ✅ FIX: Clear any existing interval
+        if (rateUpdateInterval) {
+            clearInterval(rateUpdateInterval);
+        }
+        
+        // ✅ FIX: Update rates every 30 seconds (not 1 second!)
         rateUpdateInterval = setInterval(loadLiveRates, 30000);
+        
+        console.log('✅ Dashboard loaded, rate updates set to 30s interval');
+        
     } catch (error) {
         console.error('Dashboard load error:', error);
     }
@@ -962,15 +964,28 @@ async function loadLiveRates() {
         const res = await fetch(`${API_URL}/rates`);
         const data = await res.json();
         
-        if (data.data) {
+        console.log('💱 Rate API response:', data);  // ✅ ADD DEBUG
+        
+        if (data.status === 'success' && data.data) {
             exchangeRates.ngnToKsh = data.data.ngnToKsh || 0.18;
             exchangeRates.kshToNgn = data.data.kshToNgn || 5.5;
-            document.getElementById('ngn-to-ksh-rate').textContent = exchangeRates.ngnToKsh.toFixed(4);
-            document.getElementById('ksh-to-ngn-rate').textContent = exchangeRates.kshToNgn.toFixed(4);
+            
+            // ✅ FIX: Update the DOM elements
+            const ngnToKshEl = document.getElementById('ngn-to-ksh-rate');
+            const kshToNgnEl = document.getElementById('ksh-to-ngn-rate');
+            
+            if (ngnToKshEl) ngnToKshEl.textContent = exchangeRates.ngnToKsh.toFixed(4);
+            if (kshToNgnEl) kshToNgnEl.textContent = exchangeRates.kshToNgn.toFixed(4);
+            
+            console.log('✅ Rates updated:', exchangeRates);
         }
     } catch (err) {
-        document.getElementById('ngn-to-ksh-rate').textContent = '0.1800';
-        document.getElementById('ksh-to-ngn-rate').textContent = '5.5000';
+        console.error('❌ Rate fetch error:', err);
+        const ngnToKshEl = document.getElementById('ngn-to-ksh-rate');
+        const kshToNgnEl = document.getElementById('ksh-to-ngn-rate');
+        
+        if (ngnToKshEl) ngnToKshEl.textContent = '0.1800';
+        if (kshToNgnEl) kshToNgnEl.textContent = '5.5000';
     }
 }
 
