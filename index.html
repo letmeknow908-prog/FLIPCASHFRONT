@@ -1021,13 +1021,14 @@ async function generateAccount() {
         } else {
             throw new Error(data.message || 'Failed to generate account');
         }
-} catch (error) {
-    console.error('Account generation error:', error);
-    btnText.textContent = 'Try Again';
-    btnText.style.display = 'inline';
-    btnLoading.style.display = 'none';
-    btn.disabled = false;
-    showToast('Failed to generate account. Please try again or contact support.', 'error')
+    } catch (error) {
+        console.error('Account generation error:', error);
+        btnText.textContent = 'Try Again';
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        btn.disabled = false;
+        showToast('Failed to generate account. Please try again or contact support.', 'error');
+    }
 }
 
 function calculateSwap() {
