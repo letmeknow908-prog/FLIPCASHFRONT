@@ -1044,8 +1044,8 @@ async function approveKYC() {
     if (!confirm('Are you sure you want to approve this KYC?')) return;
     
     try {
-        const response = await fetch(`${API_URL}/users/kyc/${currentKYCUser}/approve`, {
-            method: 'PUT',
+        const response = await fetch(`${API_URL}/admin/kyc/${currentKYCUser}/approve`, {  // ✅ FIXED URL
+            method: 'POST',  // ✅ FIXED METHOD
             headers: {
                 'Authorization': `Bearer ${ADMIN_TOKEN}`,
                 'Content-Type': 'application/json'
@@ -1082,8 +1082,8 @@ async function confirmReject() {
     }
     
     try {
-        const response = await fetch(`${API_URL}/users/kyc/${currentKYCUser}/reject`, {
-            method: 'PUT',
+        const response = await fetch(`${API_URL}/admin/kyc/${currentKYCUser}/reject`, {  // ✅ FIXED URL
+            method: 'POST',  // ✅ FIXED METHOD
             headers: {
                 'Authorization': `Bearer ${ADMIN_TOKEN}`,
                 'Content-Type': 'application/json'
