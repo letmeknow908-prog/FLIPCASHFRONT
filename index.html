@@ -1223,7 +1223,10 @@ async function loadHistory() {
     }
 }
 
-async function submitKYC() {
+async function submitKYC(event) {
+    // CRITICAL: Prevent form reload!
+    if (event) event.preventDefault();
+    
     const btn = document.getElementById('kyc-btn');
     const fullname = document.getElementById('kyc-fullname').value.trim();
     const dob = document.getElementById('kyc-dob').value;
@@ -1262,7 +1265,10 @@ async function submitKYC() {
     
     try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_URL}/users/kyc`, {
+        
+        console.log('📋 Submitting KYC to:', `${API_URL}/users/kyc/submit`);
+        
+        const response = await fetch(`${API_URL}/users/kyc/submit`, {  // FIXED: Changed to /submit endpoint
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1282,9 +1288,10 @@ async function submitKYC() {
         });
         
         const data = await response.json();
+        console.log('📡 KYC Response:', data);
         
         if (data.status === 'success') {
-            showToast('KYC submitted successfully! Verification usually takes 24-48 hours.', 'success');
+            showToast('✅ KYC submitted successfully! Verification usually takes 24-48 hours.', 'success');
             
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             user.kycStatus = 'pending';
@@ -1306,7 +1313,7 @@ async function submitKYC() {
             btn.textContent = 'Submit KYC Verification';
         }
     } catch (error) {
-        console.error('KYC submission error:', error);
+        console.error('❌ KYC submission error:', error);
         showAlert('kyc-alert-page', 'Connection error. Please check your internet and try again', 'error');
         btn.disabled = false;
         btn.textContent = 'Submit KYC Verification';
