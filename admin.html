@@ -1029,12 +1029,34 @@ async function viewKYC(userId) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">BVN</label>
-                    <input type="text" class="form-control" value="${kyc.bvn || 'N/A'}" readonly>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" class="form-control" value="${kyc.bvn || 'N/A'}" readonly style="flex: 1;">
+                        ${kyc.bvn ? `<button class="btn btn-primary" onclick="verifyBVN(${userId})">🔍 Verify BVN</button>` : ''}
+                    </div>
+                    ${kyc.bvn_verified ? '<small style="color: #10B981;">✅ BVN Verified</small>' : ''}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <input type="text" class="form-control" value="${kyc.country || 'N/A'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Occupation</label>
+                    <input type="text" class="form-control" value="${kyc.occupation || 'N/A'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Source of Funds</label>
+                    <input type="text" class="form-control" value="${kyc.source_funds || 'N/A'}" readonly>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Submitted At</label>
                     <input type="text" class="form-control" value="${new Date(kyc.kyc_submitted_at).toLocaleString()}" readonly>
                 </div>
+                ${kyc.bvn_verification_data ? `
+                <div class="form-group">
+                    <label class="form-label">BVN Verification Details</label>
+                    <textarea class="form-control" readonly>${JSON.stringify(kyc.bvn_verification_data, null, 2)}</textarea>
+                </div>
+                ` : ''}
                 ${kyc.kyc_rejection_reason ? `
                 <div class="form-group">
                     <label class="form-label">Rejection Reason</label>
@@ -1053,6 +1075,52 @@ async function viewKYC(userId) {
     }
 }
 
+// Add this RIGHT AFTER the viewKYC() function
+
+async function verifyBVN(userId) {
+    try {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Verifying...';
+        
+        console.log('🔍 Verifying BVN for user:', userId);
+        
+        const response = await fetch(`${API_URL}/admin/kyc/${userId}/verify-bvn`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
+        
+        const data = await response.json();
+        console.log('📋 BVN verification result:', data);
+        
+        if (data.status === 'success') {
+            if (data.data.match) {
+                alert('✅ BVN Verified!\n\nNames match perfectly:\n' +
+                      `User Name: ${data.data.userFirstName} ${data.data.userLastName}\n` +
+                      `BVN Name: ${data.data.bvnFirstName} ${data.data.bvnLastName}`);
+            } else {
+                alert('⚠️ BVN Mismatch!\n\n' +
+                      `User Name: ${data.data.userFirstName} ${data.data.userLastName}\n` +
+                      `BVN Name: ${data.data.bvnFirstName} ${data.data.bvnLastName}\n\n` +
+                      'Please verify the information before approving KYC.');
+            }
+        } else {
+            alert('❌ BVN Verification Failed\n\n' + (data.message || 'Please try again or contact support.'));
+        }
+        
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    } catch (error) {
+        console.error('❌ BVN verification error:', error);
+        alert('❌ Failed to verify BVN. Please try again.');
+        event.target.disabled = false;
+        event.target.innerHTML = '🔍 Verify BVN';
+    }
+}
+    
 async function approveKYC() {
     if (!currentKYCUser) return;
     
