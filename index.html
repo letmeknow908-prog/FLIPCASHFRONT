@@ -895,13 +895,35 @@ function handleLogout() {
 async function loadDashboard() {
     try {
         const token = localStorage.getItem('accessToken');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        userData = user;
         
-        if (!user.kycVerified) {
-            document.getElementById('kyc-alert').style.display = 'block';
-        } else {
-            document.getElementById('kyc-alert').style.display = 'none';
+        // FETCH FRESH USER DATA FROM BACKEND
+        try {
+            const userResponse = await fetch(`${API_URL}/users/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const userData = await userResponse.json();
+            
+            if (userData.status === 'success') {
+                // Update localStorage with fresh data
+                const user = userData.data;
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                // Check KYC status
+                if (!user.kyc_verified && user.kyc_status !== 'approved') {
+                    document.getElementById('kyc-alert').style.display = 'block';
+                } else {
+                    document.getElementById('kyc-alert').style.display = 'none';
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching user data:', err);
+            // Fallback to localStorage
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.kycVerified) {
+                document.getElementById('kyc-alert').style.display = 'block';
+            } else {
+                document.getElementById('kyc-alert').style.display = 'none';
+            }
         }
         
         try {
@@ -1290,19 +1312,31 @@ async function submitKYC(event) {
         const data = await response.json();
         console.log('📡 KYC Response:', data);
         
-        if (data.status === 'success') {
-            showToast('✅ KYC submitted successfully! Verification usually takes 24-48 hours.', 'success');
-            
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            user.kycStatus = 'pending';
-            user.fullname = fullname;
-            user.dob = dob;
-            user.address = address;
-            user.idType = idType;
-            user.idNumber = idNumber;
-            user.bvn = bvn;
-            localStorage.setItem('user', JSON.stringify(user));
-            
+if (data.status === 'success') {
+    showToast('✅ KYC submitted successfully! Verification usually takes 24-48 hours.', 'success');
+    
+    // FETCH UPDATED USER DATA FROM BACKEND
+    try {
+        const userResponse = await fetch(`${API_URL}/users/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const freshUserData = await userResponse.json();
+        
+        if (freshUserData.status === 'success') {
+            localStorage.setItem('user', JSON.stringify(freshUserData.data));
+        }
+    } catch (err) {
+        // Fallback: manually update localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        user.kyc_status = 'pending';
+        user.fullname = fullname;
+        user.dob = dob;
+        user.address = address;
+        user.idType = idType;
+        user.idNumber = idNumber;
+        user.bvn = bvn;
+        localStorage.setItem('user', JSON.stringify(user));
+    }    
             setTimeout(() => {
                 showPage('dashboard');
                 loadDashboard();
@@ -1320,13 +1354,30 @@ async function submitKYC(event) {
     }
 }
 
-function loadSettings() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+async function loadSettings() {
+    // FETCH FRESH USER DATA
+    const token = localStorage.getItem('accessToken');
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    try {
+        const response = await fetch(`${API_URL}/users/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            user = data.data;
+            localStorage.setItem('user', JSON.stringify(user));
+        }
+    } catch (err) {
+        console.error('Error fetching user:', err);
+    }
+    
     document.getElementById('settings-email').value = user.email || '';
     document.getElementById('settings-phone').value = user.phone || '';
     
     const kycDisplay = document.getElementById('kyc-status-display');
-    const kycStatus = user.kycStatus || 'not_submitted';
+    const kycStatus = user.kyc_status || 'not_submitted';
     
     if (kycStatus === 'approved') {
         kycDisplay.innerHTML = '<div class="kyc-status approved">✅ KYC Approved</div><p>Your identity has been verified</p>';
@@ -1344,8 +1395,8 @@ function loadSettings() {
             <p><strong>Full Name:</strong> ${user.fullname || 'Not provided'}</p>
             <p><strong>Date of Birth:</strong> <span class="blur-text">${user.dob || 'Not provided'}</span></p>
             <p><strong>Address:</strong> ${user.address ? user.address.substring(0, 20) + '...' : 'Not provided'} <span class="blur-text">${user.address ? user.address.substring(20) : ''}</span></p>
-            <p><strong>ID Type:</strong> ${user.idType || 'Not provided'}</p>
-            <p><strong>ID Number:</strong> <span class="blur-text">${user.idNumber || 'Not provided'}</span></p>
+            <p><strong>ID Type:</strong> ${user.id_type || user.idType || 'Not provided'}</p>
+            <p><strong>ID Number:</strong> <span class="blur-text">${user.id_number || user.idNumber || 'Not provided'}</span></p>
             ${user.bvn ? `<p><strong>BVN:</strong> <span class="blur-text">${user.bvn}</span></p>` : '<p><strong>BVN:</strong> Not provided</p>'}
         `;
     } else {
