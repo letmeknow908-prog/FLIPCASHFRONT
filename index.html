@@ -1021,13 +1021,13 @@ async function generateAccount() {
         } else {
             throw new Error(data.message || 'Failed to generate account');
         }
-    } catch (error) {
-        btnText.textContent = 'Try Again';
-        btnText.style.display = 'inline';
-        btnLoading.style.display = 'none';
-        btn.disabled = false;
-        showToast('Failed to generate account. Please complete KYC first.', 'error');
-    }
+} catch (error) {
+    console.error('Account generation error:', error);
+    btnText.textContent = 'Try Again';
+    btnText.style.display = 'inline';
+    btnLoading.style.display = 'none';
+    btn.disabled = false;
+    showToast('Failed to generate account. Please try again or contact support.', 'error')
 }
 
 function calculateSwap() {
@@ -1360,15 +1360,20 @@ async function loadSettings() {
     const token = localStorage.getItem('accessToken');
     let user = JSON.parse(localStorage.getItem('user') || '{}');
     
+    console.log('👤 User from localStorage:', user);
+    
     try {
         const response = await fetch(`${API_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         
+        console.log('📡 Fresh user data from API:', data);
+        
         if (data.status === 'success') {
             user = data.data;
             localStorage.setItem('user', JSON.stringify(user));
+            console.log('✅ Updated user:', user);
         }
     } catch (err) {
         console.error('Error fetching user:', err);
@@ -1378,7 +1383,13 @@ async function loadSettings() {
     document.getElementById('settings-phone').value = user.phone || '';
     
     const kycDisplay = document.getElementById('kyc-status-display');
-    const kycStatus = user.kyc_status || 'not_submitted';
+    
+    // ✅ FIXED: Check BOTH user.kyc_status AND user.kycStatus
+    const kycStatus = user.kyc_status || user.kycStatus || 'not_submitted';
+    
+    console.log('🔍 KYC Status being checked:', kycStatus);
+    console.log('🔍 kyc_verified:', user.kyc_verified);
+    console.log('🔍 kycVerified:', user.kycVerified);
     
     if (kycStatus === 'approved') {
         kycDisplay.innerHTML = '<div class="kyc-status approved">✅ KYC Approved</div><p>Your identity has been verified</p>';
@@ -1390,24 +1401,24 @@ async function loadSettings() {
         kycDisplay.innerHTML = '<p>KYC not submitted</p><button class="btn btn-primary" onclick="showPage(\'kyc\')" style="max-width:200px;margin-top:15px">Submit KYC</button>';
     }
     
-const detailsDisplay = document.getElementById('personal-details-display');
-// Check if user has ANY KYC data (fullname OR from kyc_data table)
-const hasKycData = user.fullname || (user.kyc_data && user.kyc_data.fullname);
-
-if (hasKycData) {
-    // Use data from wherever it exists
-    const kycData = user.kyc_data || user;
-    detailsDisplay.innerHTML = `
-        <p><strong>Full Name:</strong> ${kycData.fullname || 'Not provided'}</p>
-        <p><strong>Date of Birth:</strong> <span class="blur-text">${kycData.dob ? new Date(kycData.dob).toLocaleDateString() : 'Not provided'}</span></p>
-        <p><strong>Address:</strong> ${kycData.address ? kycData.address.substring(0, 20) + '...' : 'Not provided'} <span class="blur-text">${kycData.address ? kycData.address.substring(20) : ''}</span></p>
-        <p><strong>ID Type:</strong> ${kycData.id_type || kycData.idType || 'Not provided'}</p>
-        <p><strong>ID Number:</strong> <span class="blur-text">${kycData.id_number || kycData.idNumber || 'Not provided'}</span></p>
-        ${kycData.bvn ? `<p><strong>BVN:</strong> <span class="blur-text">${kycData.bvn}</span></p>` : '<p><strong>BVN:</strong> Not provided</p>'}
-    `;
-} else {
-    detailsDisplay.innerHTML = '<p>No KYC details available. Please complete KYC verification.</p>';
-}
+    const detailsDisplay = document.getElementById('personal-details-display');
+    // Check if user has ANY KYC data (fullname OR from kyc_data table)
+    const hasKycData = user.fullname || (user.kyc_data && user.kyc_data.fullname);
+    
+    if (hasKycData) {
+        // Use data from wherever it exists
+        const kycData = user.kyc_data || user;
+        detailsDisplay.innerHTML = `
+            <p><strong>Full Name:</strong> ${kycData.fullname || 'Not provided'}</p>
+            <p><strong>Date of Birth:</strong> <span class="blur-text">${kycData.dob ? new Date(kycData.dob).toLocaleDateString() : 'Not provided'}</span></p>
+            <p><strong>Address:</strong> ${kycData.address ? kycData.address.substring(0, 20) + '...' : 'Not provided'} <span class="blur-text">${kycData.address ? kycData.address.substring(20) : ''}</span></p>
+            <p><strong>ID Type:</strong> ${kycData.id_type || kycData.idType || 'Not provided'}</p>
+            <p><strong>ID Number:</strong> <span class="blur-text">${kycData.id_number || kycData.idNumber || 'Not provided'}</span></p>
+            ${kycData.bvn ? `<p><strong>BVN:</strong> <span class="blur-text">${kycData.bvn}</span></p>` : '<p><strong>BVN:</strong> Not provided</p>'}
+        `;
+    } else {
+        detailsDisplay.innerHTML = '<p>No KYC details available. Please complete KYC verification.</p>';
+    }
 }
 
 async function loadKYCForm() {
