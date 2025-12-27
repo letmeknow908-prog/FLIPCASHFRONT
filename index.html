@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>FlipCash - Currency Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -218,6 +221,43 @@
     </div>
 </div>
 
+<!-- FOOTER -->
+    <footer style="background:#1F2937;color:white;padding:40px 20px;margin-top:60px">
+        <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px">
+            <div>
+                <h3 style="margin-bottom:15px;color:#10B981">FlipCash</h3>
+                <p style="color:#D1D5DB;line-height:1.8">Your trusted partner for seamless currency exchange between Nigeria and Kenya.</p>
+                <div style="display:flex;gap:15px;margin-top:15px">
+                    <a href="https://www.instagram.com/flipcashafrica?igsh=c2ExeGhudnM1Zmpm&utm_source=qr" target="_blank" style="font-size:24px;color:#D1D5DB;transition:color 0.3s" title="Follow us on Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://twitter.com/flipcash" target="_blank" style="font-size:24px;color:#D1D5DB;transition:color 0.3s"><i class="fab fa-twitter"></i></a>
+                    <a href="https://facebook.com/flipcash" target="_blank" style="font-size:24px;color:#D1D5DB;transition:color 0.3s"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:15px;color:#10B981">Quick Links</h3>
+                <p><a href="#" onclick="event.preventDefault();showPage('register')" style="color:#D1D5DB;text-decoration:none">Get Started</a></p>
+                <p><a href="#" onclick="event.preventDefault();showPage('login')" style="color:#D1D5DB;text-decoration:none">Login</a></p>
+                <p><a href="mailto:support@flipcash.app" style="color:#D1D5DB;text-decoration:none">Contact Support</a></p>
+            </div>
+            <div>
+                <h3 style="margin-bottom:15px;color:#10B981">Legal</h3>
+                <p><a href="#" style="color:#D1D5DB;text-decoration:none">Terms of Service</a></p>
+                <p><a href="#" style="color:#D1D5DB;text-decoration:none">Privacy Policy</a></p>
+                <p><a href="#" style="color:#D1D5DB;text-decoration:none">KYC Policy</a></p>
+            </div>
+            <div>
+                <h3 style="margin-bottom:15px;color:#10B981">Contact</h3>
+                <p style="color:#D1D5DB"><i class="fas fa-envelope"></i> support@flipcash.app</p>
+                <p style="color:#D1D5DB"><i class="fas fa-phone"></i> +234 XXX XXX XXXX</p>
+                <p style="color:#D1D5DB"><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</p>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid #374151;color:#9CA3AF">
+            <p>&copy; 2025 FlipCash. All rights reserved.</p>
+        </div>
+    </footer>
+</div>
+    
 <!-- LOGIN -->
 <div id="login-page" class="hidden page">
     <header class="header">
@@ -336,15 +376,33 @@
 <div id="dashboard-page" class="hidden page">
     <header class="header">
         <div class="logo">💰 FlipCash</div>
-        <div class="nav-btns">
+         <div class="nav-btns">
+            <div style="position:relative;cursor:pointer;font-size:24px;color:#6B7280;margin-right:15px" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <span style="position:absolute;top:-5px;right:-5px;background:#EF4444;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;display:none;align-items:center;justify-content:center;font-weight:bold" id="notification-badge">0</span>
+            </div>
             <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
         </div>
     </header>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" style="position:absolute;top:60px;right:20px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);width:350px;max-height:400px;overflow-y:auto;display:none;z-index:10000">
+        <div style="padding:15px;border-bottom:2px solid #E5E7EB;font-weight:bold">
+            Notifications
+            <span style="float:right;color:#6B7280;font-size:12px;cursor:pointer" onclick="markAllAsRead()">Mark all read</span>
+        </div>
+        <div id="notification-list"></div>
+    </div>
+    
     <div class="container">
         <h1>Dashboard</h1>
         <div class="alert alert-info" id="kyc-alert" style="display:none">
             <strong>⚠️ KYC Required</strong> 
             <a href="#" onclick="event.preventDefault();showPage('kyc')" style="color:#1D4ED8">Verify Now</a>
+        </div>
+        <div class="alert" id="kyc-pending-alert" style="display:none;background:#FEF3C7;color:#D97706">
+            <strong>⏳ KYC Pending Review</strong>
+            <p style="margin-top:5px">Your verification is being processed. This usually takes 24-48 hours.</p>
         </div>
         <div class="wallets">
             <div class="wallet-card">
@@ -408,31 +466,44 @@
     <div class="container" style="max-width:500px">
         <h2>Swap</h2>
         <div id="swap-alert"></div>
-        <div class="form-group">
-            <label>From</label>
-            <select id="swap-from" onchange="calculateSwap()">
-                <option value="NGN">NGN</option>
-                <option value="KSH">KSH</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>To</label>
-            <select id="swap-to" onchange="calculateSwap()">
-                <option value="KSH">KSH</option>
-                <option value="NGN">NGN</option>
-            </select>
+<div style="display:flex;align-items:center;gap:15px;margin:20px 0">
+            <div class="form-group" style="flex:1;margin:0">
+                <label>From</label>
+        <select id="swap-from" onchange="calculateSwap()">
+                    <option value="NGN">NGN (Nigerian Naira)</option>
+                    <option value="KSH">KSH (Kenyan Shilling)</option>
+                </select>
+            </div>
+            <button onclick="swapCurrencies()" style="background:#10B981;color:white;border:none;border-radius:50%;width:50px;height:50px;font-size:24px;cursor:pointer;transition:all 0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-top:20px" title="Switch currencies">
+                <i class="fas fa-exchange-alt"></i>
+            </button>
+            <div class="form-group" style="flex:1;margin:0">
+                <label>To</label>
+                <select id="swap-to" onchange="calculateSwap()">
+                    <option value="KSH">KSH (Kenyan Shilling)</option>
+                    <option value="NGN">NGN (Nigerian Naira)</option>
+                </select>
+            </div>
         </div>
         <div class="form-group">
             <label>Amount</label>
             <input type="number" id="swap-amount" placeholder="Amount" step="0.01" oninput="calculateSwap()">
             <small>Available: <span id="swap-available">0.00</span> <span id="swap-from-curr">NGN</span></small>
         </div>
-        <div class="summary-box" id="swap-summary" style="display:none">
-            <h3>💱 Summary</h3>
-            <div class="summary-row"><span>Send:</span><strong id="summary-send-amount">0</strong></div>
-            <div class="summary-row"><span>Rate:</span><strong id="summary-rate">0</strong></div>
-            <div class="summary-row"><span>Fee (1%):</span><strong id="summary-fee">0</strong></div>
-            <div class="summary-row"><span>Receive:</span><strong id="summary-receive-amount">0</strong></div>
+      <div class="summary-box" id="swap-summary" style="display:none">
+            <h3 style="margin-bottom:20px;font-size:1.3rem">💱 Swap Summary</h3>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
+                <span>You Send:</span><strong id="summary-send-amount">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
+                <span>Exchange Rate:</span><strong id="summary-rate">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
+                <span>Transaction Fee (1%):</span><strong id="summary-fee">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:2px solid rgba(255,255,255,0.3);font-size:1.05rem">
+                <span>You Receive:</span><strong id="summary-receive-amount" style="font-weight:700;font-size:1.3rem;color:#D1FAE5">0</strong>
+            </div>
         </div>
         <button class="btn btn-primary" onclick="handleSwap()" id="swap-btn">Confirm</button>
     </div>
@@ -469,11 +540,19 @@
             </select>
         </div>
         <div class="summary-box" id="withdraw-summary" style="display:none">
-            <h3>💸 Summary</h3>
-            <div class="summary-row"><span>Amount:</span><strong id="w-summary-amount">0</strong></div>
-            <div class="summary-row"><span>Fee (2%):</span><strong id="w-summary-fee">0</strong></div>
-            <div class="summary-row"><span>Deducted:</span><strong id="w-summary-total">0</strong></div>
-            <div class="summary-row"><span>Receive:</span><strong id="w-summary-receive">0</strong></div>
+            <h3 style="margin-bottom:20px;font-size:1.3rem">💸 Withdrawal Summary</h3>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
+                <span>Withdrawal Amount:</span><strong id="w-summary-amount">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
+                <span>Transaction Fee (2%):</span><strong id="w-summary-fee">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
+                <span>Total Deducted:</span><strong id="w-summary-total">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:2px solid rgba(255,255,255,0.3);font-size:1.05rem">
+                <span>You Receive (to M-Pesa):</span><strong id="w-summary-receive" style="font-weight:700;font-size:1.3rem;color:#D1FAE5">0</strong>
+            </div>
         </div>
         <button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn">Withdraw</button>
     </div>
@@ -618,17 +697,26 @@
         </div>
         <div class="kyc-step">
             <h3>Security</h3>
-            <div class="form-group">
+        <div class="form-group">
                 <label>Current Password</label>
-                <input type="password" id="settings-current-password">
+                <div class="password-toggle">
+                    <input type="password" id="settings-current-password" placeholder="Enter current password">
+                    <button type="button" class="password-toggle-btn" onclick="togglePassword('settings-current-password',this)">👁️</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>New Password</label>
-                <input type="password" id="settings-new-password">
+                <div class="password-toggle">
+                    <input type="password" id="settings-new-password" placeholder="Enter new password">
+                    <button type="button" class="password-toggle-btn" onclick="togglePassword('settings-new-password',this)">👁️</button>
+                </div>
             </div>
             <div class="form-group">
-                <label>Confirm</label>
-                <input type="password" id="settings-confirm-password">
+                <label>Confirm New Password</label>
+                <div class="password-toggle">
+                    <input type="password" id="settings-confirm-password" placeholder="Confirm new password">
+                    <button type="button" class="password-toggle-btn" onclick="togglePassword('settings-confirm-password',this)">👁️</button>
+                </div>
             </div>
             <button class="btn btn-primary" onclick="changePassword()">Change</button>
         </div>
@@ -909,10 +997,18 @@ async function loadDashboard() {
                 const user = userData.data;
                 localStorage.setItem('user', JSON.stringify(user));
                 
-                if (!user.kyc_verified && user.kyc_status !== 'approved') {
-                    document.getElementById('kyc-alert').style.display = 'block';
+                const kycAlert = document.getElementById('kyc-alert');
+                const kycPendingAlert = document.getElementById('kyc-pending-alert');
+                
+                if (user.kyc_status === 'pending') {
+                    kycAlert.style.display = 'none';
+                    kycPendingAlert.style.display = 'block';
+                } else if (!user.kyc_verified && user.kyc_status !== 'approved') {
+                    kycAlert.style.display = 'block';
+                    kycPendingAlert.style.display = 'none';
                 } else {
-                    document.getElementById('kyc-alert').style.display = 'none';
+                    kycAlert.style.display = 'none';
+                    kycPendingAlert.style.display = 'none';
                 }
             }
         } catch (err) {
@@ -921,8 +1017,11 @@ async function loadDashboard() {
         
         // Load wallets
         try {
-            const res = await fetch(`${API_URL}/wallets`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch(`${API_URL}/wallets?t=${Date.now()}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Cache-Control': 'no-cache'
+                }
             });
             const data = await res.json();
             
@@ -1033,6 +1132,14 @@ async function generateAccount() {
     const btnText = document.getElementById('gen-btn-text');
     const btnLoading = document.getElementById('gen-btn-loading');
     
+    // ✅ FIX: Check KYC before generating account
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.kyc_status !== 'approved') {
+        showToast('Please complete KYC verification first to generate virtual account', 'error');
+        showPage('kyc');
+        return;
+    }
+    
     btnText.style.display = 'none';
     btnLoading.style.display = 'inline-block';
     btn.disabled = true;
@@ -1078,6 +1185,13 @@ function calculateSwap() {
     const to = document.getElementById('swap-to').value;
     const amount = parseFloat(document.getElementById('swap-amount').value);
     const available = walletsData[from] || 0;
+    
+    // ✅ FIX: Prevent same currency swap
+    if (from === to) {
+        showAlert('swap-alert', '⚠️ Cannot swap between the same currency. Please select different currencies.', 'error');
+        document.getElementById('swap-summary').style.display = 'none';
+        return;
+    }
     
     document.getElementById('swap-available').textContent = available.toFixed(2);
     document.getElementById('swap-from-curr').textContent = from;
@@ -1571,8 +1685,53 @@ async function updateProfile() {
     }
 }
 
-function changePassword() {
-    showToast('To change password, please contact support@flipcash.app', 'info');
+async function changePassword() {
+    const currentPassword = document.getElementById('settings-current-password').value;
+    const newPassword = document.getElementById('settings-new-password').value;
+    const confirmPassword = document.getElementById('settings-confirm-password').value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showAlert('settings-alert', 'Please fill all password fields', 'error');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showAlert('settings-alert', 'New passwords do not match', 'error');
+        return;
+    }
+    
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newPassword)) {
+        showAlert('settings-alert', 'Password must contain: minimum 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character', 'error');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/users/change-password`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                currentPassword, 
+                newPassword 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            showToast('Password changed successfully!', 'success');
+            document.getElementById('settings-current-password').value = '';
+            document.getElementById('settings-new-password').value = '';
+            document.getElementById('settings-confirm-password').value = '';
+        } else {
+            showAlert('settings-alert', data.message || 'Failed to change password', 'error');
+        }
+    } catch (error) {
+        showAlert('settings-alert', 'Connection error. Please try again.', 'error');
+    }
 }
 
 function saveNotifications() {
@@ -1582,6 +1741,66 @@ function saveNotifications() {
     showToast('Notification preferences saved!', 'success');
 }
 
+ // ✅ Notification System Functions
+let notifications = [];
+
+function toggleNotifications() {
+    const panel = document.getElementById('notification-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    if (panel.style.display === 'block') loadNotifications();
+}
+
+function loadNotifications() {
+    // Mock notifications - replace with API call later
+    notifications = [
+        { id: 1, type: 'deposit', message: 'Deposit received', time: '5 mins ago', read: false }
+    ];
+    
+    const list = document.getElementById('notification-list');
+    if (notifications.length === 0) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:#6B7280">No notifications</div>';
+    } else {
+        list.innerHTML = notifications.map(n => `
+            <div style="padding:15px;border-bottom:1px solid #E5E7EB;cursor:pointer;background:${n.read ? 'white' : '#EFF6FF'}" onclick="markAsRead(${n.id})">
+                <div style="font-weight:600">${n.message}</div>
+                <div style="font-size:12px;color:#6B7280;margin-top:5px">${n.time}</div>
+            </div>
+        `).join('');
+    }
+    
+    const unreadCount = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById('notification-badge');
+    if (unreadCount > 0) {
+        badge.textContent = unreadCount;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function markAsRead(id) {
+    const notification = notifications.find(n => n.id === id);
+    if (notification) notification.read = true;
+    loadNotifications();
+}
+
+function markAllAsRead() {
+    notifications.forEach(n => n.read = true);
+    loadNotifications();
+}
+
+// ✅ Swap Currency Toggle
+function swapCurrencies() {
+    const fromSelect = document.getElementById('swap-from');
+    const toSelect = document.getElementById('swap-to');
+    
+    const tempValue = fromSelect.value;
+    fromSelect.value = toSelect.value;
+    toSelect.value = tempValue;
+    
+    calculateSwap();
+}   
+    
 // Check authentication on load
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('accessToken');
