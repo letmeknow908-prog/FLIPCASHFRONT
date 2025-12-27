@@ -1039,13 +1039,28 @@ try {
         }
     });
     
-    console.log('📡 Wallet API response status:', res.status);
-    const data = await res.json();
-    console.log('💰 Wallet data received:', data);
-            
-  if (data.data && Array.isArray(data.data)) {
+console.log('📡 Wallet API response status:', res.status);
+const data = await res.json();
+console.log('💰 Wallet data received:', data);
+
+// ✅ FIXED: Handle both array AND object formats
+let wallets = [];
+if (data.data && Array.isArray(data.data)) {
+    wallets = data.data;
+} else if (data.data && typeof data.data === 'object') {
+    if (data.data.NGN !== undefined || data.data.KSH !== undefined) {
+        wallets = [
+            { currency: 'NGN', balance: data.data.NGN || 0 },
+            { currency: 'KSH', balance: data.data.KSH || 0 }
+        ];
+    } else {
+        wallets = [data.data];
+    }
+}
+
+if (wallets.length > 0) {
     console.log('✅ Processing wallet data...');
-    data.data.forEach(wallet => {
+    wallets.forEach(wallet => {
         console.log(`💵 Wallet found: ${wallet.currency} = ${wallet.balance}`);
         if (wallet.currency === 'NGN') {
             const ngnElement = document.getElementById('ngn-balance');
@@ -1063,12 +1078,12 @@ try {
 } else {
     console.error('❌ Invalid wallet data format:', data);
 }
-        } catch (err) {
-            console.error('Wallet load error:', err);
-        }
+} catch (err) {
+    console.error('Wallet load error:', err);
+}
         
-        // ✅ FIX: Load rates immediately
-        await loadLiveRates();
+// ✅ FIX: Load rates immediately
+await loadLiveRates();
         
         // ✅ FIX: Clear any existing interval
         if (rateUpdateInterval) {
@@ -1127,16 +1142,41 @@ async function loadDeposit() {
         });
         const data = await res.json();
         
-        if (data.data && Array.isArray(data.data)) {
-            data.data.forEach(wallet => {
-                if (wallet.currency === 'NGN') {
-                    walletsData.NGN = wallet.balance;
-                }
-                if (wallet.currency === 'KSH') {
-                    walletsData.KSH = wallet.balance;
-                }
-            });
+// ✅ FIXED: Handle both array AND object formats
+let wallets = [];
+if (data.data && Array.isArray(data.data)) {
+    wallets = data.data;
+} else if (data.data && typeof data.data === 'object') {
+    if (data.data.NGN !== undefined || data.data.KSH !== undefined) {
+        wallets = [
+            { currency: 'NGN', balance: data.data.NGN || 0 },
+            { currency: 'KSH', balance: data.data.KSH || 0 }
+        ];
+    } else {
+        wallets = [data.data];
+    }
+}
+
+if (wallets.length > 0) {
+    wallets.forEach(wallet => {
+        if (wallet.currency === 'NGN') {
+            const ngnElement = document.getElementById('ngn-balance');
+            ngnElement.textContent = wallet.balance.toFixed(2);
+            walletsData.NGN = wallet.balance;
+            console.log('✅ NGN updated:', wallet.balance);
         }
+        if (wallet.currency === 'KSH') {
+            const kshElement = document.getElementById('ksh-balance');
+            kshElement.textContent = wallet.balance.toFixed(2);
+            walletsData.KSH = wallet.balance;
+            console.log('✅ KSH updated:', wallet.balance);
+        }
+    });
+    showToast('✅ Balance refreshed successfully!', 'success');
+} else {
+    showToast('❌ Failed to refresh balance', 'error');
+}
+
     } catch (err) {
         console.error('Wallet refresh error:', err);
     }
@@ -1866,17 +1906,6 @@ function swapCurrencies() {
     calculateSwap();
 }   
     
-// Check authentication on load
-document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-        showPage('dashboard');
-        loadDashboard();
-    } else {
-        showPage('landing');
-    }
-});
-
 // ✅ Force Refresh Balance Function
 async function forceRefreshBalance() {
     console.log('🔄 FORCE REFRESH triggered by user');
@@ -1896,8 +1925,23 @@ async function forceRefreshBalance() {
         const data = await res.json();
         console.log('💰 Force refresh data:', data);
         
+        // ✅ FIXED: Handle both array AND object formats
+        let wallets = [];
         if (data.data && Array.isArray(data.data)) {
-            data.data.forEach(wallet => {
+            wallets = data.data;
+        } else if (data.data && typeof data.data === 'object') {
+            if (data.data.NGN !== undefined || data.data.KSH !== undefined) {
+                wallets = [
+                    { currency: 'NGN', balance: data.data.NGN || 0 },
+                    { currency: 'KSH', balance: data.data.KSH || 0 }
+                ];
+            } else {
+                wallets = [data.data];
+            }
+        }
+
+        if (wallets.length > 0) {
+            wallets.forEach(wallet => {
                 if (wallet.currency === 'NGN') {
                     const ngnElement = document.getElementById('ngn-balance');
                     ngnElement.textContent = wallet.balance.toFixed(2);
