@@ -1480,30 +1480,100 @@ async function handleWithdraw() {
 async function loadHistory() {
     try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_URL}/transactions?limit=50`, {
+        const response = await fetch(`${API_URL}/users/transactions?limit=50`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         const list = document.getElementById('transaction-list');
         
+        console.log('📊 Transaction data:', data); // Debug log
+        
         if (data.data && data.data.length > 0) {
-            list.innerHTML = data.data.map(tx => `
-                <div style="padding:15px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between">
-                    <div>
-                        <strong style="color:#10B981">${tx.type.toUpperCase()}</strong><br>
-                        <small style="color:#6B7280">${new Date(tx.createdAt).toLocaleDateString()}</small>
+            list.innerHTML = data.data.map(tx => {
+                // Determine icon and color based on transaction type
+                let icon = '💳';
+                let typeColor = '#10B981';
+                
+                switch(tx.type.toLowerCase()) {
+                    case 'deposit':
+                        icon = '💳';
+                        typeColor = '#10B981';
+                        break;
+                    case 'swap':
+                        icon = '💱';
+                        typeColor = '#3B82F6';
+                        break;
+                    case 'withdraw':
+                    case 'withdrawal':
+                        icon = '💸';
+                        typeColor = '#F59E0B';
+                        break;
+                    case 'transfer':
+                        icon = '📤';
+                        typeColor = '#8B5CF6';
+                        break;
+                    default:
+                        icon = '📊';
+                        typeColor = '#6B7280';
+                }
+                
+                // Format date
+                const date = new Date(tx.createdAt || tx.created_at);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Status color
+                const statusColor = tx.status === 'completed' || tx.status === 'success' 
+                    ? '#10B981' 
+                    : tx.status === 'pending' 
+                    ? '#EAB308' 
+                    : '#EF4444';
+                
+                return `
+                    <div style="padding:15px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;transition:background 0.2s;cursor:pointer" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="font-size:24px">${icon}</div>
+                            <div>
+                                <strong style="color:${typeColor}">${tx.type.toUpperCase()}</strong>
+                                ${tx.description ? `<br><small style="color:#9CA3AF">${tx.description}</small>` : ''}
+                                <br><small style="color:#6B7280">${formattedDate}</small>
+                            </div>
+                        </div>
+                        <div style="text-align:right">
+                            <strong style="font-size:1.1rem">${tx.amount} ${tx.currency}</strong>
+                            <br><small style="color:${statusColor};font-weight:600">${(tx.status || 'pending').toUpperCase()}</small>
+                        </div>
                     </div>
-                    <div style="text-align:right">
-                        <strong>${tx.amount} ${tx.currency}</strong><br>
-                        <small style="color:${tx.status === 'completed' ? '#10B981' : tx.status === 'pending' ? '#EAB308' : '#EF4444'}">${tx.status.toUpperCase()}</small>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         } else {
-            list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#6B7280"><div style="font-size:3rem">📊</div><p>No transactions yet</p><button class="btn btn-primary" onclick="showPage(\'deposit\')" style="max-width:200px;margin:20px auto">Make Your First Deposit</button></div>';
+            list.innerHTML = `
+                <div style="text-align:center;padding:60px 20px;color:#6B7280">
+                    <div style="font-size:3rem">📊</div>
+                    <p style="font-size:1.1rem;margin:20px 0">No transactions yet</p>
+                    <p style="color:#9CA3AF;margin-bottom:20px">Start by making your first deposit</p>
+                    <button class="btn btn-primary" onclick="showPage('deposit')" style="max-width:200px;margin:20px auto">
+                        💳 Make Deposit
+                    </button>
+                </div>
+            `;
         }
     } catch (error) {
-        console.error('History load error:', error);
+        console.error('❌ History load error:', error);
+        document.getElementById('transaction-list').innerHTML = `
+            <div style="text-align:center;padding:40px 20px;color:#EF4444">
+                <div style="font-size:2rem">❌</div>
+                <p>Failed to load transaction history</p>
+                <button class="btn btn-primary" onclick="loadHistory()" style="max-width:200px;margin:20px auto">
+                    🔄 Retry
+                </button>
+            </div>
+        `;
     }
 }
 
