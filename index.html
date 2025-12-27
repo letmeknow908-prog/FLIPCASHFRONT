@@ -403,7 +403,7 @@
             <strong>⏳ KYC Pending Review</strong>
             <p style="margin-top:5px">Your verification is being processed. This usually takes 24-48 hours.</p>
         </div>
-        <div class="wallets">
+<div class="wallets">
             <div class="wallet-card">
                 <h3>NGN</h3>
                 <div class="balance" id="ngn-balance">0.00</div>
@@ -413,6 +413,12 @@
                 <div class="balance" id="ksh-balance">0.00</div>
             </div>
         </div>
+        
+        <!-- ✅ FORCE REFRESH BUTTON -->
+        <button class="btn btn-primary" onclick="forceRefreshBalance()" style="max-width:300px;margin:20px auto;display:block;background:#059669">
+            🔄 Refresh Balance
+        </button>
+        
         <div class="rates">
             <h3>Live Rates 📈</h3>
             <p>1 NGN = <span id="ngn-to-ksh-rate">...</span> KSH</p>
@@ -1023,28 +1029,40 @@ async function loadDashboard() {
             console.error('Error fetching user data:', err);
         }
         
-        // Load wallets
-        try {
-            const res = await fetch(`${API_URL}/wallets?t=${Date.now()}`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Cache-Control': 'no-cache'
-                }
-            });
-            const data = await res.json();
+// Load wallets
+try {
+    console.log('🔄 Fetching wallets for user...');
+    const res = await fetch(`${API_URL}/wallets?t=${Date.now()}`, {
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Cache-Control': 'no-cache'
+        }
+    });
+    
+    console.log('📡 Wallet API response status:', res.status);
+    const data = await res.json();
+    console.log('💰 Wallet data received:', data);
             
-            if (data.data && Array.isArray(data.data)) {
-                data.data.forEach(wallet => {
-                    if (wallet.currency === 'NGN') {
-                        document.getElementById('ngn-balance').textContent = wallet.balance.toFixed(2);
-                        walletsData.NGN = wallet.balance;
-                    }
-                    if (wallet.currency === 'KSH') {
-                        document.getElementById('ksh-balance').textContent = wallet.balance.toFixed(2);
-                        walletsData.KSH = wallet.balance;
-                    }
-                });
-            }
+  if (data.data && Array.isArray(data.data)) {
+    console.log('✅ Processing wallet data...');
+    data.data.forEach(wallet => {
+        console.log(`💵 Wallet found: ${wallet.currency} = ${wallet.balance}`);
+        if (wallet.currency === 'NGN') {
+            const ngnElement = document.getElementById('ngn-balance');
+            ngnElement.textContent = wallet.balance.toFixed(2);
+            walletsData.NGN = wallet.balance;
+            console.log('✅ NGN balance updated in DOM:', ngnElement.textContent);
+        }
+        if (wallet.currency === 'KSH') {
+            const kshElement = document.getElementById('ksh-balance');
+            kshElement.textContent = wallet.balance.toFixed(2);
+            walletsData.KSH = wallet.balance;
+            console.log('✅ KSH balance updated in DOM:', kshElement.textContent);
+        }
+    });
+} else {
+    console.error('❌ Invalid wallet data format:', data);
+}
         } catch (err) {
             console.error('Wallet load error:', err);
         }
@@ -1858,6 +1876,62 @@ document.addEventListener('DOMContentLoaded', function() {
         showPage('landing');
     }
 });
+
+// ✅ Force Refresh Balance Function
+async function forceRefreshBalance() {
+    console.log('🔄 FORCE REFRESH triggered by user');
+    const token = localStorage.getItem('accessToken');
+    
+    try {
+        const res = await fetch(`${API_URL}/wallets?force=${Date.now()}`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+        
+        console.log('📡 Force refresh response:', res.status);
+        const data = await res.json();
+        console.log('💰 Force refresh data:', data);
+        
+        if (data.data && Array.isArray(data.data)) {
+            data.data.forEach(wallet => {
+                if (wallet.currency === 'NGN') {
+                    const ngnElement = document.getElementById('ngn-balance');
+                    ngnElement.textContent = wallet.balance.toFixed(2);
+                    walletsData.NGN = wallet.balance;
+                    console.log('✅ NGN updated:', wallet.balance);
+                }
+                if (wallet.currency === 'KSH') {
+                    const kshElement = document.getElementById('ksh-balance');
+                    kshElement.textContent = wallet.balance.toFixed(2);
+                    walletsData.KSH = wallet.balance;
+                    console.log('✅ KSH updated:', wallet.balance);
+                }
+            });
+            showToast('✅ Balance refreshed successfully!', 'success');
+        } else {
+            showToast('❌ Failed to refresh balance', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Force refresh error:', error);
+        showToast('❌ Connection error', 'error');
+    }
+}
+
+// Check authentication on load
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        showPage('dashboard');
+        loadDashboard();
+    } else {
+        showPage('landing');
+    }
+});
+  
 </script>
 </body>
 </html>
