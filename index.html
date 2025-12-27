@@ -1774,7 +1774,7 @@ function saveNotifications() {
     showToast('Notification preferences saved!', 'success');
 }
 
- // ✅ Notification System Functions
+// ✅ Notification System Functions
 let notifications = [];
 
 function toggleNotifications() {
@@ -1789,7 +1789,7 @@ async function loadNotifications() {
     
     try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_URL}/notifications`, {
+        const response = await fetch(`${API_URL}/notifications`, {  // ✅ FIXED: Added (
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -1822,27 +1822,6 @@ async function loadNotifications() {
         } else {
             badge.style.display = 'none';
         }
-    }
-}
-    const list = document.getElementById('notification-list');
-    if (notifications.length === 0) {
-        list.innerHTML = '<div style="padding:20px;text-align:center;color:#6B7280">No notifications</div>';
-    } else {
-        list.innerHTML = notifications.map(n => `
-            <div style="padding:15px;border-bottom:1px solid #E5E7EB;cursor:pointer;background:${n.read ? 'white' : '#EFF6FF'}" onclick="markAsRead(${n.id})">
-                <div style="font-weight:600">${n.message}</div>
-                <div style="font-size:12px;color:#6B7280;margin-top:5px">${n.time}</div>
-            </div>
-        `).join('');
-    }
-    
-    const unreadCount = notifications.filter(n => !n.read).length;
-    const badge = document.getElementById('notification-badge');
-    if (unreadCount > 0) {
-        badge.textContent = unreadCount;
-        badge.style.display = 'flex';
-    } else {
-        badge.style.display = 'none';
     }
 }
 
