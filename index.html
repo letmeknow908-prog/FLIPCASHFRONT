@@ -1043,11 +1043,16 @@ console.log('📡 Wallet API response status:', res.status);
 const data = await res.json();
 console.log('💰 Wallet data received:', data);
 
-// ✅ FIXED: Handle both array AND object formats
+// ✅ FIXED: Handle nested wallets array
 let wallets = [];
-if (data.data && Array.isArray(data.data)) {
+if (data.data && data.data.wallets && Array.isArray(data.data.wallets)) {
+    // API returns: {data: {wallets: [...]}}
+    wallets = data.data.wallets;
+} else if (data.data && Array.isArray(data.data)) {
+    // API returns: {data: [...]}
     wallets = data.data;
 } else if (data.data && typeof data.data === 'object') {
+    
     if (data.data.NGN !== undefined || data.data.KSH !== undefined) {
         wallets = [
             { currency: 'NGN', balance: data.data.NGN || 0 },
@@ -1143,8 +1148,11 @@ async function loadDeposit() {
         const data = await res.json();
         
 // ✅ FIXED: Handle both array AND object formats
+// ✅ FIXED: Handle nested wallets array
 let wallets = [];
-if (data.data && Array.isArray(data.data)) {
+if (data.data && data.data.wallets && Array.isArray(data.data.wallets)) {
+    wallets = data.data.wallets;
+} else if (data.data && Array.isArray(data.data)) {
     wallets = data.data;
 } else if (data.data && typeof data.data === 'object') {
     if (data.data.NGN !== undefined || data.data.KSH !== undefined) {
@@ -1926,8 +1934,11 @@ async function forceRefreshBalance() {
         console.log('💰 Force refresh data:', data);
         
         // ✅ FIXED: Handle both array AND object formats
-        let wallets = [];
-        if (data.data && Array.isArray(data.data)) {
+// ✅ FIXED: Handle nested wallets array
+let wallets = [];
+if (data.data && data.data.wallets && Array.isArray(data.data.wallets)) {
+    wallets = data.data.wallets;
+} else if (data.data && Array.isArray(data.data)) {
             wallets = data.data;
         } else if (data.data && typeof data.data === 'object') {
             if (data.data.NGN !== undefined || data.data.KSH !== undefined) {
