@@ -1069,20 +1069,23 @@ if (wallets.length > 0) {
         console.log(`💵 Wallet found: ${wallet.currency} = ${wallet.balance}`);
         if (wallet.currency === 'NGN') {
             const ngnElement = document.getElementById('ngn-balance');
-            ngnElement.textContent = wallet.balance.toFixed(2);
-            walletsData.NGN = wallet.balance;
+            const balance = parseFloat(wallet.balance) || 0;  // ✅ Convert to number
+            ngnElement.textContent = balance.toFixed(2);
+            walletsData.NGN = balance;
             console.log('✅ NGN balance updated in DOM:', ngnElement.textContent);
         }
         if (wallet.currency === 'KSH') {
             const kshElement = document.getElementById('ksh-balance');
-            kshElement.textContent = wallet.balance.toFixed(2);
-            walletsData.KSH = wallet.balance;
+            const balance = parseFloat(wallet.balance) || 0;  // ✅ Convert to number
+            kshElement.textContent = balance.toFixed(2);
+            walletsData.KSH = balance;
             console.log('✅ KSH balance updated in DOM:', kshElement.textContent);
         }
     });
 } else {
     console.error('❌ Invalid wallet data format:', data);
 }
+    
 } catch (err) {
     console.error('Wallet load error:', err);
 }
@@ -1169,15 +1172,17 @@ if (wallets.length > 0) {
     wallets.forEach(wallet => {
         if (wallet.currency === 'NGN') {
             const ngnElement = document.getElementById('ngn-balance');
-            ngnElement.textContent = wallet.balance.toFixed(2);
-            walletsData.NGN = wallet.balance;
-            console.log('✅ NGN updated:', wallet.balance);
+            const balance = parseFloat(wallet.balance) || 0;  // ✅ Convert to number
+            ngnElement.textContent = balance.toFixed(2);
+            walletsData.NGN = balance;
+            console.log('✅ NGN updated:', balance);
         }
         if (wallet.currency === 'KSH') {
             const kshElement = document.getElementById('ksh-balance');
-            kshElement.textContent = wallet.balance.toFixed(2);
-            walletsData.KSH = wallet.balance;
-            console.log('✅ KSH updated:', wallet.balance);
+            const balance = parseFloat(wallet.balance) || 0;  // ✅ Convert to number
+            kshElement.textContent = balance.toFixed(2);
+            walletsData.KSH = balance;
+            console.log('✅ KSH updated:', balance);
         }
     });
     showToast('✅ Balance refreshed successfully!', 'success');
@@ -1951,21 +1956,23 @@ if (data.data && data.data.wallets && Array.isArray(data.data.wallets)) {
             }
         }
 
-        if (wallets.length > 0) {
-            wallets.forEach(wallet => {
-                if (wallet.currency === 'NGN') {
-                    const ngnElement = document.getElementById('ngn-balance');
-                    ngnElement.textContent = wallet.balance.toFixed(2);
-                    walletsData.NGN = wallet.balance;
-                    console.log('✅ NGN updated:', wallet.balance);
-                }
-                if (wallet.currency === 'KSH') {
-                    const kshElement = document.getElementById('ksh-balance');
-                    kshElement.textContent = wallet.balance.toFixed(2);
-                    walletsData.KSH = wallet.balance;
-                    console.log('✅ KSH updated:', wallet.balance);
-                }
-            });
+if (wallets.length > 0) {
+    wallets.forEach(wallet => {
+        if (wallet.currency === 'NGN') {
+            const ngnElement = document.getElementById('ngn-balance');
+            const balance = parseFloat(wallet.balance) || 0;  // ✅ Convert to number
+            ngnElement.textContent = balance.toFixed(2);
+            walletsData.NGN = balance;
+            console.log('✅ NGN updated:', balance);
+        }
+        if (wallet.currency === 'KSH') {
+            const kshElement = document.getElementById('ksh-balance');
+            const balance = parseFloat(wallet.balance) || 0;  // ✅ Convert to number
+            kshElement.textContent = balance.toFixed(2);
+            walletsData.KSH = balance;
+            console.log('✅ KSH updated:', balance);
+        }
+    });
             showToast('✅ Balance refreshed successfully!', 'success');
         } else {
             showToast('❌ Failed to refresh balance', 'error');
