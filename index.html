@@ -982,6 +982,15 @@ function handleLogout() {
 }
 
 async function loadDashboard() {
+    // ✅ ONE-TIME ALERT: Tell users to refresh if balance is wrong
+    const hasSeenRefreshAlert = localStorage.getItem('hasSeenRefreshAlert');
+    if (!hasSeenRefreshAlert) {
+        setTimeout(() => {
+            showToast('💡 Tip: Press Ctrl+Shift+R (or Cmd+Shift+R) to refresh and see latest balance', 'info');
+            localStorage.setItem('hasSeenRefreshAlert', 'true');
+        }, 2000);
+    }
+    
     try {
         const token = localStorage.getItem('accessToken');
         
@@ -1089,6 +1098,31 @@ async function loadLiveRates() {
 }
 
 async function loadDeposit() {
+    // ✅ FORCE REFRESH WALLET BALANCES
+    const token = localStorage.getItem('accessToken');
+    try {
+        const res = await fetch(`${API_URL}/wallets?t=${Date.now()}`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            }
+        });
+        const data = await res.json();
+        
+        if (data.data && Array.isArray(data.data)) {
+            data.data.forEach(wallet => {
+                if (wallet.currency === 'NGN') {
+                    walletsData.NGN = wallet.balance;
+                }
+                if (wallet.currency === 'KSH') {
+                    walletsData.KSH = wallet.balance;
+                }
+            });
+        }
+    } catch (err) {
+        console.error('Wallet refresh error:', err);
+    }
+    
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     // Set default name
@@ -1749,11 +1783,47 @@ function toggleNotifications() {
     if (panel.style.display === 'block') loadNotifications();
 }
 
-function loadNotifications() {
-    // Mock notifications - replace with API call later
-    notifications = [
-        { id: 1, type: 'deposit', message: 'Deposit received', time: '5 mins ago', read: false }
-    ];
+async function loadNotifications() {
+    const list = document.getElementById('notification-list');
+    const badge = document.getElementById('notification-badge');
+    
+    try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/notifications`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            notifications = data.data || [];
+        } else {
+            notifications = [];
+        }
+    } catch (error) {
+        console.log('No notifications API available yet');
+        notifications = [];
+    }
+    
+    if (notifications.length === 0) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:#6B7280">No notifications</div>';
+        badge.style.display = 'none';
+    } else {
+        list.innerHTML = notifications.map(n => `
+            <div style="padding:15px;border-bottom:1px solid #E5E7EB;cursor:pointer;background:${n.read ? 'white' : '#EFF6FF'}" onclick="markAsRead(${n.id})">
+                <div style="font-weight:600">${n.message}</div>
+                <div style="font-size:12px;color:#6B7280;margin-top:5px">${n.time || new Date(n.createdAt).toLocaleString()}</div>
+            </div>
+        `).join('');
+        
+        const unreadCount = notifications.filter(n => !n.read).length;
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
     
     const list = document.getElementById('notification-list');
     if (notifications.length === 0) {
