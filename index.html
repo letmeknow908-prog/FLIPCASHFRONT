@@ -515,6 +515,7 @@
 </div>
 
 <!-- WITHDRAW -->
+<!-- WITHDRAW -->
 <div id="withdraw-page" class="hidden page">
     <header class="header">
         <div class="logo">💰 FlipCash</div>
@@ -523,43 +524,97 @@
         </div>
     </header>
     <div class="container" style="max-width:500px">
-        <h2>Withdraw</h2>
+        <h2>Withdraw to M-Pesa/Airtel</h2>
         <div id="withdraw-alert"></div>
-        <div class="alert alert-info">KSH only to M-Pesa/Airtel</div>
-        <div class="form-group">
-            <label>Amount (KSH)</label>
-            <input type="number" id="withdraw-amount" placeholder="Amount" step="0.01" oninput="calculateWithdraw()">
-            <small>Available: <span id="withdraw-available">0.00</span> KSH</small>
+        
+        <!-- Step 1: Select Provider -->
+        <div class="kyc-step">
+            <h3>Select Payment Method</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px">
+                <button class="provider-btn active" onclick="selectProvider('MPESA')" id="btn-mpesa" style="padding:20px;border:2px solid #10B981;border-radius:12px;background:white;cursor:pointer;transition:all 0.3s">
+                    <div style="font-size:2rem">📱</div>
+                    <div style="font-weight:600;margin-top:10px">M-Pesa</div>
+                    <div style="font-size:12px;color:#6B7280">Safaricom</div>
+                </button>
+                <button class="provider-btn" onclick="selectProvider('AIRTEL')" id="btn-airtel" style="padding:20px;border:2px solid #E5E7EB;border-radius:12px;background:white;cursor:pointer;transition:all 0.3s">
+                    <div style="font-size:2rem">📲</div>
+                    <div style="font-weight:600;margin-top:10px">Airtel Money</div>
+                    <div style="font-size:12px;color:#6B7280">Airtel Kenya</div>
+                </button>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Phone (+254XXXXXXXXX)</label>
-            <input type="tel" id="withdraw-phone" placeholder="+254712345678" oninput="verifyMpesaNumber()">
-            <small>9 digits after +254</small>
+
+        <!-- Step 2: Recipient Details -->
+        <div class="kyc-step">
+            <h3>Recipient Details</h3>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="withdraw-phone" placeholder="+254712345678" oninput="validatePhoneAndFetchName()" maxlength="13">
+                <small>Format: +254XXXXXXXXX (9 digits after +254)</small>
+            </div>
+            
+            <div id="phone-validation-status" style="margin-top:10px;display:none"></div>
+            
+            <div class="form-group">
+                <label>Recipient Name</label>
+                <input type="text" id="withdraw-recipient-name" placeholder="Enter recipient name" required>
+                <small>Full name as registered with <span id="provider-name">M-Pesa</span></small>
+            </div>
         </div>
-        <div id="mpesa-name-display" style="display:none"></div>
-        <div class="form-group">
-            <label>Method</label>
-            <select id="withdraw-method">
-                <option value="MPESA">M-Pesa</option>
-                <option value="AIRTEL">Airtel</option>
-            </select>
+
+        <!-- Step 3: Amount -->
+        <div class="kyc-step">
+            <h3>Withdrawal Amount</h3>
+            <div class="form-group">
+                <label>Amount (KSH)</label>
+                <div style="position:relative">
+                    <span style="position:absolute;left:12px;top:12px;font-size:20px;color:#6B7280">KSh</span>
+                    <input type="number" id="withdraw-amount" placeholder="0.00" step="0.01" oninput="calculateWithdraw()" style="padding-left:60px;font-size:24px;font-weight:600">
+                </div>
+                <small>Available: <span id="withdraw-available" style="font-weight:600;color:#10B981">0.00</span> KSH</small>
+            </div>
         </div>
+
+        <!-- Summary -->
         <div class="summary-box" id="withdraw-summary" style="display:none">
             <h3 style="margin-bottom:20px;font-size:1.3rem">💸 Withdrawal Summary</h3>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
-                <span>Withdrawal Amount:</span><strong id="w-summary-amount">0</strong>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+                <span>Recipient:</span><strong id="w-summary-recipient">-</strong>
             </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
-                <span>Transaction Fee (2%):</span><strong id="w-summary-fee">0</strong>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+                <span>Phone Number:</span><strong id="w-summary-phone">-</strong>
             </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:1.05rem">
-                <span>Total Deducted:</span><strong id="w-summary-total">0</strong>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+                <span>Payment Method:</span><strong id="w-summary-method">-</strong>
             </div>
-            <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:2px solid rgba(255,255,255,0.3);font-size:1.05rem">
-                <span>You Receive (to M-Pesa):</span><strong id="w-summary-receive" style="font-weight:700;font-size:1.3rem;color:#D1FAE5">0</strong>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+                <span>Withdrawal Amount:</span><strong id="w-summary-amount">0 KSH</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+                <span>Transaction Fee (2%):</span><strong id="w-summary-fee">0 KSH</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+                <span>Total Deducted:</span><strong id="w-summary-total">0 KSH</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:2px solid rgba(255,255,255,0.3)">
+                <span>Recipient Receives:</span><strong id="w-summary-receive" style="font-weight:700;font-size:1.3rem;color:#D1FAE5">0 KSH</strong>
             </div>
         </div>
-        <button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn">Withdraw</button>
+
+        <button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn" disabled>
+            <span id="withdraw-btn-text">Complete Withdrawal</span>
+            <span id="withdraw-btn-loading" class="loading" style="display:none"></span>
+        </button>
+
+        <div style="background:#FEF3C7;padding:15px;border-radius:8px;margin-top:20px;border-left:4px solid #F59E0B">
+            <div style="display:flex;gap:10px">
+                <div style="font-size:20px">⚡</div>
+                <div>
+                    <strong>Fast Processing</strong>
+                    <p style="margin-top:5px;font-size:14px;color:#92400E">Withdrawals are processed instantly. Funds arrive within 1-5 minutes.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1321,7 +1376,7 @@ function calculateSwap() {
     document.getElementById('swap-summary').style.display = 'block';
 }
 
-async function handleSwap() {
+ async function handleSwap() {
     const btn = document.getElementById('swap-btn');
     const from = document.getElementById('swap-from').value;
     const to = document.getElementById('swap-to').value;
@@ -1370,9 +1425,71 @@ async function handleSwap() {
     }
 }
 
+// Global variable for selected provider
+let selectedProvider = 'MPESA';
+
+function selectProvider(provider) {
+    selectedProvider = provider;
+    
+    // Update button styles
+    document.getElementById('btn-mpesa').style.border = provider === 'MPESA' ? '2px solid #10B981' : '2px solid #E5E7EB';
+    document.getElementById('btn-mpesa').style.background = provider === 'MPESA' ? '#F0FDF4' : 'white';
+    
+    document.getElementById('btn-airtel').style.border = provider === 'AIRTEL' ? '2px solid #10B981' : '2px solid #E5E7EB';
+    document.getElementById('btn-airtel').style.background = provider === 'AIRTEL' ? '#F0FDF4' : 'white';
+    
+    // Update provider name in form
+    document.getElementById('provider-name').textContent = provider === 'MPESA' ? 'M-Pesa' : 'Airtel Money';
+    
+    calculateWithdraw();
+}
+
+async function validatePhoneAndFetchName() {
+    const phone = document.getElementById('withdraw-phone').value.trim();
+    const statusDiv = document.getElementById('phone-validation-status');
+    const nameInput = document.getElementById('withdraw-recipient-name');
+    
+    // Clear previous status
+    statusDiv.style.display = 'none';
+    statusDiv.innerHTML = '';
+    
+    // Basic validation
+    if (!phone.startsWith('+254')) {
+        if (phone.length > 0) {
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<div style="color:#EF4444;font-size:14px">❌ Phone must start with +254</div>';
+        }
+        return;
+    }
+    
+    const digits = phone.substring(4);
+    if (digits.length !== 9 || !/^\d{9}$/.test(digits)) {
+        if (phone.length >= 4) {
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<div style="color:#EF4444;font-size:14px">❌ Phone must have 9 digits after +254</div>';
+        }
+        return;
+    }
+    
+    if (!['7', '1', '0'].includes(digits[0])) {
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<div style="color:#EF4444;font-size:14px">⚠️ Invalid Kenya phone number format</div>';
+        return;
+    }
+    
+    // Phone is valid
+    statusDiv.style.display = 'block';
+    statusDiv.innerHTML = '<div style="color:#10B981;font-size:14px">✅ Valid phone number</div>';
+    
+    calculateWithdraw();
+}
+
 function calculateWithdraw() {
     const amount = parseFloat(document.getElementById('withdraw-amount').value);
     const available = walletsData.KSH || 0;
+    const phone = document.getElementById('withdraw-phone').value.trim();
+    const recipientName = document.getElementById('withdraw-recipient-name').value.trim();
+    const btn = document.getElementById('withdraw-btn');
     
     document.getElementById('withdraw-available').textContent = available.toFixed(2);
     
@@ -1388,6 +1505,26 @@ function calculateWithdraw() {
         document.getElementById('withdraw-summary').style.display = 'none';
         return;
     }
+
+    // Validate all fields
+    const phoneValid = phone.startsWith('+254') && phone.length === 13;
+    const nameValid = recipientName.length >= 3;
+    
+    if (!phoneValid || !nameValid) {
+        btn.disabled = true;
+        if (amount > 0) {
+            showAlert('withdraw-alert', '⚠️ Please fill in all recipient details', 'error');
+        }
+        return;
+    }
+    
+    // Clear errors
+    showAlert('withdraw-alert', '', 'success');
+    
+    // Update summary
+    document.getElementById('w-summary-recipient').textContent = recipientName;
+    document.getElementById('w-summary-phone').textContent = phone;
+    document.getElementById('w-summary-method').textContent = selectedProvider === 'MPESA' ? 'M-Pesa' : 'Airtel Money';
     
     document.getElementById('w-summary-amount').textContent = `${amount.toFixed(2)} KSH`;
     document.getElementById('w-summary-fee').textContent = `${(amount * 0.02).toFixed(2)} KSH`;
@@ -1425,9 +1562,17 @@ function verifyMpesaNumber() {
 
 async function handleWithdraw() {
     const btn = document.getElementById('withdraw-btn');
+    const btnText = document.getElementById('withdraw-btn-text');
+    const btnLoading = document.getElementById('withdraw-btn-loading');
+    
     const amount = parseFloat(document.getElementById('withdraw-amount').value);
     const phone = document.getElementById('withdraw-phone').value.trim();
-    const method = document.getElementById('withdraw-method').value;
+    const recipientName = document.getElementById('withdraw-recipient-name').value.trim();
+    
+    if (!amount || !phone || !recipientName) {
+        showAlert('withdraw-alert', 'Please fill all required fields', 'error');
+        return;
+    }
     
     if (!amount || !phone) {
         showAlert('withdraw-alert', 'Please fill all required fields', 'error');
@@ -1455,25 +1600,33 @@ async function handleWithdraw() {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ currency: 'KSH', amount, phone, method })
+            body: JSON.stringify({ 
+                currency: 'KSH', 
+                amount, 
+                phone,
+                beneficiaryName: recipientName,
+                method: selectedProvider
+            })
         });
         const data = await response.json();
         
         if (data.status === 'success') {
-            showToast(`Withdrawal of ${amount} KSH initiated successfully!`, 'success');
+            showToast(`✅ Withdrawal of ${amount} KSH sent to ${recipientName}!`, 'success');
             setTimeout(() => {
                 showPage('dashboard');
                 loadDashboard();
             }, 1500);
-        } else {
+    } else {
             showAlert('withdraw-alert', data.message || 'Withdrawal failed. Please try again', 'error');
             btn.disabled = false;
-            btn.textContent = 'Withdraw';
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
         }
     } catch (error) {
         showAlert('withdraw-alert', 'Connection error', 'error');
         btn.disabled = false;
-        btn.textContent = 'Withdraw';
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
     }
 }
 
