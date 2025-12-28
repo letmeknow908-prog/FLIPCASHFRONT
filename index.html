@@ -1531,6 +1531,9 @@ function calculateWithdraw() {
     document.getElementById('w-summary-total').textContent = `${totalDeducted.toFixed(2)} KSH`;
     document.getElementById('w-summary-receive').textContent = `${amount.toFixed(2)} KSH`;
     document.getElementById('withdraw-summary').style.display = 'block';
+    
+    // ✅ ENABLE THE BUTTON!
+    btn.disabled = false;
 }
 
 function verifyMpesaNumber() {
