@@ -1408,7 +1408,7 @@ function calculateSwap() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            showToast('Currency swap successful!', 'success');
+            showToast(`✅ Withdrawal of ${amount} KSH sent to ${recipientName}!`, 'success');
             setTimeout(() => {
                 showPage('dashboard');
                 loadDashboard();
@@ -1626,10 +1626,10 @@ async function handleWithdraw() {
             btnLoading.style.display = 'none';
         }
     } catch (error) {
-        showAlert('withdraw-alert', 'Connection error', 'error');
+        console.error('Withdrawal error:', error);
+        showAlert('withdraw-alert', data?.message || 'Withdrawal failed. Please try again or contact support.', 'error');
         btn.disabled = false;
-        btnText.style.display = 'inline';
-        btnLoading.style.display = 'none';
+        btn.innerHTML = 'Complete Withdrawal';  // ✅ Reset button text
     }
 }
 
