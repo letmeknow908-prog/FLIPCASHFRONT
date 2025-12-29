@@ -1498,6 +1498,14 @@ function calculateWithdraw() {
         return;
     }
     
+    // ✅ ADD: 30 KSH minimum validation
+    if (amount < 30) {
+        showAlert('withdraw-alert', '⚠️ Minimum withdrawal amount is 30 KSH (Flutterwave requirement)', 'error');
+        document.getElementById('withdraw-summary').style.display = 'none';
+        btn.disabled = true;
+        return;
+    }
+    
     const totalDeducted = amount + (amount * 0.02);
     
     if (totalDeducted > available) {
@@ -2086,51 +2094,66 @@ async function loadNotifications() {
     
     try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_URL}/notifications`, {  // ✅ FIXED: Added (
+        const response = await fetch(`${API_URL}/notifications`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (response.ok) {
             const data = await response.json();
             notifications = data.data || [];
-        } else {
-            notifications = [];
+            
+            if (notifications.length === 0) {
+                list.innerHTML = '<div style="padding:20px;text-align:center;color:#6B7280">No notifications</div>';
+                badge.style.display = 'none';
+            } else {
+                list.innerHTML = notifications.map(n => `
+                    <div style="padding:15px;border-bottom:1px solid #E5E7EB;cursor:pointer;background:${n.read ? 'white' : '#EFF6FF'}" onclick="markAsRead(${n.id})">
+                        <div style="font-weight:600">${n.title}</div>
+                        <div style="color:#6B7280;font-size:14px;margin-top:5px">${n.message}</div>
+                        <div style="font-size:12px;color:#9CA3AF;margin-top:5px">${new Date(n.created_at).toLocaleString()}</div>
+                    </div>
+                `).join('');
+                
+                const unreadCount = notifications.filter(n => !n.read).length;
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
         }
     } catch (error) {
-        console.log('No notifications API available yet');
-        notifications = [];
-    }
-    
-    if (notifications.length === 0) {
+        console.log('Notification load error:', error);
         list.innerHTML = '<div style="padding:20px;text-align:center;color:#6B7280">No notifications</div>';
         badge.style.display = 'none';
-    } else {
-        list.innerHTML = notifications.map(n => `
-            <div style="padding:15px;border-bottom:1px solid #E5E7EB;cursor:pointer;background:${n.read ? 'white' : '#EFF6FF'}" onclick="markAsRead(${n.id})">
-                <div style="font-weight:600">${n.message}</div>
-                <div style="font-size:12px;color:#6B7280;margin-top:5px">${n.time || new Date(n.createdAt).toLocaleString()}</div>
-            </div>
-        `).join('');
-        
-        const unreadCount = notifications.filter(n => !n.read).length;
-        if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
-        }
     }
 }
 
-function markAsRead(id) {
-    const notification = notifications.find(n => n.id === id);
-    if (notification) notification.read = true;
-    loadNotifications();
+async function markAsRead(id) {
+    try {
+        const token = localStorage.getItem('accessToken');
+        await fetch(`${API_URL}/notifications/${id}/read`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        await loadNotifications();
+    } catch (error) {
+        console.error('Mark as read error:', error);
+    }
 }
 
-function markAllAsRead() {
-    notifications.forEach(n => n.read = true);
-    loadNotifications();
+async function markAllAsRead() {
+    try {
+        const token = localStorage.getItem('accessToken');
+        await fetch(`${API_URL}/notifications/read-all`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        await loadNotifications();
+    } catch (error) {
+        console.error('Mark all as read error:', error);
+    }
 }
 
 // ✅ Swap Currency Toggle
