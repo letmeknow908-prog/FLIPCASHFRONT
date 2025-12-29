@@ -565,47 +565,93 @@
     <div class="page-content active" id="dashboard-page">
         <div class="container">
             <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-title">Total Users</span>
-                        <div class="stat-icon primary">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="total-users">0</div>
-                </div>
-                
-                <div class="stat-card warning">
-                    <div class="stat-header">
-                        <span class="stat-title">Pending KYC</span>
-                        <div class="stat-icon warning">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="pending-kyc">0</div>
-                </div>
-                
-                <div class="stat-card info">
-                    <div class="stat-header">
-                        <span class="stat-title">Total Transactions</span>
-                        <div class="stat-icon info">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="total-transactions">0</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-title">Revenue (NGN)</span>
-                        <div class="stat-icon primary">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="total-revenue">₦0</div>
-                </div>
+            <!-- Enhanced Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">Total Users</span>
+            <div class="stat-icon primary">
+                <i class="fas fa-users"></i>
             </div>
+        </div>
+        <div class="stat-value" id="total-users">0</div>
+        <div style="font-size: 12px; color: var(--text-light); margin-top: 8px;">
+            <span id="verified-users">0</span> verified
+        </div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-header">
+            <span class="stat-title">Pending KYC</span>
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+        <div class="stat-value" id="pending-kyc">0</div>
+        <div style="font-size: 12px; color: var(--text-light); margin-top: 8px;">
+            Needs review
+        </div>
+    </div>
+    
+    <div class="stat-card info">
+        <div class="stat-header">
+            <span class="stat-title">Total Transactions</span>
+            <div class="stat-icon info">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+        </div>
+        <div class="stat-value" id="total-transactions">0</div>
+        <div style="font-size: 12px; color: var(--text-light); margin-top: 8px;">
+            <span style="color: #10B981">↑ <span id="deposits-count">0</span> deposits</span> · 
+            <span style="color: #EF4444">↓ <span id="withdrawals-count">0</span> withdrawals</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">Platform Revenue</span>
+            <div class="stat-icon primary">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        <div class="stat-value" id="total-revenue">₦0.00</div>
+        <div style="font-size: 12px; color: var(--text-light); margin-top: 8px;">
+            From fees (1% swap + 2% withdrawal)
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Breakdown Card -->
+<div class="card" style="margin-bottom: 30px;">
+    <div class="card-header">
+        <h3 class="card-title">💰 Revenue Breakdown</h3>
+        <select class="form-control" style="width: auto;" id="revenue-period" onchange="loadRevenueBreakdown()">
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month" selected>This Month</option>
+            <option value="all">All Time</option>
+        </select>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div style="text-align: center; padding: 15px; background: #F0FDF4; border-radius: 8px;">
+                <div style="font-size: 12px; color: #059669; font-weight: 600; margin-bottom: 8px;">SWAP FEES (1%)</div>
+                <div style="font-size: 24px; font-weight: bold; color: #059669;" id="swap-revenue">₦0.00</div>
+                <div style="font-size: 12px; color: #6B7280; margin-top: 4px;"><span id="swap-count">0</span> swaps</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #FEF3C7; border-radius: 8px;">
+                <div style="font-size: 12px; color: #D97706; font-weight: 600; margin-bottom: 8px;">WITHDRAWAL FEES (2%)</div>
+                <div style="font-size: 24px; font-weight: bold; color: #D97706;" id="withdrawal-revenue">₦0.00</div>
+                <div style="font-size: 12px; color: #6B7280; margin-top: 4px;"><span id="withdrawal-count">0</span> withdrawals</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #DBEAFE; border-radius: 8px;">
+                <div style="font-size: 12px; color: #1D4ED8; font-weight: 600; margin-bottom: 8px;">TOTAL VOLUME</div>
+                <div style="font-size: 24px; font-weight: bold; color: #1D4ED8;" id="total-volume">₦0.00</div>
+                <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">Transaction volume</div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Recent Activity -->
             <div class="card">
@@ -697,26 +743,100 @@
     </div>
 
     <!-- Exchange Rates Page -->
-    <div class="page-content" id="rates-page">
-        <div class="container">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Update Exchange Rates</h3>
+<div class="page-content" id="rates-page">
+    <div class="container">
+        <!-- Current Rates Display -->
+        <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+                <h3 class="card-title">📊 Current Exchange Rates</h3>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="badge" id="rate-mode-badge" style="background: #10B981; color: white;">API MODE</span>
+                    <button class="btn btn-outline btn-sm" onclick="loadCurrentRates()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">NGN to KSH Rate</label>
-                        <input type="number" class="form-control" id="ngn-to-ksh" step="0.0001" placeholder="0.18">
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="padding: 20px; background: linear-gradient(135deg, #10B981, #059669); border-radius: 12px; color: white;">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">NGN → KSH</div>
+                        <div style="font-size: 32px; font-weight: bold;" id="current-ngn-ksh">0.0000</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 8px;">1 NGN = <span id="current-ngn-ksh-display">0</span> KSH</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">KSH to NGN Rate</label>
-                        <input type="number" class="form-control" id="ksh-to-ngn" step="0.0001" placeholder="5.5">
+                    <div style="padding: 20px; background: linear-gradient(135deg, #3B82F6, #2563EB); border-radius: 12px; color: white;">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">KSH → NGN</div>
+                        <div style="font-size: 32px; font-weight: bold;" id="current-ksh-ngn">0.0000</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 8px;">1 KSH = <span id="current-ksh-ngn-display">0</span> NGN</div>
                     </div>
-                    <button class="btn btn-primary" onclick="updateRates()">Update Rates</button>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: #F3F4F6; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 12px; color: #6B7280;">
+                        <i class="fas fa-clock"></i> Last updated: <strong id="rate-last-updated">Never</strong>
+                    </div>
+                    <div style="font-size: 12px; color: #6B7280;">
+                        Source: <strong id="rate-source">API</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Rate Override -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">✏️ Manual Rate Override</h3>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="manual-mode-toggle" onchange="toggleManualMode()" style="width: 18px; height: 18px;">
+                        <span style="font-size: 14px; font-weight: 600;">Enable Manual Mode</span>
+                    </label>
+                </div>
+            </div>
+            <div class="card-body" id="manual-rate-form" style="opacity: 0.5; pointer-events: none;">
+                <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #F59E0B;">
+                    <strong style="color: #D97706;">⚠️ Manual Mode Active</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 14px; color: #92400E;">
+                        When enabled, your custom rates will be used instead of live API rates. Remember to re-enable API mode when done!
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">NGN to KSH Rate</label>
+                    <input type="number" class="form-control" id="manual-ngn-to-ksh" step="0.0001" placeholder="0.0906">
+                    <small style="color: #6B7280;">Current API rate: <strong id="api-ngn-ksh">0.0000</strong></small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">KSH to NGN Rate</label>
+                    <input type="number" class="form-control" id="manual-ksh-to-ngn" step="0.0001" placeholder="11.0275">
+                    <small style="color: #6B7280;">Current API rate: <strong id="api-ksh-ngn">0.0000</strong></small>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="saveManualRates()">
+                        <i class="fas fa-save"></i> Save Manual Rates
+                    </button>
+                    <button class="btn btn-danger" onclick="disableManualMode()">
+                        <i class="fas fa-undo"></i> Revert to API Rates
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate History -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3 class="card-title">📈 Rate History (Last 24 Hours)</h3>
+            </div>
+            <div class="card-body">
+                <div id="rate-history-chart" style="min-height: 200px;">
+                    <p style="text-align: center; color: var(--text-light); padding: 40px;">
+                        Rate history chart coming soon...
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Settings Page -->
     <div class="page-content" id="settings-page">
@@ -1354,11 +1474,232 @@ function logout() {
     }
 }
 
+// ===== ENHANCED DASHBOARD FUNCTIONS =====
+
+async function loadRevenueBreakdown() {
+    const period = document.getElementById('revenue-period')?.value || 'month';
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/revenue?period=${period}`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const rev = data.data;
+            
+            // Update revenue breakdown
+            document.getElementById('swap-revenue').textContent = '₦' + (rev.swapRevenue || 0).toFixed(2);
+            document.getElementById('swap-count').textContent = rev.swapCount || 0;
+            
+            document.getElementById('withdrawal-revenue').textContent = '₦' + (rev.withdrawalRevenue || 0).toFixed(2);
+            document.getElementById('withdrawal-count').textContent = rev.withdrawalCount || 0;
+            
+            document.getElementById('total-volume').textContent = '₦' + (rev.totalVolume || 0).toFixed(2);
+            
+            // Update main stats
+            document.getElementById('deposits-count').textContent = rev.depositCount || 0;
+            document.getElementById('withdrawals-count').textContent = rev.withdrawalCount || 0;
+        }
+    } catch (error) {
+        console.error('Revenue breakdown error:', error);
+    }
+}
+
+// ===== EXCHANGE RATES FUNCTIONS =====
+
+async function loadCurrentRates() {
+    try {
+        const response = await fetch(`${API_URL}/rates`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const rates = data.data;
+            
+            document.getElementById('current-ngn-ksh').textContent = rates.ngnToKsh.toFixed(4);
+            document.getElementById('current-ngn-ksh-display').textContent = rates.ngnToKsh.toFixed(4);
+            document.getElementById('api-ngn-ksh').textContent = rates.ngnToKsh.toFixed(4);
+            
+            document.getElementById('current-ksh-ngn').textContent = rates.kshToNgn.toFixed(4);
+            document.getElementById('current-ksh-ngn-display').textContent = rates.kshToNgn.toFixed(4);
+            document.getElementById('api-ksh-ngn').textContent = rates.kshToNgn.toFixed(4);
+            
+            document.getElementById('rate-last-updated').textContent = new Date(rates.updated_at || Date.now()).toLocaleString();
+            document.getElementById('rate-source').textContent = rates.manual_override ? 'MANUAL' : 'API';
+            
+            const badge = document.getElementById('rate-mode-badge');
+            if (rates.manual_override) {
+                badge.textContent = 'MANUAL MODE';
+                badge.style.background = '#F59E0B';
+                document.getElementById('manual-mode-toggle').checked = true;
+                document.getElementById('manual-rate-form').style.opacity = '1';
+                document.getElementById('manual-rate-form').style.pointerEvents = 'auto';
+            } else {
+                badge.textContent = 'API MODE';
+                badge.style.background = '#10B981';
+                document.getElementById('manual-mode-toggle').checked = false;
+                document.getElementById('manual-rate-form').style.opacity = '0.5';
+                document.getElementById('manual-rate-form').style.pointerEvents = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Load rates error:', error);
+    }
+}
+
+function toggleManualMode() {
+    const form = document.getElementById('manual-rate-form');
+    const checkbox = document.getElementById('manual-mode-toggle');
+    
+    if (checkbox.checked) {
+        form.style.opacity = '1';
+        form.style.pointerEvents = 'auto';
+    } else {
+        form.style.opacity = '0.5';
+        form.style.pointerEvents = 'none';
+    }
+}
+
+async function saveManualRates() {
+    const ngnToKsh = parseFloat(document.getElementById('manual-ngn-to-ksh').value);
+    const kshToNgn = parseFloat(document.getElementById('manual-ksh-to-ngn').value);
+    
+    if (!ngnToKsh || !kshToNgn) {
+        alert('⚠️ Please enter both rates');
+        return;
+    }
+    
+    if (ngnToKsh <= 0 || kshToNgn <= 0) {
+        alert('⚠️ Rates must be positive numbers');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to set manual rates?\n\nNGN → KSH: ${ngnToKsh}\nKSH → NGN: ${kshToNgn}\n\nThis will override API rates until you re-enable API mode.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/rates/manual`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ngnToKsh,
+                kshToNgn,
+                enabled: true
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ Manual rates saved successfully!');
+            loadCurrentRates();
+        } else {
+            alert('❌ Failed to save rates: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Save rates error:', error);
+        alert('❌ Error saving rates');
+    }
+}
+
+async function disableManualMode() {
+    if (!confirm('Are you sure you want to revert to API rates?\n\nYour manual rates will be disabled and live API rates will be used.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/rates/manual`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                enabled: false
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ API mode restored successfully!');
+            document.getElementById('manual-mode-toggle').checked = false;
+            toggleManualMode();
+            loadCurrentRates();
+        } else {
+            alert('❌ Failed to disable manual mode: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Disable manual mode error:', error);
+        alert('❌ Error disabling manual mode');
+    }
+}
+
+// ===== UPDATE MAIN LOAD DASHBOARD =====
+// Replace the existing loadDashboard function with this enhanced version:
+
+async function loadDashboard() {
+    console.log('📊 Loading enhanced dashboard...');
+    
+    try {
+        const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        
+        if (!ADMIN_TOKEN) {
+            console.log('❌ No admin token found');
+            window.location.href = 'admin-login.html';
+            return;
+        }
+        
+        // Load stats
+        const response = await fetch(`${API_URL}/admin/stats`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        if (response.status === 401) {
+            console.log('❌ Unauthorized - token expired');
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminData');
+            window.location.href = 'admin-login.html';
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            document.getElementById('total-users').textContent = data.data.totalUsers || '0';
+            document.getElementById('verified-users').textContent = data.data.verifiedUsers || '0';
+            document.getElementById('pending-kyc').textContent = data.data.pendingKYC || '0';
+            document.getElementById('total-transactions').textContent = data.data.totalTransactions || '0';
+            document.getElementById('total-revenue').textContent = '₦' + (data.data.totalRevenue || 0).toFixed(2);
+            
+            console.log('✅ Dashboard stats loaded');
+        }
+        
+        // Load revenue breakdown
+        await loadRevenueBreakdown();
+        
+        // Load recent KYC
+        loadRecentKYC();
+    } catch (error) {
+        console.error('❌ Dashboard load error:', error);
+    }
+}
+    
 // ✅ LOAD DASHBOARD IMMEDIATELY ON PAGE LOAD
 window.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 DOM loaded, initializing dashboard...');
     loadDashboard();
 });
+
+
 </script>
 
 </body>
