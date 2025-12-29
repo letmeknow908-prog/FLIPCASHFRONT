@@ -1406,7 +1406,7 @@ function calculateSwap() {
     document.getElementById('swap-summary').style.display = 'block';
 }
 
- async function handleSwap() {
+async function handleSwap() {
     const btn = document.getElementById('swap-btn');
     const from = document.getElementById('swap-from').value;
     const to = document.getElementById('swap-to').value;
@@ -1438,7 +1438,11 @@ function calculateSwap() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            showToast(`✅ Withdrawal of ${amount} KSH sent to ${recipientName}!`, 'success');
+            // ✅ FIXED: Show correct swap success message
+            const rate = from === 'NGN' ? exchangeRates.ngnToKsh : exchangeRates.kshToNgn;
+            const receivedAmount = (amount * rate * 0.99).toFixed(2);
+            showToast(`✅ Swap successful! ${amount} ${from} → ${receivedAmount} ${to}`, 'success');
+            
             setTimeout(() => {
                 showPage('dashboard');
                 loadDashboard();
@@ -1449,7 +1453,9 @@ function calculateSwap() {
             btn.textContent = 'Confirm';
         }
     } catch (error) {
-        showAlert('swap-alert', 'Connection error', 'error');
+        // ✅ FIXED: Better error handling
+        console.error('❌ Swap error:', error);
+        showAlert('swap-alert', 'Connection error. Please check your internet and try again', 'error');
         btn.disabled = false;
         btn.textContent = 'Confirm';
     }
