@@ -1658,7 +1658,7 @@ async function handleWithdraw() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            showToast(`✅ Withdrawal of ${amount} KSH sent to ${recipientName}!`, 'success');
+            showToast(`Withdrawal of ${amount} KSH sent to ${recipientName}!`, 'success');
             setTimeout(() => {
                 showPage('dashboard');
                 loadDashboard();
