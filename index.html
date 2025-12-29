@@ -1536,7 +1536,7 @@ function calculateWithdraw() {
     
     // ✅ ADD: 30 KSH minimum validation
     if (amount < 30) {
-        showAlert('withdraw-alert', '⚠️ Minimum withdrawal amount is 30 KSH (Flutterwave requirement)', 'error');
+        showAlert('withdraw-alert', '⚠️ Minimum withdrawal amount is 30 KSH', 'error');
         document.getElementById('withdraw-summary').style.display = 'none';
         btn.disabled = true;
         return;
