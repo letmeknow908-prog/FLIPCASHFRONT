@@ -1441,7 +1441,7 @@ async function handleSwap() {
             // ✅ FIXED: Show correct swap success message
             const rate = from === 'NGN' ? exchangeRates.ngnToKsh : exchangeRates.kshToNgn;
             const receivedAmount = (amount * rate * 0.99).toFixed(2);
-            showToast(`✅ Swap successful! ${amount} ${from} → ${receivedAmount} ${to}`, 'success');
+            showToast(`Swap successful! ${amount} ${from} → ${receivedAmount} ${to}`, 'success');
             
             setTimeout(() => {
                 showPage('dashboard');
