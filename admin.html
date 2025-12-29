@@ -975,6 +975,8 @@ function showPage(page) {
     if (page === 'kyc') loadKYC();
     if (page === 'users') loadUsers();
     if (page === 'transactions') loadTransactions();
+    if (page === 'rates') loadCurrentRates();
+    if (page === 'settings') loadSettings();
 }
 
 // Load Dashboard
@@ -1369,10 +1371,140 @@ async function loadUsers() {
     }
 }
 
-function viewUser(userId) {
-    alert('User details for ID: ' + userId + '\n\nFull user management coming soon!');
+async function viewUser(userId) {
+    try {
+        const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const user = data.data;
+            
+            const details = document.getElementById('user-details');
+            details.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">User ID</label>
+                    <input type="text" class="form-control" value="${user.id}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" value="${user.first_name} ${user.last_name}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" value="${user.email}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" value="${user.phone || 'N/A'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">KYC Status</label>
+                    <input type="text" class="form-control" value="${user.kyc_status || 'not_submitted'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">KYC Verified</label>
+                    <input type="text" class="form-control" value="${user.kyc_verified ? 'Yes' : 'No'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Registered Date</label>
+                    <input type="text" class="form-control" value="${new Date(user.created_at).toLocaleString()}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account Status</label>
+                    <input type="text" class="form-control" value="${user.is_blocked ? 'Blocked' : 'Active'}" readonly>
+                </div>
+                
+                <hr style="margin: 20px 0;">
+                
+                <h4 style="margin-bottom: 15px;">Wallet Balances</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="padding: 15px; background: #F0FDF4; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 12px; color: #059669; font-weight: 600;">NGN BALANCE</div>
+                        <div style="font-size: 20px; font-weight: bold; color: #059669; margin-top: 5px;" id="user-ngn-balance">₦0.00</div>
+                    </div>
+                    <div style="padding: 15px; background: #DBEAFE; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 12px; color: #1D4ED8; font-weight: 600;">KSH BALANCE</div>
+                        <div style="font-size: 20px; font-weight: bold; color: #1D4ED8; margin-top: 5px;" id="user-ksh-balance">KSh 0.00</div>
+                    </div>
+                </div>
+                
+                <h4 style="margin-bottom: 15px;">Recent Transactions</h4>
+                <div id="user-transactions" style="max-height: 200px; overflow-y: auto;">
+                    <p style="text-align: center; color: var(--text-light); padding: 20px;">Loading transactions...</p>
+                </div>
+            `;
+            
+            openModal('user-modal');
+            
+            // Load user wallets
+            loadUserWallets(userId);
+            
+            // Load user transactions
+            loadUserTransactions(userId);
+        } else {
+            alert('Failed to load user details');
+        }
+    } catch (error) {
+        console.error('View user error:', error);
+        alert('Error loading user details');
+    }
 }
 
+async function loadUserWallets(userId) {
+    try {
+        const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        const response = await fetch(`${API_URL}/admin/users/${userId}/wallets`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data) {
+            const wallets = data.data;
+            const ngnWallet = wallets.find(w => w.currency === 'NGN');
+            const kshWallet = wallets.find(w => w.currency === 'KSH');
+            
+            document.getElementById('user-ngn-balance').textContent = '₦' + (ngnWallet?.balance || 0).toFixed(2);
+            document.getElementById('user-ksh-balance').textContent = 'KSh ' + (kshWallet?.balance || 0).toFixed(2);
+        }
+    } catch (error) {
+        console.error('Load user wallets error:', error);
+    }
+}
+
+async function loadUserTransactions(userId) {
+    try {
+        const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        const response = await fetch(`${API_URL}/admin/users/${userId}/transactions`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        const container = document.getElementById('user-transactions');
+        
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+            container.innerHTML = data.data.slice(0, 10).map(tx => `
+                <div style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span class="badge badge-${tx.type === 'deposit' ? 'success' : tx.type === 'withdraw' ? 'danger' : 'info'}">${tx.type}</span>
+                        <span style="margin-left: 10px; font-size: 14px;">${tx.amount.toFixed(2)} ${tx.currency}</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-light);">${new Date(tx.created_at).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No transactions found</p>';
+        }
+    } catch (error) {
+        console.error('Load user transactions error:', error);
+        document.getElementById('user-transactions').innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load transactions</p>';
+    }
+}
 async function loadTransactions() {
     const table = document.getElementById('transactions-table');
     table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading transactions...</p>';
@@ -1445,12 +1577,78 @@ async function updateRates() {
 }
 
 async function updateSettings() {
-    const fee = document.getElementById('transaction-fee').value;
-    const withdrawalFee = document.getElementById('withdrawal-fee').value;
-    const minDeposit = document.getElementById('min-deposit').value;
-    const minWithdrawal = document.getElementById('min-withdrawal').value;
+    const transactionFee = parseFloat(document.getElementById('transaction-fee').value);
+    const withdrawalFee = parseFloat(document.getElementById('withdrawal-fee').value);
+    const minDeposit = parseFloat(document.getElementById('min-deposit').value);
+    const minWithdrawal = parseFloat(document.getElementById('min-withdrawal').value);
     
-    alert('Settings updated successfully!');
+    // Validation
+    if (!transactionFee || !withdrawalFee || !minDeposit || !minWithdrawal) {
+        alert('⚠️ Please fill in all fields');
+        return;
+    }
+    
+    if (transactionFee < 0 || withdrawalFee < 0 || minDeposit < 0 || minWithdrawal < 0) {
+        alert('⚠️ All values must be positive numbers');
+        return;
+    }
+    
+    if (!confirm(`Confirm Settings Update:\n\n` +
+                 `Transaction Fee: ${transactionFee}%\n` +
+                 `Withdrawal Fee: ${withdrawalFee}%\n` +
+                 `Minimum Deposit: ₦${minDeposit}\n` +
+                 `Minimum Withdrawal: KSh ${minWithdrawal}\n\n` +
+                 `These changes will affect all future transactions.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/settings`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                transactionFee,
+                withdrawalFee,
+                minDeposit,
+                minWithdrawal
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ Settings updated successfully!');
+        } else {
+            alert('❌ Failed to update settings: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Update settings error:', error);
+        alert('❌ Error updating settings');
+    }
+}
+
+// Load current settings when page loads
+async function loadSettings() {
+    try {
+        const response = await fetch(`${API_URL}/admin/settings`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data) {
+            const settings = data.data;
+            document.getElementById('transaction-fee').value = settings.transactionFee || 1;
+            document.getElementById('withdrawal-fee').value = settings.withdrawalFee || 2;
+            document.getElementById('min-deposit').value = settings.minDeposit || 1000;
+            document.getElementById('min-withdrawal').value = settings.minWithdrawal || 100;
+        }
+    } catch (error) {
+        console.error('Load settings error:', error);
+    }
 }
 
 function filterKYC() {
