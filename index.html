@@ -1923,14 +1923,15 @@ function calculateWithdraw() {
     console.log('🔍 [WITHDRAW FEE DEBUG] Tier from localStorage:', lastSwapInfo.tier);
     
     if (lastSwapInfo.tier) {
-        // Map tier to withdrawal fee
-        const tierFees = {
-           'Starter': 6,
-           'Basic': 4.5,
-           'Standard': 3.5,
-           'Premium': 2.8,
-           'VIP': 2
-        };
+    // ✅ NEW: Map tier to withdrawal fee
+    const tierFees = {
+       'Micro': 12,
+       'Basic': 8,
+       'Standard': 5,
+       'Premium': 3.5,
+       'VIP': 2.5,
+       'Elite': 2
+    };
         feePercent = tierFees[lastSwapInfo.tier] || 2;
         tierName = lastSwapInfo.tier;
         
