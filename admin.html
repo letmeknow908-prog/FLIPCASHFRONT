@@ -1452,6 +1452,17 @@ async function viewUser(userId) {
                 <div id="user-transactions" style="max-height: 200px; overflow-y: auto;">
                     <p style="text-align: center; color: var(--text-light); padding: 20px;">Loading transactions...</p>
                 </div>
+                <hr style="margin: 20px 0;">
+                
+                <h4 style="margin-bottom: 15px;">🔐 Password Management</h4>
+                <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="margin: 0; font-size: 14px; color: #92400E;">
+                        Generate a temporary password for the user. They will be required to change it on next login.
+                    </p>
+                </div>
+                <button class="btn btn-warning" onclick="generateTemporaryPassword(${user.id})" style="width: 100%;">
+                    <i class="fas fa-key"></i> Generate Temporary Password
+                </button>
             `;
             
             openModal('user-modal');
@@ -1473,22 +1484,41 @@ async function viewUser(userId) {
 async function loadUserWallets(userId) {
     try {
         const ADMIN_TOKEN = localStorage.getItem('adminToken');
+        console.log('💰 Loading wallets for user:', userId);
+        
         const response = await fetch(`${API_URL}/admin/users/${userId}/wallets`, {
             headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
         });
         
         const data = await response.json();
+        console.log('💰 Wallet data:', data);
         
         if (data.status === 'success' && data.data) {
             const wallets = data.data;
+            console.log('💰 Wallets array:', wallets);
+            
             const ngnWallet = wallets.find(w => w.currency === 'NGN');
             const kshWallet = wallets.find(w => w.currency === 'KSH');
             
-            document.getElementById('user-ngn-balance').textContent = '₦' + (ngnWallet?.balance || 0).toFixed(2);
-            document.getElementById('user-ksh-balance').textContent = 'KSh ' + (kshWallet?.balance || 0).toFixed(2);
+            console.log('💰 NGN wallet:', ngnWallet);
+            console.log('💰 KSH wallet:', kshWallet);
+            
+            const ngnBalance = ngnWallet ? parseFloat(ngnWallet.balance || 0) : 0;
+            const kshBalance = kshWallet ? parseFloat(kshWallet.balance || 0) : 0;
+            
+            document.getElementById('user-ngn-balance').textContent = '₦' + ngnBalance.toFixed(2);
+            document.getElementById('user-ksh-balance').textContent = 'KSh ' + kshBalance.toFixed(2);
+            
+            console.log('✅ Balances updated:', { ngnBalance, kshBalance });
+        } else {
+            console.error('❌ Failed to load wallets:', data);
+            document.getElementById('user-ngn-balance').textContent = '₦0.00';
+            document.getElementById('user-ksh-balance').textContent = 'KSh 0.00';
         }
     } catch (error) {
-        console.error('Load user wallets error:', error);
+        console.error('❌ Load user wallets error:', error);
+        document.getElementById('user-ngn-balance').textContent = '₦0.00';
+        document.getElementById('user-ksh-balance').textContent = 'KSh 0.00';
     }
 }
 
@@ -1522,6 +1552,59 @@ async function loadUserTransactions(userId) {
         if (container) {
             container.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load transactions</p>';
         }
+    }
+}
+
+async function generateTemporaryPassword(userId) {
+    if (!confirm('Generate a temporary password for this user?\n\nThe user will need to change it on their next login.')) {
+        return;
+    }
+    
+    try {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Generating...';
+        
+        const response = await fetch(`${API_URL}/admin/users/${userId}/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const tempPassword = data.data.temporaryPassword;
+            
+            // Show password in a copyable format
+            const message = `✅ Temporary Password Generated!\n\n` +
+                          `Password: ${tempPassword}\n\n` +
+                          `📋 This password has been copied to your clipboard.\n\n` +
+                          `⚠️ User must change this password on next login.\n` +
+                          `Share this password securely with the user.`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(tempPassword).then(() => {
+                alert(message);
+            }).catch(() => {
+                alert(message + '\n\n(Could not copy to clipboard automatically)');
+            });
+            
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        } else {
+            alert('❌ Failed to generate password: ' + data.message);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    } catch (error) {
+        console.error('Generate password error:', error);
+        alert('❌ Error generating temporary password');
+        event.target.disabled = false;
+        event.target.innerHTML = '<i class="fas fa-key"></i> Generate Temporary Password';
     }
 }
     
