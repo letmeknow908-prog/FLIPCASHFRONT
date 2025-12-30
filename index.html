@@ -601,6 +601,7 @@
     </div>
 </div>
 
+    
 <!-- WITHDRAW -->
 <!-- WITHDRAW -->
 <div id="withdraw-page" class="hidden page">
@@ -1738,6 +1739,72 @@ function calculateSwap() {
     showAlert('swap-alert', '', 'success');
 }
 
+// ✅ ADD THIS ENTIRE FUNCTION
+async function handleSwap() {
+    const btn = document.getElementById('swap-btn');
+    const from = document.getElementById('swap-from').value;
+    const to = document.getElementById('swap-to').value;
+    const amount = parseFloat(document.getElementById('swap-amount').value);
+    
+    if (!amount || amount <= 0) {
+        showAlert('swap-alert', 'Please enter a valid amount', 'error');
+        return;
+    }
+    
+    const available = walletsData[from] || 0;
+    if (amount > available) {
+        showAlert('swap-alert', `Insufficient ${from} balance`, 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span> Processing...';
+    
+    try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/transactions/swap`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                fromCurrency: from, 
+                toCurrency: to, 
+                amount 
+            })
+        });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // ✅ Store tier info for future withdrawals
+            if (data.data && data.data.fees && data.data.fees.tier) {
+                localStorage.setItem('lastSwapInfo', JSON.stringify({
+                    tier: data.data.fees.tier,
+                    amount: amount,
+                    date: new Date().toISOString()
+                }));
+                console.log('✅ Stored tier info:', data.data.fees.tier);
+            }
+            
+            showToast('Swap successful!', 'success');
+            setTimeout(() => {
+                showPage('dashboard');
+                loadDashboard();
+            }, 1500);
+        } else {
+            showAlert('swap-alert', data.message || 'Swap failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Confirm';
+        }
+    } catch (error) {
+        console.error('Swap error:', error);
+        showAlert('swap-alert', 'Connection error. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Confirm';
+    }
+}
+    
 // Global variable for selected provider
 let selectedProvider = 'MPESA';
 
@@ -1811,7 +1878,7 @@ function calculateWithdraw() {
         return;
     }
     
-    // ✅ ADD: 30 KSH minimum validation
+    // ✅ MINIMUM VALIDATION
     if (amount < 30) {
         showAlert('withdraw-alert', '⚠️ Minimum withdrawal amount is 30 KSH', 'error');
         document.getElementById('withdraw-summary').style.display = 'none';
@@ -1819,10 +1886,37 @@ function calculateWithdraw() {
         return;
     }
     
-    const totalDeducted = amount + (amount * 0.02);
+    // ✅ ESTIMATE FEE BASED ON USER'S TIER (stored in localStorage from last swap)
+    let feePercent = 2; // Default
+    let tierName = 'Standard';
+    
+    // Check if user has tier info from recent swap
+    const lastSwapInfo = JSON.parse(localStorage.getItem('lastSwapInfo') || '{}');
+    if (lastSwapInfo.tier) {
+        // Map tier to withdrawal fee
+        const tierFees = {
+            'Micro': 5,
+            'Small': 3,
+            'Medium': 2.5,
+            'Large': 2,
+            'Very Large': 1.8
+        };
+        feePercent = tierFees[lastSwapInfo.tier] || 2;
+        tierName = lastSwapInfo.tier;
+    }
+    
+    const withdrawalFee = amount * (feePercent / 100);
+    const totalDeducted = amount + withdrawalFee;
+    
+    console.log('💰 Calculated fee:', {
+        tier: tierName,
+        feePercent: feePercent + '%',
+        withdrawalFee: withdrawalFee.toFixed(2),
+        totalDeducted: totalDeducted.toFixed(2)
+    });
     
     if (totalDeducted > available) {
-    showAlert('withdraw-alert', `⚠️ Insufficient funds. Required: ${totalDeducted.toFixed(2)} KSH (${amount.toFixed(2)} withdrawal + ${(amount * 0.02).toFixed(2)} fee). Available: ${available.toFixed(2)} KSH`, 'error');
+        showAlert('withdraw-alert', `⚠️ Insufficient funds. Required: ${totalDeducted.toFixed(2)} KSH (${amount.toFixed(2)} withdrawal + ${withdrawalFee.toFixed(2)} fee [${feePercent}%]). Available: ${available.toFixed(2)} KSH`, 'error');
         document.getElementById('withdraw-summary').style.display = 'none';
         return;
     }
@@ -1848,7 +1942,7 @@ function calculateWithdraw() {
     document.getElementById('w-summary-method').textContent = selectedProvider === 'MPESA' ? 'M-Pesa' : 'Airtel Money';
     
     document.getElementById('w-summary-amount').textContent = `${amount.toFixed(2)} KSH`;
-    document.getElementById('w-summary-fee').textContent = `${(amount * 0.02).toFixed(2)} KSH`;
+    document.getElementById('w-summary-fee').textContent = `${withdrawalFee.toFixed(2)} KSH (${feePercent}% - ${tierName} tier)`;
     document.getElementById('w-summary-total').textContent = `${totalDeducted.toFixed(2)} KSH`;
     document.getElementById('w-summary-receive').textContent = `${amount.toFixed(2)} KSH`;
     document.getElementById('withdraw-summary').style.display = 'block';
