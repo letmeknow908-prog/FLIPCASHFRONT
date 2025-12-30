@@ -949,22 +949,46 @@ async function handleLogin() {
     btn.innerHTML = '<span class="loading"></span> Logging in...';
     
     try {
+        console.log('🔐 Attempting login for:', email);
+        
         const response = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
         
+        console.log('📡 Response status:', response.status);
+        
         const data = await response.json();
+        console.log('📦 Response data:', data);
         
         if (response.ok && data.status === 'success') {
-            localStorage.setItem('accessToken', data.data.accessToken);
+            console.log('✅ Login successful!');
+            
+            // ✅ CRITICAL: Store token BEFORE checking requirePasswordChange
+            if (data.data.accessToken) {
+                localStorage.setItem('accessToken', data.data.accessToken);
+                console.log('🔑 Token stored:', data.data.accessToken.substring(0, 20) + '...');
+            } else {
+                console.error('❌ No access token in response!');
+                showAlert('login-alert', 'Login failed: No access token received', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Login';
+                return;
+            }
+            
             localStorage.setItem('user', JSON.stringify(data.data.user));
             userData = data.data.user;
             
             // ✅ CHECK FOR TEMPORARY PASSWORD
             if (data.data.user.requirePasswordChange || data.data.requirePasswordChange) {
+                console.log('⚠️ User must change temporary password');
                 showToast('⚠️ You must change your temporary password', 'info');
+                
+                // ✅ Store the temporary password in a variable for the modal
+                window.tempLoginPassword = password;
+                
+                // Show modal
                 document.getElementById('password-change-modal').classList.remove('hidden');
                 btn.disabled = false;
                 btn.textContent = 'Login';
@@ -973,6 +997,7 @@ async function handleLogin() {
                 setTimeout(() => showPage('dashboard'), 1000);
             }
         } else {
+            console.log('❌ Login failed:', data.message);
             showAlert('login-alert', data.message || 'Invalid email or password', 'error');
             btn.disabled = false;
             btn.textContent = 'Login';
@@ -1017,14 +1042,12 @@ function checkPasswordStrengthModal(password) {
     }
 }
 
-// ✅ Submit password change from modal
 async function submitPasswordChange() {
     const btn = document.getElementById('password-change-btn');
     const tempPassword = document.getElementById('temp-password').value;
     const newPassword = document.getElementById('new-password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
     
-    // Clear previous alerts
     document.getElementById('password-change-alert').innerHTML = '';
     
     if (!tempPassword || !newPassword || !confirmPassword) {
@@ -1047,6 +1070,19 @@ async function submitPasswordChange() {
     
     try {
         const token = localStorage.getItem('accessToken');
+        
+        // ✅ DEBUG: Check if token exists
+        if (!token) {
+            console.error('❌ No token found in localStorage!');
+            showAlert('password-change-alert', 'Session expired. Please login again.', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Change Password';
+            return;
+        }
+        
+        console.log('🔑 Using token:', token.substring(0, 20) + '...');
+        console.log('🔐 Changing password from temp to new...');
+        
         const response = await fetch(`${API_URL}/users/change-password`, {
             method: 'POST',
             headers: {
@@ -1059,7 +1095,9 @@ async function submitPasswordChange() {
             })
         });
         
+        console.log('📡 Password change response status:', response.status);
         const data = await response.json();
+        console.log('📦 Password change response:', data);
         
         if (data.status === 'success') {
             showToast('✅ Password changed successfully! Please login with your new password.', 'success');
@@ -1070,6 +1108,9 @@ async function submitPasswordChange() {
             document.getElementById('new-password').value = '';
             document.getElementById('confirm-password').value = '';
             
+            // Clear temp password from memory
+            if (window.tempLoginPassword) delete window.tempLoginPassword;
+            
             // Logout and redirect to login
             localStorage.clear();
             setTimeout(() => showPage('login'), 1500);
@@ -1079,7 +1120,7 @@ async function submitPasswordChange() {
             btn.textContent = 'Change Password';
         }
     } catch (error) {
-        console.error('Password change error:', error);
+        console.error('❌ Password change error:', error);
         showAlert('password-change-alert', 'Connection error. Please try again.', 'error');
         btn.disabled = false;
         btn.textContent = 'Change Password';
