@@ -665,31 +665,32 @@
             </div>
         </div>
 
-        <!-- Summary -->
-        <div class="summary-box" id="withdraw-summary" style="display:none">
-            <h3 style="margin-bottom:20px;font-size:1.3rem">💸 Withdrawal Summary</h3>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
-                <span>Recipient:</span><strong id="w-summary-recipient">-</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
-                <span>Phone Number:</span><strong id="w-summary-phone">-</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
-                <span>Payment Method:</span><strong id="w-summary-method">-</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
-                <span>Withdrawal Amount:</span><strong id="w-summary-amount">0 KSH</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
-                <span>Transaction Fee (2%):</span><strong id="w-summary-fee">0 KSH</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
-                <span>Total Deducted:</span><strong id="w-summary-total">0 KSH</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:2px solid rgba(255,255,255,0.3)">
-                <span>Recipient Receives:</span><strong id="w-summary-receive" style="font-weight:700;font-size:1.3rem;color:#D1FAE5">0 KSH</strong>
-            </div>
-        </div>
+       <!-- Summary -->
+<div class="summary-box" id="withdraw-summary" style="display:none">
+    <h3 style="margin-bottom:20px;font-size:1.3rem">💸 Withdrawal Summary</h3>
+    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+        <span>Recipient:</span><strong id="w-summary-recipient">-</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+        <span>Phone Number:</span><strong id="w-summary-phone">-</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+        <span>Payment Method:</span><strong id="w-summary-method">-</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+        <span>Withdrawal Amount:</span><strong id="w-summary-amount">0 KSH</strong>
+    </div>
+    <!-- ✅ FIX: Dynamic fee display -->
+    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+        <span id="w-summary-fee-label">Transaction Fee:</span><strong id="w-summary-fee">0 KSH</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.2)">
+        <span>Total Deducted:</span><strong id="w-summary-total">0 KSH</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:2px solid rgba(255,255,255,0.3)">
+        <span>Recipient Receives:</span><strong id="w-summary-receive" style="font-weight:700;font-size:1.3rem;color:#D1FAE5">0 KSH</strong>
+    </div>
+</div>
 
         <button class="btn btn-primary" onclick="handleWithdraw()" id="withdraw-btn" disabled>
             <span id="withdraw-btn-text">Complete Withdrawal</span>
@@ -1947,9 +1948,10 @@ function calculateWithdraw() {
     document.getElementById('w-summary-recipient').textContent = recipientName;
     document.getElementById('w-summary-phone').textContent = phone;
     document.getElementById('w-summary-method').textContent = selectedProvider === 'MPESA' ? 'M-Pesa' : 'Airtel Money';
-    
+
     document.getElementById('w-summary-amount').textContent = `${amount.toFixed(2)} KSH`;
-    document.getElementById('w-summary-fee').textContent = `${withdrawalFee.toFixed(2)} KSH (${feePercent}% - ${tierName} tier)`;
+    document.getElementById('w-summary-fee-label').textContent = `Transaction Fee (${feePercent}%):`;
+    document.getElementById('w-summary-fee').textContent = `${withdrawalFee.toFixed(2)} KSH`;
     document.getElementById('w-summary-total').textContent = `${totalDeducted.toFixed(2)} KSH`;
     document.getElementById('w-summary-receive').textContent = `${amount.toFixed(2)} KSH`;
     document.getElementById('withdraw-summary').style.display = 'block';
