@@ -293,6 +293,47 @@
     </div>
 </div>
 
+<!-- ✅ PASSWORD CHANGE MODAL (INSERT HERE) -->
+<div id="password-change-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000">
+    <div style="background:white;padding:40px;border-radius:16px;max-width:450px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.3)">
+        <h2 style="text-align:center;margin-bottom:15px;color:#DC2626">⚠️ Password Change Required</h2>
+        <p style="text-align:center;color:#6B7280;margin-bottom:30px">You must change your temporary password before continuing</p>
+        
+        <div id="password-change-alert"></div>
+        
+        <div class="form-group">
+            <label>Temporary Password</label>
+            <div class="password-toggle">
+                <input type="password" id="temp-password" placeholder="Enter temporary password">
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('temp-password',this)">👁️</button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>New Password</label>
+            <div class="password-toggle">
+                <input type="password" id="new-password" placeholder="Enter new password" oninput="checkPasswordStrengthModal(this.value)">
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('new-password',this)">👁️</button>
+            </div>
+            <div class="password-strength">
+                <div class="password-strength-bar" id="modal-password-strength-bar"></div>
+            </div>
+            <div id="modal-password-strength-text" style="font-size:12px;margin-top:5px;font-weight:600"></div>
+            <small style="color:#6B7280;display:block;margin-top:5px">Min 8 characters, 1 uppercase, 1 number, 1 special</small>
+        </div>
+        
+        <div class="form-group">
+            <label>Confirm New Password</label>
+            <div class="password-toggle">
+                <input type="password" id="confirm-password" placeholder="Confirm new password">
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('confirm-password',this)">👁️</button>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="submitPasswordChange()" id="password-change-btn">Change Password</button>
+    </div>
+</div>
+
 <!-- FORGOT PASSWORD -->
 <div id="forgot-password-page" class="hidden page">
     <header class="header">
@@ -897,7 +938,6 @@ async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     
-    // Clear any previous errors
     document.getElementById('login-alert').innerHTML = '';
     
     if (!email || !password) {
@@ -909,30 +949,30 @@ async function handleLogin() {
     btn.innerHTML = '<span class="loading"></span> Logging in...';
     
     try {
-        console.log('🔐 Attempting login for:', email);
-        
         const response = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
         
-        console.log('📡 Response status:', response.status);
-        
         const data = await response.json();
-        console.log('📦 Response data:', data);
         
-        // CRITICAL: Check BOTH response.ok AND data.status
         if (response.ok && data.status === 'success') {
-            console.log('✅ Login successful!');
             localStorage.setItem('accessToken', data.data.accessToken);
             localStorage.setItem('user', JSON.stringify(data.data.user));
             userData = data.data.user;
-            showToast('Login successful! Welcome back!', 'success');
-            setTimeout(() => showPage('dashboard'), 1000);
+            
+            // ✅ CHECK FOR TEMPORARY PASSWORD
+            if (data.data.user.requirePasswordChange || data.data.requirePasswordChange) {
+                showToast('⚠️ You must change your temporary password', 'info');
+                document.getElementById('password-change-modal').classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Login';
+            } else {
+                showToast('Login successful! Welcome back!', 'success');
+                setTimeout(() => showPage('dashboard'), 1000);
+            }
         } else {
-            // Login FAILED
-            console.log('❌ Login failed:', data.message);
             showAlert('login-alert', data.message || 'Invalid email or password', 'error');
             btn.disabled = false;
             btn.textContent = 'Login';
@@ -945,6 +985,107 @@ async function handleLogin() {
     }
 }
 
+// ✅ Password strength checker for modal
+function checkPasswordStrengthModal(password) {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[@$!%*?&]/.test(password)) strength++;
+    
+    const bar = document.getElementById('modal-password-strength-bar');
+    const text = document.getElementById('modal-password-strength-text');
+    
+    if (strength === 0) {
+        bar.style.width = '0%';
+        text.textContent = '';
+    } else if (strength <= 2) {
+        bar.style.width = '33%';
+        bar.style.background = '#EF4444';
+        text.textContent = 'Weak';
+        text.style.color = '#EF4444';
+    } else if (strength === 3) {
+        bar.style.width = '66%';
+        bar.style.background = '#F59E0B';
+        text.textContent = 'Medium';
+        text.style.color = '#F59E0B';
+    } else {
+        bar.style.width = '100%';
+        bar.style.background = '#10B981';
+        text.textContent = 'Strong';
+        text.style.color = '#10B981';
+    }
+}
+
+// ✅ Submit password change from modal
+async function submitPasswordChange() {
+    const btn = document.getElementById('password-change-btn');
+    const tempPassword = document.getElementById('temp-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    // Clear previous alerts
+    document.getElementById('password-change-alert').innerHTML = '';
+    
+    if (!tempPassword || !newPassword || !confirmPassword) {
+        showAlert('password-change-alert', 'Please fill all fields', 'error');
+        return;
+    }
+    
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newPassword)) {
+        showAlert('password-change-alert', 'Password must contain: minimum 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character', 'error');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showAlert('password-change-alert', 'Passwords do not match', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span> Changing Password...';
+    
+    try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/users/change-password`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                currentPassword: tempPassword,
+                newPassword: newPassword
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            showToast('✅ Password changed successfully! Please login with your new password.', 'success');
+            
+            // Hide modal and clear form
+            document.getElementById('password-change-modal').classList.add('hidden');
+            document.getElementById('temp-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            
+            // Logout and redirect to login
+            localStorage.clear();
+            setTimeout(() => showPage('login'), 1500);
+        } else {
+            showAlert('password-change-alert', data.message || 'Failed to change password', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Change Password';
+        }
+    } catch (error) {
+        console.error('Password change error:', error);
+        showAlert('password-change-alert', 'Connection error. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Change Password';
+    }
+}
+    
 async function handleRegister() {
     const btn = document.getElementById('register-btn');
     const firstName = document.getElementById('reg-firstname').value.trim();
