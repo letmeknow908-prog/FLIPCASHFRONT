@@ -939,9 +939,9 @@
         <span class="badge" style="background: #10B981; color: white;">ACTIVE</span>
     </div>
     <div class="card-body">
-        <p style="margin-bottom: 20px; color: #6B7280;">
-            Dynamic fee structure ensures profitability on all transaction sizes while keeping fees competitive.
-        </p>
+      <p style="margin-bottom: 20px; color: #6B7280;">
+    ✅ Dynamic fees apply to BOTH swaps AND withdrawals based on transaction tier.
+     </p>
         
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
@@ -1689,6 +1689,126 @@ async function loadUserTransactions(userId) {
     }
 }
 
+async function viewTransaction(txId) {
+    try {
+        const response = await fetch(`${API_URL}/admin/transactions/${txId}`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const tx = data.data;
+            
+            // Open modal with transaction details
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Transaction Details</h3>
+                        <button class="modal-close" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Transaction ID</label>
+                            <input type="text" class="form-control" value="${tx.id}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">User</label>
+                            <input type="text" class="form-control" value="${tx.user_email}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <input type="text" class="form-control" value="${tx.type}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="text" class="form-control" value="${tx.amount} ${tx.currency}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <input type="text" class="form-control" value="${tx.status}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Flutterwave Reference</label>
+                            <input type="text" class="form-control" value="${tx.flutterwave_ref || 'N/A'}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Created At</label>
+                            <input type="text" class="form-control" value="${new Date(tx.created_at).toLocaleString()}" readonly>
+                        </div>
+                        
+                        ${tx.status === 'failed' || tx.status === 'pending' ? `
+                        <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <strong style="color: #D97706;">⚠️ Failed Transaction</strong>
+                            <p style="margin: 10px 0 0 0; color: #92400E;">This transaction failed. You can issue a refund to the user.</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Close</button>
+                        ${tx.status === 'failed' || tx.status === 'pending' ? `
+                        <button class="btn btn-primary" onclick="issueManualRefund(${tx.user_id}, '${tx.currency}', ${tx.amount}, '${tx.id}', this)">
+                            <i class="fas fa-undo"></i> Issue Refund
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+    } catch (error) {
+        console.error('View transaction error:', error);
+        alert('Failed to load transaction details');
+    }
+}
+
+async function issueManualRefund(userId, currency, amount, transactionId, button) {
+    if (!confirm(`Issue refund of ${amount} ${currency} to user ${userId}?\n\nThis action cannot be undone.`)) {
+        return;
+    }
+    
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="loading"></span> Processing...';
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/refund/manual`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId,
+                currency,
+                amount,
+                transactionId,
+                reason: 'Manual admin refund for failed transaction'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ Refund issued successfully!');
+            button.closest('.modal').remove();
+            loadTransactions();  // Refresh transaction list
+        } else {
+            alert('❌ Refund failed: ' + data.message);
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    } catch (error) {
+        console.error('Manual refund error:', error);
+        alert('❌ Error issuing refund');
+        button.disabled = false;
+        button.innerHTML = originalText;
+    }
+}
+    
 async function generateTemporaryPassword(userId) {
     if (!confirm('Generate a temporary password for this user?\n\nThe user will need to change it on their next login.')) {
         return;
