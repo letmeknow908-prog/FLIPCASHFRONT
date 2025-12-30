@@ -1557,7 +1557,7 @@ function calculateSwap() {
     const amount = parseFloat(document.getElementById('swap-amount').value);
     const available = walletsData[from] || 0;
     
-    // ✅ FIX: Prevent same currency swap
+    // Prevent same currency swap
     if (from === to) {
         showAlert('swap-alert', '⚠️ Cannot swap between the same currency. Please select different currencies.', 'error');
         document.getElementById('swap-summary').style.display = 'none';
@@ -1572,75 +1572,90 @@ function calculateSwap() {
         return;
     }
     
-    if (amount > available) {
-        showAlert('swap-alert', `⚠️ Insufficient ${from}. Available: ${available.toFixed(2)} ${from}`, 'error');
-        document.getElementById('swap-summary').style.display = 'none';
-        return;
-    }
+    // ✅ DYNAMIC FEE CALCULATION
+    let fees;
     
-    const rate = from === 'NGN' ? exchangeRates.ngnToKsh : exchangeRates.kshToNgn;
-    const netAmount = (amount * rate) * 0.99;
-    
-    document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
-    document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
-    document.getElementById('summary-fee').textContent = `${(amount * 0.01).toFixed(2)} ${from}`;
-    document.getElementById('summary-receive-amount').textContent = `${netAmount.toFixed(2)} ${to}`;
-    document.getElementById('swap-summary').style.display = 'block';
-}
-
-async function handleSwap() {
-    const btn = document.getElementById('swap-btn');
-    const from = document.getElementById('swap-from').value;
-    const to = document.getElementById('swap-to').value;
-    const amount = parseFloat(document.getElementById('swap-amount').value);
-    
-    if (!amount || amount <= 0) {
-        showAlert('swap-alert', 'Please enter a valid amount', 'error');
-        return;
-    }
-    
-    if (amount > (walletsData[from] || 0)) {
-        showAlert('swap-alert', '⚠️ Insufficient funds', 'error');
-        return;
-    }
-    
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span> Processing...';
-    
-    try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_URL}/transactions/swap`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ fromCurrency: from, toCurrency: to, amount })
-        });
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            // ✅ FIXED: Show correct swap success message
-            const rate = from === 'NGN' ? exchangeRates.ngnToKsh : exchangeRates.kshToNgn;
-            const receivedAmount = (amount * rate * 0.99).toFixed(2);
-            showToast(`Swap successful! ${amount} ${from} → ${receivedAmount} ${to}`, 'success');
-            
-            setTimeout(() => {
-                showPage('dashboard');
-                loadDashboard();
-            }, 1500);
+    if (from === 'NGN') {
+        // Tiered fees for NGN → KSH
+        if (amount < 5000) {
+            fees = {
+                serviceFee: 1500,
+                swapFeePercent: 0,
+                withdrawalFeePercent: 5,
+                tier: 'Micro'
+            };
+        } else if (amount < 20000) {
+            fees = {
+                serviceFee: 800,
+                swapFeePercent: 2,
+                withdrawalFeePercent: 3,
+                tier: 'Small'
+            };
+        } else if (amount < 50000) {
+            fees = {
+                serviceFee: 500,
+                swapFeePercent: 1.5,
+                withdrawalFeePercent: 2.5,
+                tier: 'Medium'
+            };
+        } else if (amount < 100000) {
+            fees = {
+                serviceFee: 300,
+                swapFeePercent: 1,
+                withdrawalFeePercent: 2,
+                tier: 'Large'
+            };
         } else {
-            showAlert('swap-alert', data.message || 'Swap failed. Please try again', 'error');
-            btn.disabled = false;
-            btn.textContent = 'Confirm';
+            fees = {
+                serviceFee: 200,
+                swapFeePercent: 0.8,
+                withdrawalFeePercent: 1.8,
+                tier: 'Very Large'
+            };
         }
-    } catch (error) {
-        // ✅ FIXED: Better error handling
-        console.error('❌ Swap error:', error);
-        showAlert('swap-alert', 'Connection error. Please check your internet and try again', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Confirm';
+        
+        const swapFee = (amount * fees.swapFeePercent) / 100;
+        const netAmount = amount - swapFee;
+        const rate = exchangeRates.ngnToKsh;
+        const amountKSH = netAmount * rate;
+        const withdrawalFeeKSH = (amountKSH * fees.withdrawalFeePercent) / 100;
+        const finalAmountKSH = amountKSH - withdrawalFeeKSH;
+        const totalDeducted = amount + fees.serviceFee;
+        
+        // Check if user has enough
+        if (totalDeducted > available) {
+            showAlert('swap-alert', `⚠️ Insufficient ${from}. Required: ${totalDeducted.toFixed(2)} ${from} (including ₦${fees.serviceFee} service fee). Available: ${available.toFixed(2)} ${from}`, 'error');
+            document.getElementById('swap-summary').style.display = 'none';
+            return;
+        }
+        
+        // Update summary
+        document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
+        document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+        document.getElementById('summary-fee').textContent = `Service: ₦${fees.serviceFee} + Swap: ${fees.swapFeePercent}% (₦${swapFee.toFixed(2)}) + Withdrawal: ${fees.withdrawalFeePercent}% (KSh ${withdrawalFeeKSH.toFixed(2)})`;
+        document.getElementById('summary-receive-amount').textContent = `${finalAmountKSH.toFixed(2)} ${to}`;
+        
+    } else {
+        // KSH → NGN: Simple 2% fee
+        const rate = exchangeRates.kshToNgn;
+        const fee = amount * 0.02;
+        const netAmount = amount - fee;
+        const finalAmount = netAmount * rate;
+        
+        if (amount > available) {
+            showAlert('swap-alert', `⚠️ Insufficient ${from}. Available: ${available.toFixed(2)} ${from}`, 'error');
+            document.getElementById('swap-summary').style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
+        document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+        document.getElementById('summary-fee').textContent = `${fee.toFixed(2)} ${from} (2%)`;
+        document.getElementById('summary-receive-amount').textContent = `${finalAmount.toFixed(2)} ${to}`;
     }
+    
+    document.getElementById('swap-summary').style.display = 'block';
+    showAlert('swap-alert', '', 'success');
 }
 
 // Global variable for selected provider
