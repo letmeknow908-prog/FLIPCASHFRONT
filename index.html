@@ -1900,6 +1900,11 @@ function calculateWithdraw() {
     
     // Check if user has tier info from recent swap
     const lastSwapInfo = JSON.parse(localStorage.getItem('lastSwapInfo') || '{}');
+    
+    // ✅ ADD DEBUGGING
+    console.log('🔍 [WITHDRAW FEE DEBUG] localStorage lastSwapInfo:', lastSwapInfo);
+    console.log('🔍 [WITHDRAW FEE DEBUG] Tier from localStorage:', lastSwapInfo.tier);
+    
     if (lastSwapInfo.tier) {
         // Map tier to withdrawal fee
         const tierFees = {
@@ -1911,12 +1916,18 @@ function calculateWithdraw() {
         };
         feePercent = tierFees[lastSwapInfo.tier] || 2;
         tierName = lastSwapInfo.tier;
+        
+        // ✅ ADD MORE DEBUGGING
+        console.log('🔍 [WITHDRAW FEE DEBUG] Mapped fee percent:', feePercent);
+        console.log('🔍 [WITHDRAW FEE DEBUG] Tier name:', tierName);
+    } else {
+        console.log('⚠️ [WITHDRAW FEE DEBUG] No tier in localStorage, using default 2%');
     }
     
     const withdrawalFee = amount * (feePercent / 100);
     const totalDeducted = amount + withdrawalFee;
     
-    console.log('💰 Calculated fee:', {
+    console.log('💰 [WITHDRAW FEE DEBUG] Calculated fee:', {
         tier: tierName,
         feePercent: feePercent + '%',
         withdrawalFee: withdrawalFee.toFixed(2),
