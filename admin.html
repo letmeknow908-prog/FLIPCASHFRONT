@@ -520,6 +520,10 @@
             <i class="fas fa-id-card"></i>
             <span>KYC Management</span>
         </div>
+        <div class="nav-item" onclick="showPage('broadcasts')">
+           <i class="fas fa-bullhorn"></i>
+           <span>Broadcasts</span>
+        </div>
         <div class="nav-item" onclick="showPage('users')">
             <i class="fas fa-users"></i>
             <span>Users</span>
@@ -542,7 +546,71 @@
         </div>
     </div>
 </div>
+<!-- Broadcasts Page -->
+<div class="page-content" id="broadcasts-page">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Broadcast Messages</h2>
+            <button class="btn btn-primary" onclick="showBroadcastModal()">
+                <i class="fas fa-plus"></i> New Broadcast
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <div id="broadcasts-table">
+                    <p style="text-align: center; color: var(--text-light); padding: 20px;">Loading broadcasts...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Broadcast Modal -->
+<div class="modal" id="broadcast-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Create Broadcast Message</h3>
+            <button class="modal-close" onclick="closeModal('broadcast-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Title *</label>
+                <input type="text" class="form-control" id="broadcast-title" placeholder="e.g., Merry Christmas!">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Message *</label>
+                <textarea class="form-control" id="broadcast-message" rows="4" placeholder="Your message to all users..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <select class="form-control" id="broadcast-type">
+                    <option value="info">Info (Blue)</option>
+                    <option value="success">Success (Green)</option>
+                    <option value="warning">Warning (Yellow)</option>
+                    <option value="announcement">Announcement (Purple)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Icon</label>
+                <input type="text" class="form-control" id="broadcast-icon" placeholder="e.g., 🎄, 🎉, ⚠️, 📢" value="📢">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Expires At (Optional)</label>
+                <input type="datetime-local" class="form-control" id="broadcast-expires">
+                <small style="color: var(--text-light);">Leave empty for permanent message</small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('broadcast-modal')">Cancel</button>
+            <button class="btn btn-primary" onclick="createBroadcast()">Send Broadcast</button>
+        </div>
+    </div>
+</div>
 <!-- Main Content -->
 <div class="main-content">
     <!-- Header -->
@@ -887,9 +955,10 @@
             </thead>
             <tbody>
                 <tr>
+                    <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;"><strong>Tier 1: Micro</strong></td>
                     <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦200 - ₦5,000</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦1,500</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦1,000</td>
                     <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">0%</td>
                     <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">5%</td>
                 </tr>
@@ -1057,6 +1126,7 @@ function showPage(page) {
     if (page === 'transactions') loadTransactions();
     if (page === 'rates') loadCurrentRates();
     if (page === 'settings') loadSettings();
+    if (page === 'broadcasts') loadBroadcasts();
 }
 
 // Load Dashboard
@@ -1669,6 +1739,133 @@ async function generateTemporaryPassword(userId) {
         alert('❌ Error generating temporary password');
         event.target.disabled = false;
         event.target.innerHTML = '<i class="fas fa-key"></i> Generate Temporary Password';
+    }
+}
+
+// Load broadcasts
+async function loadBroadcasts() {
+    const table = document.getElementById('broadcasts-table');
+    table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">Loading...</p>';
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/broadcasts`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Title</th>
+                            <th>Message</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.data.map(broadcast => `
+                            <tr>
+                                <td style="font-size: 20px;">${broadcast.icon}</td>
+                                <td><strong>${broadcast.title}</strong></td>
+                                <td style="max-width: 300px;">${broadcast.message.substring(0, 100)}${broadcast.message.length > 100 ? '...' : ''}</td>
+                                <td><span class="badge badge-${broadcast.type === 'success' ? 'success' : broadcast.type === 'warning' ? 'warning' : 'info'}">${broadcast.type}</span></td>
+                                <td><span class="badge badge-${broadcast.active ? 'success' : 'danger'}">${broadcast.active ? 'Active' : 'Inactive'}</span></td>
+                                <td>${new Date(broadcast.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    ${broadcast.active ? `<button class="btn btn-danger btn-sm" onclick="deactivateBroadcast(${broadcast.id})">Deactivate</button>` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No broadcasts yet</p>';
+        }
+    } catch (error) {
+        console.error('Load broadcasts error:', error);
+        table.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 20px;">Failed to load broadcasts</p>';
+    }
+}
+
+function showBroadcastModal() {
+    document.getElementById('broadcast-title').value = '';
+    document.getElementById('broadcast-message').value = '';
+    document.getElementById('broadcast-type').value = 'info';
+    document.getElementById('broadcast-icon').value = '📢';
+    document.getElementById('broadcast-expires').value = '';
+    openModal('broadcast-modal');
+}
+
+async function createBroadcast() {
+    const title = document.getElementById('broadcast-title').value.trim();
+    const message = document.getElementById('broadcast-message').value.trim();
+    const type = document.getElementById('broadcast-type').value;
+    const icon = document.getElementById('broadcast-icon').value.trim();
+    const expiresAt = document.getElementById('broadcast-expires').value;
+    
+    if (!title || !message) {
+        alert('Please fill in title and message');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/broadcasts`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title,
+                message,
+                type,
+                icon,
+                expiresAt: expiresAt || null
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ Broadcast sent successfully!');
+            closeModal('broadcast-modal');
+            loadBroadcasts();
+        } else {
+            alert('❌ Failed to send broadcast: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Create broadcast error:', error);
+        alert('❌ Error sending broadcast');
+    }
+}
+
+async function deactivateBroadcast(id) {
+    if (!confirm('Deactivate this broadcast?')) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/broadcasts/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ Broadcast deactivated');
+            loadBroadcasts();
+        } else {
+            alert('❌ Failed to deactivate');
+        }
+    } catch (error) {
+        console.error('Deactivate error:', error);
+        alert('❌ Error');
     }
 }
     
