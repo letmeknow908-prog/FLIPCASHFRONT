@@ -863,8 +863,72 @@
                         <input type="number" class="form-control" id="min-withdrawal" placeholder="100">
                     </div>
                     <button class="btn btn-primary" onclick="updateSettings()">Save Settings</button>
-                </div>
-            </div>
+
+                    <!-- Fee Tiers Card -->
+<div class="card" style="margin-top: 20px;">
+    <div class="card-header">
+        <h3 class="card-title">💰 Fee Tier Structure</h3>
+        <span class="badge" style="background: #10B981; color: white;">ACTIVE</span>
+    </div>
+    <div class="card-body">
+        <p style="margin-bottom: 20px; color: #6B7280;">
+            Dynamic fee structure ensures profitability on all transaction sizes while keeping fees competitive.
+        </p>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #F3F4F6;">
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">Tier</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">Amount Range</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">Service Fee</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">Swap Fee</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">Withdrawal Fee</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;"><strong>Tier 1: Micro</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦200 - ₦5,000</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦1,500</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">0%</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">5%</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;"><strong>Tier 2: Small</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦5,001 - ₦20,000</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦800</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">2%</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">3%</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;"><strong>Tier 3: Medium</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦20,001 - ₦50,000</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦500</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">1.5%</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">2.5%</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;"><strong>Tier 4: Large</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦50,001 - ₦100,000</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">₦300</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">1%</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">2%</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px;"><strong>Tier 5: Very Large</strong></td>
+                    <td style="padding: 12px;">₦100,001+</td>
+                    <td style="padding: 12px;">₦200</td>
+                    <td style="padding: 12px;">0.8%</td>
+                    <td style="padding: 12px;">1.8%</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #F0FDF4; border-radius: 8px; border-left: 4px solid #10B981;">
+            <strong style="color: #059669;">✅ Profitability Guaranteed</strong>
+            <p style="margin: 8px 0 0 0; font-size: 14px; color: #065F46;">
+                Every tier ensures profit even after covering Flutterwave's KSh 107.5 flat fee per transaction.
+            </p>
         </div>
     </div>
 </div>
