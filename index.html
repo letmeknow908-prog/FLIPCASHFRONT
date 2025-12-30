@@ -1747,7 +1747,6 @@ function calculateSwap() {
     showAlert('swap-alert', '', 'success');
 }
     
-// ✅ ADD THIS ENTIRE FUNCTION
 async function handleSwap() {
     const btn = document.getElementById('swap-btn');
     const from = document.getElementById('swap-from').value;
@@ -1784,15 +1783,33 @@ async function handleSwap() {
         });
         const data = await response.json();
         
+        // ✅ ADD COMPREHENSIVE DEBUGGING
+        console.log('🔍 [SWAP DEBUG] Full API response:', data);
+        console.log('🔍 [SWAP DEBUG] data.data:', data.data);
+        console.log('🔍 [SWAP DEBUG] data.data.fees:', data.data?.fees);
+        console.log('🔍 [SWAP DEBUG] data.data.fees.tier:', data.data?.fees?.tier);
+        
         if (data.status === 'success') {
             // ✅ Store tier info for future withdrawals
             if (data.data && data.data.fees && data.data.fees.tier) {
-                localStorage.setItem('lastSwapInfo', JSON.stringify({
+                const tierInfo = {
                     tier: data.data.fees.tier,
                     amount: amount,
                     date: new Date().toISOString()
-                }));
-                console.log('✅ Stored tier info:', data.data.fees.tier);
+                };
+                
+                console.log('💾 [SWAP DEBUG] Storing to localStorage:', tierInfo);
+                localStorage.setItem('lastSwapInfo', JSON.stringify(tierInfo));
+                
+                // ✅ VERIFY IT WAS STORED
+                const verifyStored = JSON.parse(localStorage.getItem('lastSwapInfo') || '{}');
+                console.log('✅ [SWAP DEBUG] Verified stored data:', verifyStored);
+                console.log('✅ [SWAP DEBUG] Verified tier:', verifyStored.tier);
+            } else {
+                console.error('❌ [SWAP DEBUG] Tier data missing from API response!');
+                console.error('❌ [SWAP DEBUG] data.data exists?', !!data.data);
+                console.error('❌ [SWAP DEBUG] data.data.fees exists?', !!(data.data && data.data.fees));
+                console.error('❌ [SWAP DEBUG] data.data.fees.tier exists?', !!(data.data && data.data.fees && data.data.fees.tier));
             }
             
             showToast('Swap successful!', 'success');
