@@ -454,13 +454,7 @@
         <!-- ✅ BROADCAST MESSAGES FROM ADMIN -->
 <div id="broadcast-messages-container"></div>
         <!-- ✅ ADD THIS RIGHT BEFORE THE WALLETS SECTION -->
-<!-- Place this INSIDE the container, right after <h1>Dashboard</h1> and alerts, BEFORE the wallets div -->
-
-<!-- ✅ ADD THIS RIGHT BEFORE THE WALLETS SECTION -->
-<!-- ✅ ADD THIS RIGHT BEFORE THE WALLETS SECTION -->
-<!-- Place this INSIDE the container, right after <h1>Dashboard</h1> and alerts, BEFORE the wallets div -->
-
-<!-- 🇰🇪 NEW YEAR COUNTDOWN BANNER (KENYA / NAIROBI TIME) -->
+<!-- 🇰🇪 NEW YEAR COUNTDOWN BANNER (CORRECT KENYA TIME) -->
 <div id="countdown-banner" style="background:linear-gradient(135deg,#7C3AED,#EC4899,#F59E0B);padding:20px;text-align:center;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.15);position:relative;overflow:hidden">
 
     <!-- Animated background -->
@@ -489,79 +483,63 @@
             🎆 Countdown to 2026 (Kenya Time) 🎆
         </h2>
 
-        <!-- Countdown Timer -->
         <div id="countdown-timer" class="countdown-timer" style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap">
-            <div style="background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);padding:15px 20px;border-radius:12px;min-width:80px">
+            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
                 <div id="days" style="font-size:2.5rem;font-weight:700">00</div>
-                <div style="font-size:0.9rem;opacity:0.9">Days</div>
+                <div>Days</div>
             </div>
-            <div style="background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);padding:15px 20px;border-radius:12px;min-width:80px">
+            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
                 <div id="hours" style="font-size:2.5rem;font-weight:700">00</div>
-                <div style="font-size:0.9rem;opacity:0.9">Hours</div>
+                <div>Hours</div>
             </div>
-            <div style="background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);padding:15px 20px;border-radius:12px;min-width:80px">
+            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
                 <div id="minutes" style="font-size:2.5rem;font-weight:700">00</div>
-                <div style="font-size:0.9rem;opacity:0.9">Minutes</div>
+                <div>Minutes</div>
             </div>
-            <div style="background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);padding:15px 20px;border-radius:12px;min-width:80px">
+            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
                 <div id="seconds" style="font-size:2.5rem;font-weight:700">00</div>
-                <div style="font-size:0.9rem;opacity:0.9">Seconds</div>
+                <div>Seconds</div>
             </div>
         </div>
 
-        <!-- Welcome Message -->
         <div id="welcome-2026" style="display:none;animation:fadeIn 1s ease-out">
-            <h1 style="font-size:3rem;margin:20px 0;font-weight:800;text-shadow:0 2px 15px rgba(0,0,0,0.4)">
-                🎉 WELCOME TO 2026! 🎊
-            </h1>
-            <p style="font-size:1.3rem;margin-top:10px;opacity:0.95">
-                Happy New Year from the FlipCash Team! 🥳
-            </p>
+            <h1 style="font-size:3rem;margin:20px 0;font-weight:800">🎉 WELCOME TO 2026! 🎊</h1>
+            <p>Happy New Year from the FlipCash Team 🥳</p>
         </div>
 
-        <p id="countdown-message" style="margin-top:15px;font-size:1.1rem;opacity:0.95;text-shadow:0 1px 5px rgba(0,0,0,0.3)">
-            Get ready for an amazing year of seamless currency exchange! 🚀
+        <p id="countdown-message" style="margin-top:15px;font-size:1.1rem">
+            Get ready for an amazing year of seamless currency exchange 🚀
         </p>
     </div>
 </div>
 
 <script>
-/* 🇰🇪 FORCE AFRICA / NAIROBI TIME (UTC+3) */
-function getNairobiTime() {
-    return new Date(
-        new Date().toLocaleString("en-US", { timeZone: "Africa/Nairobi" })
-    );
-}
+// ✅ CORRECT KENYA TIME COUNTDOWN USING UTC (NO DRIFT)
 
-function getNairobiDate(dateString) {
-    return new Date(
-        new Date(dateString).toLocaleString("en-US", { timeZone: "Africa/Nairobi" })
-    );
-}
+// New Year in Kenya = 2026-01-01 00:00 EAT = 2025-12-31 21:00 UTC
+const NEW_YEAR_UTC = Date.UTC(2025, 11, 31, 21, 0, 0);
+// Hide after Jan 15 Kenya time = Jan 14 21:00 UTC
+const HIDE_AFTER_UTC = Date.UTC(2026, 0, 14, 21, 0, 0);
 
-/* ✅ COUNTDOWN LOGIC (KENYA TIME) */
 function updateCountdown() {
-    const now = getNairobiTime();
-    const newYear = getNairobiDate('2026-01-01T00:00:00');
-    const midJan = getNairobiDate('2026-01-15T00:00:00');
-
+    const nowUTC = Date.now();
     const banner = document.getElementById('countdown-banner');
 
-    if (now > midJan) {
-        if (banner) banner.style.display = 'none';
+    if (nowUTC > HIDE_AFTER_UTC) {
+        banner.style.display = 'none';
         return;
     }
 
-    if (now >= newYear) {
+    if (nowUTC >= NEW_YEAR_UTC) {
         document.getElementById('countdown-title').style.display = 'none';
         document.getElementById('countdown-timer').style.display = 'none';
         document.getElementById('welcome-2026').style.display = 'block';
         document.getElementById('countdown-message').textContent =
-            'Wishing you prosperity and success in 2026! 💰✨';
+            'Wishing you prosperity and success in 2026 💰✨';
         return;
     }
 
-    const diff = newYear - now;
+    const diff = NEW_YEAR_UTC - nowUTC;
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -574,11 +552,10 @@ function updateCountdown() {
     document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
 }
 
-if (document.getElementById('countdown-banner')) {
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-}
+updateCountdown();
+setInterval(updateCountdown, 1000);
 </script>
+
 
 <div class="wallets">
             <div class="wallet-card">
