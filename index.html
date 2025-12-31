@@ -1690,6 +1690,96 @@ function calculateSwap() {
     }
     
     if (from === 'NGN') {
+        // ✅ EXACT BACKEND LOGIC
+        let tier, rateMarkup, withdrawalFee, message;
+        
+        if (amount < 5000) {
+            tier = 'Micro';
+            rateMarkup = 40;
+            withdrawalFee = 20;
+            message = '⚠️ Small amounts have high fees. Swap ₦10K+ for LIVE rates!';
+        } else if (amount < 10000) {
+            tier = 'Basic';
+            rateMarkup = 15;
+            withdrawalFee = 12;
+            message = '💡 Just ₦' + (10000 - amount).toFixed(0) + ' more unlocks LIVE rates!';
+        } else if (amount < 50000) {
+            tier = 'Standard';
+            rateMarkup = 0;  // LIVE RATE!
+            withdrawalFee = 14;
+            message = '🔥 LIVE RATE! You\'re getting real market value.';
+        } else if (amount < 100000) {
+            tier = 'Premium';
+            rateMarkup = 0;  // LIVE RATE!
+            withdrawalFee = 8;
+            message = '👑 Premium tier - LIVE rates + low fees!';
+        } else if (amount < 500000) {
+            tier = 'VIP';
+            rateMarkup = 0;  // LIVE RATE!
+            withdrawalFee = 5;
+            message = '💎 VIP Member - Best rates guaranteed!';
+        } else {
+            tier = 'Elite';
+            rateMarkup = 0;  // LIVE RATE!
+            withdrawalFee = 3.5;
+            message = '🌟 Elite Member - Premium service!';
+        }
+        
+        const baseRate = exchangeRates.ngnToKsh;
+        const adjustedRate = baseRate * (1 - rateMarkup / 100);
+        const amountKSH = amount * adjustedRate;
+        
+        // ✅ Calculate what user will GET after withdrawal fee
+        const afterWithdrawalFee = amountKSH * (1 - withdrawalFee / 100);
+        
+        // Check balance
+        if (amount > available) {
+            showAlert('swap-alert', `⚠️ Insufficient ${from}. Available: ${available.toFixed(2)} ${from}`, 'error');
+            document.getElementById('swap-summary').style.display = 'none';
+            return;
+        }
+        
+        // ✅ Update summary with ACCURATE values
+        document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
+        document.getElementById('summary-rate').textContent = `1 ${from} = ${adjustedRate.toFixed(4)} ${to}`;
+        document.getElementById('summary-fee').textContent = `Withdrawal Fee (${withdrawalFee}%): ${(amountKSH * withdrawalFee / 100).toFixed(2)} KSH`;
+        document.getElementById('summary-receive-amount').textContent = `${amountKSH.toFixed(2)} ${to} (${afterWithdrawalFee.toFixed(2)} KSH after withdrawal)`;
+        
+        // Show tier message
+        showAlert('swap-alert', message, amount >= 10000 ? 'success' : 'info');
+        
+    } else {
+        // KSH → NGN: Simple 2% fee
+        const rate = exchangeRates.kshToNgn;
+        const fee = amount * 0.02;
+        const netAmount = amount - fee;
+        const finalAmount = netAmount * rate;
+        
+        if (amount > available) {
+            showAlert('swap-alert', `⚠️ Insufficient ${from}. Available: ${available.toFixed(2)} ${from}`, 'error');
+            document.getElementById('swap-summary').style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
+        document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+        document.getElementById('summary-fee').textContent = `Transaction Fee: 2% (${fee.toFixed(2)} ${from})`;
+        document.getElementById('summary-receive-amount').textContent = `${finalAmount.toFixed(2)} ${to}`;
+        
+        showAlert('swap-alert', '', 'success');
+    }
+    
+    document.getElementById('swap-summary').style.display = 'block';
+}
+    
+    // ✅ MINIMUM CHECK
+    if (from === 'NGN' && amount < 2000) {
+        showAlert('swap-alert', '⚠️ Minimum swap amount is ₦2,000', 'error');
+        document.getElementById('swap-summary').style.display = 'none';
+        return;
+    }
+    
+    if (from === 'NGN') {
         // ✅ NEW TIER STRUCTURE
         let tier, rateMarkup, withdrawalFee, message;
         
