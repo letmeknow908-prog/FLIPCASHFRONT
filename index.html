@@ -474,60 +474,79 @@
             <p>1 NGN = <span id="ngn-to-ksh-rate">...</span> KSH</p>
             <p>1 KSH = <span id="ksh-to-ngn-rate">...</span> NGN</p>
         </div>
-        <!-- Around line 650 - Replace the promo banner -->
-<div style="background: linear-gradient(135deg, #10B981, #059669); padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <!-- ✅ PERFECTED TIER DISPLAY - Isolated & Smart -->
+      <div style="background: linear-gradient(135deg, #10B981, #059669); padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+    <!-- Header -->
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
         <div style="font-size: 40px;">💎</div>
-        <div>
+        <div style="flex: 1;">
             <h3 style="color: white; margin: 0; font-size: 1.5rem; font-weight: 700;">Smart Fee Structure</h3>
             <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 0.95rem;">Lower amounts = Higher fees. Swap ₦10K+ for LIVE rates!</p>
         </div>
     </div>
     
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 20px;">
-        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px;">
-            <div style="color: white; font-size: 0.8rem; opacity: 0.9;">₦2K-₦5K</div>
-            <div style="color: white; font-weight: 700; font-size: 1rem;">20% fee</div>
+    <!-- Tier Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+        <!-- Micro Tier -->
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center;">
+            <div style="color: white; font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">₦2K-₦5K</div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 3px;">20% fee</div>
             <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;">Micro</div>
         </div>
-        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px;">
-            <div style="color: white; font-size: 0.8rem; opacity: 0.9;">₦5K-₦10K</div>
-            <div style="color: white; font-weight: 700; font-size: 1rem;">12% fee</div>
+        
+        <!-- Basic Tier -->
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center;">
+            <div style="color: white; font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">₦5K-₦10K</div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 3px;">12% fee</div>
             <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;">Basic</div>
         </div>
-        <div style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3);">
-            <div style="color: white; font-size: 0.8rem; opacity: 0.9;">₦10K+ 🔥</div>
-            <div style="color: white; font-weight: 700; font-size: 1rem;">14% fee</div>
-            <div style="color: rgba(255,255,255,0.9); font-size: 0.75rem; font-weight: 600;">LIVE RATE!</div>
+        
+        <!-- Standard Tier - HIGHLIGHTED (LIVE RATE) -->
+        <div style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.4); text-align: center;">
+            <div style="color: white; font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">₦10K+ 🔥</div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 3px;">14% fee</div>
+            <div style="color: rgba(255,255,255,0.95); font-size: 0.75rem; font-weight: 600;">LIVE RATE!</div>
         </div>
-        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px;">
-            <div style="color: white; font-size: 0.8rem; opacity: 0.9;">₦50K+</div>
-            <div style="color: white; font-weight: 700; font-size: 1rem;">8% fee</div>
+        
+        <!-- Premium Tier -->
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center;">
+            <div style="color: white; font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">₦50K+</div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 3px;">8% fee</div>
             <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;">Premium</div>
         </div>
-        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px;">
-            <div style="color: white; font-size: 0.8rem; opacity: 0.9;">₦100K+</div>
-            <div style="color: white; font-weight: 700; font-size: 1rem;">5% fee</div>
+        
+        <!-- VIP Tier -->
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center;">
+            <div style="color: white; font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">₦100K+</div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 3px;">5% fee</div>
             <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;">VIP</div>
         </div>
-        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px;">
-            <div style="color: white; font-size: 0.8rem; opacity: 0.9;">₦500K+</div>
-            <div style="color: white; font-weight: 700; font-size: 1rem;">3.5% fee</div>
+        
+        <!-- Elite Tier -->
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center;">
+            <div style="color: white; font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">₦500K+</div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 3px;">3.5% fee</div>
             <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;">Elite</div>
-         <div style="margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+        </div>
+    </div>
+    
+    <!-- Pro Tip Footer -->
+    <div style="margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; text-align: center;">
         <p style="color: white; margin: 0; font-size: 0.9rem;">
             <strong>💡 Pro Tip:</strong> Minimum swap is ₦2,000. Larger amounts get better rates!
         </p>
     </div>
 </div>
-        <div class="actions">
-            <button class="action-btn" onclick="showPage('deposit')">💳 Deposit</button>
-            <button class="action-btn" onclick="showPage('swap')">💱 Swap</button>
-            <button class="action-btn" onclick="showPage('withdraw')">💸 Withdraw</button>
-            <button class="action-btn" onclick="showPage('history')">📊 History</button>
-            <button class="action-btn" onclick="showPage('settings')">⚙️ Settings</button>
-            <button class="action-btn" onclick="showPage('kyc')">✅ KYC</button>
-        </div>
+
+<!-- ✅ ACTION BUTTONS - Properly separated -->
+<div class="actions">
+    <button class="action-btn" onclick="showPage('deposit')">💳 Deposit</button>
+    <button class="action-btn" onclick="showPage('swap')">💱 Swap</button>
+    <button class="action-btn" onclick="showPage('withdraw')">💸 Withdraw</button>
+    <button class="action-btn" onclick="showPage('history')">📊 History</button>
+    <button class="action-btn" onclick="showPage('settings')">⚙️ Settings</button>
+    <button class="action-btn" onclick="showPage('kyc')">✅ KYC</button>
+</div>
     </div>
 </div>
 
