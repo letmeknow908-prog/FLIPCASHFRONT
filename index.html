@@ -456,10 +456,13 @@
         <!-- ✅ ADD THIS RIGHT BEFORE THE WALLETS SECTION -->
 <!-- Place this INSIDE the container, right after <h1>Dashboard</h1> and alerts, BEFORE the wallets div -->
 
+<!-- ✅ ADD THIS RIGHT BEFORE THE WALLETS SECTION -->
+<!-- Place this INSIDE the container, right after <h1>Dashboard</h1> and alerts, BEFORE the wallets div -->
+
 <!-- NEW YEAR COUNTDOWN BANNER -->
 <div id="countdown-banner" style="background:linear-gradient(135deg,#7C3AED,#EC4899,#F59E0B);padding:20px;text-align:center;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.15);position:relative;overflow:hidden">
     <!-- Animated background -->
-    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.3)\"/><circle cx=\"30\" cy=\"20\" r=\"1.5\" fill=\"rgba(255,255,255,0.2)\"/><circle cx=\"50\" cy=\"15\" r=\"2.5\" fill=\"rgba(255,255,255,0.25)\"/><circle cx=\"70\" cy=\"25\" r=\"1\" fill=\"rgba(255,255,255,0.3)\"/><circle cx=\"90\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.2)\"/></svg></div>
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.3)\"/><circle cx=\"30\" cy=\"20\" r=\"1.5\" fill=\"rgba(255,255,255,0.2)\"/><circle cx=\"50\" cy=\"15\" r=\"2.5\" fill=\"rgba(255,255,255,0.25)\"/><circle cx=\"70\" cy=\"25\" r=\"1\" fill=\"rgba(255,255,255,0.3)\"/><circle cx=\"90\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.2)\"/></svg>');background-size:200px 100px;animation:sparkle 20s linear infinite;opacity:0.5"></div>
     
     <style>
         @keyframes sparkle {
@@ -513,21 +516,25 @@
 </div>
 
 <script>
-// ✅ NEW YEAR COUNTDOWN LOGIC
+// ✅ NEW YEAR COUNTDOWN LOGIC (KENYA TIMEZONE - EAT)
 function updateCountdown() {
+    // Get current time in Kenya (EAT - UTC+3)
     const now = new Date();
-    const newYear = new Date('2026-01-01T00:00:00');
-    const midJan = new Date('2026-01-15T00:00:00');
+    const kenyaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Nairobi' }));
+    
+    // New Year 2026 in Kenya timezone
+    const newYear = new Date('2026-01-01T00:00:00+03:00');
+    const midJan = new Date('2026-01-15T00:00:00+03:00');
     const banner = document.getElementById('countdown-banner');
     
     // Hide banner after mid-January
-    if (now > midJan) {
+    if (kenyaTime > midJan) {
         if (banner) banner.style.display = 'none';
         return;
     }
     
     // Show "WELCOME TO 2026" after New Year
-    if (now >= newYear) {
+    if (kenyaTime >= newYear) {
         document.getElementById('countdown-title').style.display = 'none';
         document.getElementById('countdown-timer').style.display = 'none';
         document.getElementById('welcome-2026').style.display = 'block';
@@ -536,7 +543,7 @@ function updateCountdown() {
     }
     
     // Calculate time remaining
-    const diff = newYear - now;
+    const diff = newYear - kenyaTime;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
