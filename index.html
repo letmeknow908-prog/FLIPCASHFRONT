@@ -1690,7 +1690,7 @@ function calculateSwap() {
     }
     
     if (from === 'NGN') {
-        // ✅ EXACT BACKEND LOGIC
+        // ✅ NEW TIER STRUCTURE
         let tier, rateMarkup, withdrawalFee, message;
         
         if (amount < 5000) {
@@ -1729,10 +1729,29 @@ function calculateSwap() {
         const adjustedRate = baseRate * (1 - rateMarkup / 100);
         const amountKSH = amount * adjustedRate;
         
-        // ✅ Calculate what user will GET after withdrawal fee
-        const afterWithdrawalFee = amountKSH * (1 - withdrawalFee / 100);
-        
         // Check balance
+        if (amount > available) {
+            showAlert('swap-alert', `⚠️ Insufficient ${from}. Available: ${available.toFixed(2)} ${from}`, 'error');
+            document.getElementById('swap-summary').style.display = 'none';
+            return;
+        }
+        
+        // Update summary
+        document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
+        document.getElementById('summary-rate').textContent = `1 ${from} = ${adjustedRate.toFixed(4)} ${to}`;
+        document.getElementById('summary-fee').textContent = `Withdrawal Fee: ${withdrawalFee}%`;
+        document.getElementById('summary-receive-amount').textContent = `${amountKSH.toFixed(2)} ${to}`;
+        
+        // Show tier message
+        showAlert('swap-alert', message, amount >= 10000 ? 'success' : 'info');
+        
+    } else {
+        // KSH → NGN: Simple 2% fee
+        const rate = exchangeRates.kshToNgn;
+        const fee = amount * 0.02;
+        const netAmount = amount - fee;
+        const finalAmount = netAmount * rate;
+        
         if (amount > available) {
             showAlert('swap-alert', `⚠️ Insufficient ${from}. Available: ${available.toFixed(2)} ${from}`, 'error');
             document.getElementById('swap-summary').style.display = 'none';
