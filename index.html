@@ -1758,6 +1758,17 @@ function calculateSwap() {
             return;
         }
         
+        document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
+        document.getElementById('summary-rate').textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+        document.getElementById('summary-fee').textContent = `Transaction Fee: 2% (${fee.toFixed(2)} ${from})`;
+        document.getElementById('summary-receive-amount').textContent = `${finalAmount.toFixed(2)} ${to}`;
+        
+        showAlert('swap-alert', '', 'success');
+    }
+    
+    document.getElementById('swap-summary').style.display = 'block';
+}
+        
         // ✅ Update summary with ACCURATE values
         document.getElementById('summary-send-amount').textContent = `${amount.toFixed(2)} ${from}`;
         document.getElementById('summary-rate').textContent = `1 ${from} = ${adjustedRate.toFixed(4)} ${to}`;
