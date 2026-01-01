@@ -1112,8 +1112,9 @@ function showPage(page) {
     // Scroll to top
     window.scrollTo(0, 0);
     
-    // ✅ CRITICAL FIX: Call load functions for each page
+    // ✅ CRITICAL FIX: Use else-if chain to prevent multiple executions
     if (page === 'dashboard') {
+        console.log('🏠 Loading dashboard...');
         loadDashboard();
     } else if (page === 'history') {
         console.log('📊 Loading history page...');
@@ -1122,14 +1123,17 @@ function showPage(page) {
         console.log('⚙️ Loading settings page...');
         loadSettings();
     } else if (page === 'deposit') {
+        console.log('💳 Loading deposit page...');
         loadDeposit();
     } else if (page === 'kyc') {
         console.log('✅ Loading KYC page...');
         loadKYCForm();
     } else if (page === 'swap') {
+        console.log('💱 Loading swap page...');
         document.getElementById('swap-available').textContent = walletsData.NGN.toFixed(2);
         document.getElementById('swap-from-curr').textContent = 'NGN';
     } else if (page === 'withdraw') {
+        console.log('💸 Loading withdraw page...');
         document.getElementById('withdraw-available').textContent = walletsData.KSH.toFixed(2);
     }
 }
