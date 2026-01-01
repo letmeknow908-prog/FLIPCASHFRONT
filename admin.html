@@ -1304,6 +1304,17 @@ function loadRecentKYC() {
 async function viewKYC(userId) {
     currentKYCUser = userId;
     
+    // ✅ CRITICAL FIX: Show modal IMMEDIATELY with loading state
+    const details = document.getElementById('kyc-details');
+    details.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+            <div class="loading" style="width: 50px; height: 50px; border-width: 5px; margin: 0 auto 20px;"></div>
+            <p style="color: var(--text-light); font-size: 16px;">Loading KYC details...</p>
+        </div>
+    `;
+    openModal('kyc-modal');
+    
+    // Now fetch data in background
     try {
         const ADMIN_TOKEN = localStorage.getItem('adminToken');
         const response = await fetch(`${API_URL}/admin/kyc/${userId}`, {
@@ -1315,7 +1326,7 @@ async function viewKYC(userId) {
         if (data.status === 'success') {
             const kyc = data.data;
             
-            const details = document.getElementById('kyc-details');
+            // ✅ Update modal content once data arrives
             details.innerHTML = `
                 <div class="form-group">
                     <label class="form-label">Email</label>
@@ -1382,14 +1393,24 @@ async function viewKYC(userId) {
                 </div>
                 ` : ''}
             `;
-            
-            openModal('kyc-modal');
         } else {
-            alert('Failed to load KYC details');
+            details.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 48px; color: #EF4444; margin-bottom: 15px;">❌</div>
+                    <p style="color: #EF4444; font-size: 16px; font-weight: 600;">Failed to load KYC details</p>
+                    <p style="color: #6B7280; margin-top: 10px;">${data.message || 'Unknown error'}</p>
+                </div>
+            `;
         }
     } catch (error) {
         console.error('View KYC error:', error);
-        alert('Error loading KYC details');
+        details.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 48px; color: #EF4444; margin-bottom: 15px;">❌</div>
+                <p style="color: #EF4444; font-size: 16px; font-weight: 600;">Connection Error</p>
+                <p style="color: #6B7280; margin-top: 10px;">Please check your internet and try again</p>
+            </div>
+        `;
     }
 }
 
@@ -1568,6 +1589,16 @@ async function loadUsers() {
 }
 
 async function viewUser(userId) {
+    // ✅ Show modal IMMEDIATELY with loading state
+    const details = document.getElementById('user-details');
+    details.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+            <div class="loading" style="width: 50px; height: 50px; border-width: 5px; margin: 0 auto 20px;"></div>
+            <p style="color: var(--text-light); font-size: 16px;">Loading user details...</p>
+        </div>
+    `;
+    openModal('user-modal');
+    
     try {
         const ADMIN_TOKEN = localStorage.getItem('adminToken');
         const response = await fetch(`${API_URL}/admin/users/${userId}`, {
@@ -1579,7 +1610,7 @@ async function viewUser(userId) {
         if (data.status === 'success') {
             const user = data.data;
             
-            const details = document.getElementById('user-details');
+            // ✅ Update content when data arrives
             details.innerHTML = `
                 <div class="form-group">
                     <label class="form-label">User ID</label>
@@ -1645,19 +1676,27 @@ async function viewUser(userId) {
                 </button>
             `;
             
-            openModal('user-modal');
-            
             // Load user wallets
             loadUserWallets(userId);
             
             // Load user transactions
             loadUserTransactions(userId);
         } else {
-            alert('Failed to load user details');
+            details.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 48px; color: #EF4444; margin-bottom: 15px;">❌</div>
+                    <p style="color: #EF4444; font-size: 16px; font-weight: 600;">Failed to load user details</p>
+                </div>
+            `;
         }
     } catch (error) {
         console.error('View user error:', error);
-        alert('Error loading user details');
+        details.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 48px; color: #EF4444; margin-bottom: 15px;">❌</div>
+                <p style="color: #EF4444; font-size: 16px; font-weight: 600;">Connection Error</p>
+            </div>
+        `;
     }
 }
 
