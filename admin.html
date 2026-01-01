@@ -1222,32 +1222,50 @@ function renderKYCTable() {
         return;
     }
     
-    table.innerHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Full Name</th>
-                    <th>Submitted</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${kycData.map(kyc => `
-                    <tr>
-                        <td>${kyc.email}</td>
-                        <td>${kyc.fullname}</td>
-                        <td>${new Date(kyc.kyc_submitted_at).toLocaleDateString()}</td>
-                        <td><span class="badge badge-${kyc.kyc_status === 'approved' ? 'success' : kyc.kyc_status === 'rejected' ? 'danger' : 'warning'}">${kyc.kyc_status}</span></td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="viewKYC(${kyc.user_id})">View</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
+    // ✅ FIX: Create table properly without string interpolation issues
+    const tableHTML = document.createElement('table');
+    tableHTML.innerHTML = `
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Full Name</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="kyc-tbody"></tbody>
     `;
+    
+    table.innerHTML = '';
+    table.appendChild(tableHTML);
+    
+    const tbody = document.getElementById('kyc-tbody');
+    
+    // ✅ FIX: Add rows with proper event listeners
+    kycData.forEach(kyc => {
+        const row = document.createElement('tr');
+        
+        const statusClass = kyc.kyc_status === 'approved' ? 'success' : 
+                           kyc.kyc_status === 'rejected' ? 'danger' : 'warning';
+        
+        row.innerHTML = `
+            <td>${kyc.email || 'N/A'}</td>
+            <td>${kyc.fullname || 'N/A'}</td>
+            <td>${new Date(kyc.kyc_submitted_at || Date.now()).toLocaleDateString()}</td>
+            <td><span class="badge badge-${statusClass}">${kyc.kyc_status || 'pending'}</span></td>
+            <td><button class="btn btn-primary btn-sm view-kyc-btn">View</button></td>
+        `;
+        
+        // ✅ CRITICAL: Add click listener directly to button
+        const viewBtn = row.querySelector('.view-kyc-btn');
+        viewBtn.addEventListener('click', function() {
+            console.log('🔍 Viewing KYC for user:', kyc.user_id);
+            viewKYC(kyc.user_id);
+        });
+        
+        tbody.appendChild(row);
+    });
 }
 
 function loadRecentKYC() {
@@ -2011,34 +2029,61 @@ async function loadTransactions() {
         if (data.status === 'success' && data.data && data.data.length > 0) {
             transactionsData = data.data;
             
-            table.innerHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Currency</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${transactionsData.map(tx => `
-                            <tr>
-                                <td>${tx.id}</td>
-                                <td>${tx.user_email || tx.user_id}</td>
-                                <td><span class="badge badge-info">${tx.type}</span></td>
-                                <td>${parseFloat(tx.amount || 0).toFixed(2)}</td>
-                                <td>${tx.currency}</td>
-                                <td><span class="badge badge-${tx.status === 'completed' ? 'success' : tx.status === 'pending' ? 'warning' : 'danger'}">${tx.status}</span></td>
-                                <td>${new Date(tx.created_at).toLocaleString()}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            // ✅ CREATE TABLE WITH REFUND BUTTONS
+            const tableHTML = document.createElement('table');
+            tableHTML.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-tbody"></tbody>
             `;
+            
+            table.innerHTML = '';
+            table.appendChild(tableHTML);
+            
+            const tbody = document.getElementById('transactions-tbody');
+            
+            transactionsData.forEach(tx => {
+                const row = document.createElement('tr');
+                
+                const statusClass = tx.status === 'completed' ? 'success' : 
+                                   tx.status === 'pending' ? 'warning' : 'danger';
+                
+                const isWithdrawal = tx.type && tx.type.toLowerCase() === 'withdraw';
+                const canRefund = (tx.status === 'failed' || tx.status === 'pending') && isWithdrawal;
+                
+                row.innerHTML = `
+                    <td>${tx.id}</td>
+                    <td>${tx.user_email || tx.user_id}</td>
+                    <td><span class="badge badge-info">${tx.type}</span></td>
+                    <td>${parseFloat(tx.amount || 0).toFixed(2)}</td>
+                    <td>${tx.currency}</td>
+                    <td><span class="badge badge-${statusClass}">${tx.status}</span></td>
+                    <td>${new Date(tx.created_at).toLocaleString()}</td>
+                    <td>
+                        ${canRefund ? `<button class="btn btn-danger btn-sm refund-btn">🔄 Refund</button>` : '—'}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+                
+                // ✅ ADD REFUND BUTTON LISTENER
+                if (canRefund) {
+                    const refundBtn = row.querySelector('.refund-btn');
+                    refundBtn.addEventListener('click', function() {
+                        refundWithdrawal(tx.user_id, tx.currency, tx.amount, tx.id, refundBtn);
+                    });
+                }
+            });
         } else {
             table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No transactions found</p>';
         }
@@ -2048,6 +2093,56 @@ async function loadTransactions() {
     }
 }
 
+// ✅ ADD THIS NEW FUNCTION RIGHT AFTER loadTransactions()
+async function refundWithdrawal(userId, currency, amount, transactionId, button) {
+    if (!confirm(`⚠️ REFUND CONFIRMATION\n\n` +
+                 `User ID: ${userId}\n` +
+                 `Amount: ${amount} ${currency}\n` +
+                 `Transaction ID: ${transactionId}\n\n` +
+                 `This will credit ${amount} ${currency} back to the user's wallet.\n\n` +
+                 `Are you sure you want to proceed?`)) {
+        return;
+    }
+    
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="loading"></span> Processing...';
+    
+    try {
+        const response = await fetch(`${API_URL}/admin/refund/manual`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId,
+                currency,
+                amount,
+                transactionId,
+                reason: 'Manual admin refund for failed withdrawal'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('✅ Refund processed successfully!\n\n' +
+                  `${amount} ${currency} has been credited back to user ${userId}'s wallet.`);
+            loadTransactions(); // Refresh the table
+        } else {
+            alert('❌ Refund failed: ' + (data.message || 'Unknown error'));
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    } catch (error) {
+        console.error('❌ Refund error:', error);
+        alert('❌ Error processing refund. Please try again or contact tech support.');
+        button.disabled = false;
+        button.innerHTML = originalText;
+    }
+}
+    
 async function updateRates() {
     const ngnToKsh = document.getElementById('ngn-to-ksh').value;
     const kshToNgn = document.getElementById('ksh-to-ngn').value;
