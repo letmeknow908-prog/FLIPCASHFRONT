@@ -1095,19 +1095,43 @@ let exchangeRates = { ngnToKsh: 0.18, kshToNgn: 5.5 };
 let rateUpdateInterval;
 
 function showPage(page) {
+    console.log('📄 Navigating to page:', page);
+    
+    // Hide all pages
     document.querySelectorAll('[id$="-page"]').forEach(el => el.classList.add('hidden'));
-    document.getElementById(page + '-page').classList.remove('hidden');
+    
+    // Show selected page
+    const pageElement = document.getElementById(page + '-page');
+    if (pageElement) {
+        pageElement.classList.remove('hidden');
+    } else {
+        console.error('❌ Page not found:', page + '-page');
+        return;
+    }
+    
+    // Scroll to top
     window.scrollTo(0, 0);
-    if (page === 'dashboard') loadDashboard();
-    if (page === 'history') loadHistory();
-    if (page === 'settings') loadSettings();
-    if (page === 'deposit') loadDeposit();
-    if (page === 'kyc') loadKYCForm();  // ✅ ADD THIS LINE
-    if (page === 'swap') {
+    
+    // ✅ CRITICAL FIX: Call load functions for each page
+    if (page === 'dashboard') {
+        loadDashboard();
+    } else if (page === 'history') {
+        console.log('📊 Loading history page...');
+        loadHistory();
+    } else if (page === 'settings') {
+        console.log('⚙️ Loading settings page...');
+        loadSettings();
+    } else if (page === 'deposit') {
+        loadDeposit();
+    } else if (page === 'kyc') {
+        console.log('✅ Loading KYC page...');
+        loadKYCForm();
+    } else if (page === 'swap') {
         document.getElementById('swap-available').textContent = walletsData.NGN.toFixed(2);
         document.getElementById('swap-from-curr').textContent = 'NGN';
+    } else if (page === 'withdraw') {
+        document.getElementById('withdraw-available').textContent = walletsData.KSH.toFixed(2);
     }
-    if (page === 'withdraw') document.getElementById('withdraw-available').textContent = walletsData.KSH.toFixed(2);
 }
 
 function showAlert(id, message, type) {
