@@ -1304,7 +1304,7 @@ function loadRecentKYC() {
 async function viewKYC(userId) {
     currentKYCUser = userId;
     
-    // ✅ CRITICAL FIX: Show modal IMMEDIATELY with VISIBLE loading spinner
+    // ✅ CRITICAL FIX: Show modal IMMEDIATELY with visible loading spinner
     const details = document.getElementById('kyc-details');
     details.innerHTML = `
         <div style="text-align: center; padding: 60px 20px;">
@@ -1589,7 +1589,7 @@ async function loadUsers() {
 }
 
 async function viewUser(userId) {
-    // ✅ Show modal IMMEDIATELY with VISIBLE loading spinner
+    // ✅ Show modal IMMEDIATELY with visible loading spinner
     const details = document.getElementById('user-details');
     details.innerHTML = `
         <div style="text-align: center; padding: 60px 20px;">
