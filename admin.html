@@ -1222,7 +1222,7 @@ function renderKYCTable() {
         return;
     }
     
-    // ✅ FIX: Create table properly without string interpolation issues
+    // ✅ FIX: Create table element properly
     const tableHTML = document.createElement('table');
     tableHTML.innerHTML = `
         <thead>
@@ -1259,7 +1259,8 @@ function renderKYCTable() {
         
         // ✅ CRITICAL: Add click listener directly to button
         const viewBtn = row.querySelector('.view-kyc-btn');
-        viewBtn.addEventListener('click', function() {
+        viewBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             console.log('🔍 Viewing KYC for user:', kyc.user_id);
             viewKYC(kyc.user_id);
         });
