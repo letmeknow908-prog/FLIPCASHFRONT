@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -75,9 +77,6 @@
     </script>
 
     <style>
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F9FAFB; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F9FAFB; }
         .header { background: white; padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; justify-content: space-between; align-items: center; }
@@ -316,9 +315,7 @@
             <div>
                 <h3 style="margin-bottom:15px;color:#10B981">Contact</h3>
                 <p style="color:#D1D5DB"><i class="fas fa-envelope"></i> support@flipcash.app</p>
-                <p style="color:#D1D5DB"><i class="fas fa-phone"></i> +254 797 411 930</p>
                 <p style="color:#D1D5DB"><i class="fas fa-phone"></i> +234 807 754 0578</p>
-                <p style="color:#D1D5DB"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
                 <p style="color:#D1D5DB"><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</p>
             </div>
         </div>
@@ -524,110 +521,6 @@
         </div>
         <!-- ✅ BROADCAST MESSAGES FROM ADMIN -->
 <div id="broadcast-messages-container"></div>
-        <!-- ✅ ADD THIS RIGHT BEFORE THE WALLETS SECTION -->
-<!-- 🇰🇪 NEW YEAR COUNTDOWN BANNER (CORRECT KENYA TIME) -->
-<div id="countdown-banner" style="background:linear-gradient(135deg,#7C3AED,#EC4899,#F59E0B);padding:20px;text-align:center;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.15);position:relative;overflow:hidden">
-
-    <!-- Animated background -->
-    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.3)\"/><circle cx=\"30\" cy=\"20\" r=\"1.5\" fill=\"rgba(255,255,255,0.2)\"/><circle cx=\"50\" cy=\"15\" r=\"2.5\" fill=\"rgba(255,255,255,0.25)\"/><circle cx=\"70\" cy=\"25\" r=\"1\" fill=\"rgba(255,255,255,0.3)\"/><circle cx=\"90\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.2)\"/></svg></div>
-
-    <style>
-        @keyframes sparkle {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(200px); }
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .countdown-timer {
-            animation: pulse 2s ease-in-out infinite;
-        }
-    </style>
-
-    <div style="position:relative;z-index:2">
-        <h2 id="countdown-title" style="font-size:2rem;margin:0 0 15px 0;font-weight:800;text-shadow:0 2px 10px rgba(0,0,0,0.3)">
-            🎆 Countdown to 2026 (Kenya Time) 🎆
-        </h2>
-
-        <div id="countdown-timer" class="countdown-timer" style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap">
-            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
-                <div id="days" style="font-size:2.5rem;font-weight:700">00</div>
-                <div>Days</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
-                <div id="hours" style="font-size:2.5rem;font-weight:700">00</div>
-                <div>Hours</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
-                <div id="minutes" style="font-size:2.5rem;font-weight:700">00</div>
-                <div>Minutes</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.2);padding:15px 20px;border-radius:12px;min-width:80px">
-                <div id="seconds" style="font-size:2.5rem;font-weight:700">00</div>
-                <div>Seconds</div>
-            </div>
-        </div>
-
-        <div id="welcome-2026" style="display:none;animation:fadeIn 1s ease-out">
-            <h1 style="font-size:3rem;margin:20px 0;font-weight:800">🎉 WELCOME TO 2026! 🎊</h1>
-            <p>Happy New Year from the FlipCash Team 🥳</p>
-        </div>
-
-        <p id="countdown-message" style="margin-top:15px;font-size:1.1rem">
-            Get ready for an amazing year of seamless currency exchange 🚀
-        </p>
-    </div>
-</div>
-
-<script>
-// ✅ CORRECT KENYA TIME COUNTDOWN USING UTC (NO DRIFT)
-
-// New Year in Kenya = 2026-01-01 00:00 EAT = 2025-12-31 21:00 UTC
-const NEW_YEAR_UTC = Date.UTC(2025, 11, 31, 21, 0, 0);
-// Hide after Jan 15 Kenya time = Jan 14 21:00 UTC
-const HIDE_AFTER_UTC = Date.UTC(2026, 0, 14, 21, 0, 0);
-
-function updateCountdown() {
-    const nowUTC = Date.now();
-    const banner = document.getElementById('countdown-banner');
-
-    if (nowUTC > HIDE_AFTER_UTC) {
-        banner.style.display = 'none';
-        return;
-    }
-
-    if (nowUTC >= NEW_YEAR_UTC) {
-        document.getElementById('countdown-title').style.display = 'none';
-        document.getElementById('countdown-timer').style.display = 'none';
-        document.getElementById('welcome-2026').style.display = 'block';
-        document.getElementById('countdown-message').textContent =
-            'Wishing you prosperity and success in 2026 💰✨';
-        return;
-    }
-
-    const diff = NEW_YEAR_UTC - nowUTC;
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-
-    document.getElementById('days').textContent = String(days).padStart(2, '0');
-    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
-}
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
-</script>
-
-
 <div class="wallets">
             <div class="wallet-card">
                 <h3>NGN</h3>
@@ -856,15 +749,15 @@ setInterval(updateCountdown, 1000);
         <!-- Step 3: Amount -->
         <div class="kyc-step">
             <h3>Withdrawal Amount</h3>
-<div class="form-group">
-    <label>Amount (KSH)</label>
-    <div style="position:relative">
-        <span style="position:absolute;left:12px;top:12px;font-size:20px;color:#6B7280">KSh</span>
-        <input type="number" id="withdraw-amount" placeholder="0.00" step="0.01" oninput="calculateWithdraw()" style="padding-left:60px;padding-right:80px;font-size:24px;font-weight:600">
-        <button onclick="calculateMaxWithdraw()" style="position:absolute;right:10px;top:10px;background:#10B981;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">MAX</button>
-    </div>
-    <small>Available: <span id="withdraw-available" style="font-weight:600;color:#10B981">0.00</span> KSH · <span style="color:#6B7280">Click MAX to withdraw all</span></small>
-</div>
+            <div class="form-group">
+                <label>Amount (KSH)</label>
+                <div style="position:relative">
+                    <span style="position:absolute;left:12px;top:12px;font-size:20px;color:#6B7280">KSh</span>
+                    <input type="number" id="withdraw-amount" placeholder="0.00" step="0.01" oninput="calculateWithdraw()" style="padding-left:60px;font-size:24px;font-weight:600">
+                </div>
+                <small>Available: <span id="withdraw-available" style="font-weight:600;color:#10B981">0.00</span> KSH</small>
+            </div>
+        </div>
 
        <!-- Summary -->
 <div class="summary-box" id="withdraw-summary" style="display:none">
@@ -1095,47 +988,19 @@ let exchangeRates = { ngnToKsh: 0.18, kshToNgn: 5.5 };
 let rateUpdateInterval;
 
 function showPage(page) {
-    console.log('📄 Navigating to page:', page);
-    
-    // Hide all pages
     document.querySelectorAll('[id$="-page"]').forEach(el => el.classList.add('hidden'));
-    
-    // Show selected page
-    const pageElement = document.getElementById(page + '-page');
-    if (pageElement) {
-        pageElement.classList.remove('hidden');
-    } else {
-        console.error('❌ Page not found:', page + '-page');
-        return;
-    }
-    
-    // Scroll to top
+    document.getElementById(page + '-page').classList.remove('hidden');
     window.scrollTo(0, 0);
-    
-    // ✅ CRITICAL FIX: Use else-if chain to prevent multiple executions
-    if (page === 'dashboard') {
-        console.log('🏠 Loading dashboard...');
-        loadDashboard();
-    } else if (page === 'history') {
-        console.log('📊 Loading history page...');
-        loadHistory();
-    } else if (page === 'settings') {
-        console.log('⚙️ Loading settings page...');
-        loadSettings();
-    } else if (page === 'deposit') {
-        console.log('💳 Loading deposit page...');
-        loadDeposit();
-    } else if (page === 'kyc') {
-        console.log('✅ Loading KYC page...');
-        loadKYCForm();
-    } else if (page === 'swap') {
-        console.log('💱 Loading swap page...');
+    if (page === 'dashboard') loadDashboard();
+    if (page === 'history') loadHistory();
+    if (page === 'settings') loadSettings();
+    if (page === 'deposit') loadDeposit();
+    if (page === 'kyc') loadKYCForm();  // ✅ ADD THIS LINE
+    if (page === 'swap') {
         document.getElementById('swap-available').textContent = walletsData.NGN.toFixed(2);
         document.getElementById('swap-from-curr').textContent = 'NGN';
-    } else if (page === 'withdraw') {
-        console.log('💸 Loading withdraw page...');
-        document.getElementById('withdraw-available').textContent = walletsData.KSH.toFixed(2);
     }
+    if (page === 'withdraw') document.getElementById('withdraw-available').textContent = walletsData.KSH.toFixed(2);
 }
 
 function showAlert(id, message, type) {
@@ -2117,50 +1982,6 @@ async function validatePhoneAndFetchName() {
     calculateWithdraw();
 }
 
-// ✅ NEW: Calculate maximum withdrawable amount (accounting for fees)
-function calculateMaxWithdraw() {
-    const available = walletsData.KSH || 0;
-    
-    if (available <= 0) {
-        showAlert('withdraw-alert', '⚠️ No balance available', 'error');
-        return;
-    }
-    
-    // Get tier fee
-    const tierFees = {
-        'Micro': 20,
-        'Basic': 12,
-        'Standard': 14,
-        'Premium': 8,
-        'VIP': 5,
-        'Elite': 3.5
-    };
-    
-    let feePercent = 20; // Default
-    const lastSwapInfo = JSON.parse(localStorage.getItem('lastSwapInfo') || '{}');
-    
-    if (lastSwapInfo.tier && tierFees[lastSwapInfo.tier]) {
-        feePercent = tierFees[lastSwapInfo.tier];
-    }
-    
-    // Calculate max withdrawal amount
-    // Formula: maxAmount = available / (1 + fee%)
-    // This ensures: maxAmount + (maxAmount * fee%) = available
-    const maxWithdrawAmount = available / (1 + feePercent / 100);
-    
-    // Set the amount
-    document.getElementById('withdraw-amount').value = maxWithdrawAmount.toFixed(2);
-    
-    // Trigger calculation
-    calculateWithdraw();
-    
-    showAlert('withdraw-alert', 
-        `💡 Maximum withdrawable: ${maxWithdrawAmount.toFixed(2)} KSH\n` +
-        `(Fee: ${(available - maxWithdrawAmount).toFixed(2)} KSH [${feePercent}%] will be deducted from your balance)`, 
-        'info'
-    );
-}
-    
 function calculateWithdraw() {
     const amount = parseFloat(document.getElementById('withdraw-amount').value);
     const available = walletsData.KSH || 0;
@@ -2213,48 +2034,10 @@ function calculateWithdraw() {
         totalDeducted: totalDeducted.toFixed(2)
     });
     
-    // ✅ FIX: AUTO-ADJUST IF INSUFFICIENT FUNDS
     if (totalDeducted > available) {
-        // Calculate max withdrawable amount
-        const maxWithdrawable = available / (1 + feePercent / 100);
-        
-        if (maxWithdrawable < 30) {
-            showAlert('withdraw-alert', `⚠️ Insufficient funds. You need at least ${(30 * (1 + feePercent / 100)).toFixed(2)} KSH to withdraw minimum 30 KSH (including ${feePercent}% fee). Available: ${available.toFixed(2)} KSH`, 'error');
-            document.getElementById('withdraw-summary').style.display = 'none';
-            btn.disabled = true;
-            return;
-        }
-        
-        // Auto-adjust to max withdrawable
-        document.getElementById('withdraw-amount').value = maxWithdrawable.toFixed(2);
-        
-        const newFee = maxWithdrawable * (feePercent / 100);
-        const newTotal = maxWithdrawable + newFee;
-        
-        showAlert('withdraw-alert', 
-            `💡 Amount adjusted! You requested ${amount.toFixed(2)} KSH but only have ${available.toFixed(2)} KSH available.\n\n` +
-            `✅ Maximum you can withdraw: ${maxWithdrawable.toFixed(2)} KSH\n` +
-            `Fee (${feePercent}%): ${newFee.toFixed(2)} KSH\n` +
-            `Total deducted from your balance: ${newTotal.toFixed(2)} KSH`, 
-            'info'
-        );
-        
-        // Update summary with adjusted values
-        document.getElementById('w-summary-recipient').textContent = recipientName || '-';
-        document.getElementById('w-summary-phone').textContent = phone || '-';
-        document.getElementById('w-summary-method').textContent = selectedProvider === 'MPESA' ? 'M-Pesa' : 'Airtel Money';
-        document.getElementById('w-summary-amount').textContent = `${maxWithdrawable.toFixed(2)} KSH`;
-        document.getElementById('w-summary-fee-label').textContent = `Fee (${feePercent}% - ${tierName} tier):`;
-        document.getElementById('w-summary-fee').textContent = `${newFee.toFixed(2)} KSH`;
-        document.getElementById('w-summary-total').textContent = `${newTotal.toFixed(2)} KSH`;
-        document.getElementById('w-summary-receive').textContent = `${maxWithdrawable.toFixed(2)} KSH`;
-        document.getElementById('withdraw-summary').style.display = 'block';
-        
-        // Validate all fields
-        const phoneValid = phone.startsWith('+254') && phone.length === 13;
-        const nameValid = recipientName.length >= 3;
-        
-        btn.disabled = !phoneValid || !nameValid;
+        showAlert('withdraw-alert', `⚠️ Insufficient funds. Required: ${totalDeducted.toFixed(2)} KSH (${amount.toFixed(2)} + ${withdrawalFee.toFixed(2)} fee [${feePercent}%]). Available: ${available.toFixed(2)} KSH`, 'error');
+        document.getElementById('withdraw-summary').style.display = 'none';
+        btn.disabled = true;
         return;
     }
 
