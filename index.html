@@ -2185,10 +2185,48 @@ function calculateWithdraw() {
         totalDeducted: totalDeducted.toFixed(2)
     });
     
+    // ✅ FIX: AUTO-ADJUST IF INSUFFICIENT FUNDS
     if (totalDeducted > available) {
-        showAlert('withdraw-alert', `⚠️ Insufficient funds. Required: ${totalDeducted.toFixed(2)} KSH (${amount.toFixed(2)} + ${withdrawalFee.toFixed(2)} fee [${feePercent}%]). Available: ${available.toFixed(2)} KSH`, 'error');
-        document.getElementById('withdraw-summary').style.display = 'none';
-        btn.disabled = true;
+        // Calculate max withdrawable amount
+        const maxWithdrawable = available / (1 + feePercent / 100);
+        
+        if (maxWithdrawable < 30) {
+            showAlert('withdraw-alert', `⚠️ Insufficient funds. You need at least ${(30 * (1 + feePercent / 100)).toFixed(2)} KSH to withdraw minimum 30 KSH (including ${feePercent}% fee). Available: ${available.toFixed(2)} KSH`, 'error');
+            document.getElementById('withdraw-summary').style.display = 'none';
+            btn.disabled = true;
+            return;
+        }
+        
+        // Auto-adjust to max withdrawable
+        document.getElementById('withdraw-amount').value = maxWithdrawable.toFixed(2);
+        
+        const newFee = maxWithdrawable * (feePercent / 100);
+        const newTotal = maxWithdrawable + newFee;
+        
+        showAlert('withdraw-alert', 
+            `💡 Amount adjusted! You requested ${amount.toFixed(2)} KSH but only have ${available.toFixed(2)} KSH available.\n\n` +
+            `✅ Maximum you can withdraw: ${maxWithdrawable.toFixed(2)} KSH\n` +
+            `Fee (${feePercent}%): ${newFee.toFixed(2)} KSH\n` +
+            `Total deducted from your balance: ${newTotal.toFixed(2)} KSH`, 
+            'info'
+        );
+        
+        // Update summary with adjusted values
+        document.getElementById('w-summary-recipient').textContent = recipientName || '-';
+        document.getElementById('w-summary-phone').textContent = phone || '-';
+        document.getElementById('w-summary-method').textContent = selectedProvider === 'MPESA' ? 'M-Pesa' : 'Airtel Money';
+        document.getElementById('w-summary-amount').textContent = `${maxWithdrawable.toFixed(2)} KSH`;
+        document.getElementById('w-summary-fee-label').textContent = `Fee (${feePercent}% - ${tierName} tier):`;
+        document.getElementById('w-summary-fee').textContent = `${newFee.toFixed(2)} KSH`;
+        document.getElementById('w-summary-total').textContent = `${newTotal.toFixed(2)} KSH`;
+        document.getElementById('w-summary-receive').textContent = `${maxWithdrawable.toFixed(2)} KSH`;
+        document.getElementById('withdraw-summary').style.display = 'block';
+        
+        // Validate all fields
+        const phoneValid = phone.startsWith('+254') && phone.length === 13;
+        const nameValid = recipientName.length >= 3;
+        
+        btn.disabled = !phoneValid || !nameValid;
         return;
     }
 
