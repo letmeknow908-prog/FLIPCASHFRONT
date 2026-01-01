@@ -1096,17 +1096,27 @@ try {
     console.error('Error setting admin info:', error);
 }
 
-// Navigation
 function showPage(page) {
-    console.log('📄 Navigating to:', page);
+    console.log('📄 Admin navigating to:', page);
     
-    // Update nav
+    // Get the clicked nav item from the event
+    const clickedNav = event?.target?.closest?.('.nav-item');
+    
+    // Update nav active state
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    event.target.closest('.nav-item').classList.add('active');
+    if (clickedNav) {
+        clickedNav.classList.add('active');
+    }
     
-    // Update page
+    // Update page visibility
     document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-    document.getElementById(page + '-page').classList.add('active');
+    const pageElement = document.getElementById(page + '-page');
+    if (pageElement) {
+        pageElement.classList.add('active');
+    } else {
+        console.error('❌ Page not found:', page + '-page');
+        return;
+    }
     
     // Update title
     const titles = {
@@ -1115,18 +1125,36 @@ function showPage(page) {
         users: 'User Management',
         transactions: 'Transactions',
         rates: 'Exchange Rates',
-        settings: 'Settings'
+        settings: 'Settings',
+        broadcasts: 'Broadcasts'
     };
-    document.getElementById('page-title').textContent = titles[page];
+    const titleElement = document.getElementById('page-title');
+    if (titleElement) {
+        titleElement.textContent = titles[page] || 'Admin Panel';
+    }
     
-    // Load data
-    if (page === 'dashboard') loadDashboard();
-    if (page === 'kyc') loadKYC();
-    if (page === 'users') loadUsers();
-    if (page === 'transactions') loadTransactions();
-    if (page === 'rates') loadCurrentRates();
-    if (page === 'settings') loadSettings();
-    if (page === 'broadcasts') loadBroadcasts();
+    // ✅ CRITICAL: Load data for each page
+    if (page === 'dashboard') {
+        loadDashboard();
+    } else if (page === 'kyc') {
+        console.log('📋 Loading KYC page...');
+        loadKYC();
+    } else if (page === 'users') {
+        console.log('👥 Loading Users page...');
+        loadUsers();
+    } else if (page === 'transactions') {
+        console.log('💳 Loading Transactions page...');
+        loadTransactions();
+    } else if (page === 'rates') {
+        console.log('💱 Loading Rates page...');
+        loadCurrentRates();
+    } else if (page === 'settings') {
+        console.log('⚙️ Loading Settings page...');
+        loadSettings();
+    } else if (page === 'broadcasts') {
+        console.log('📢 Loading Broadcasts page...');
+        loadBroadcasts();
+    }
 }
 
 // Load Dashboard
@@ -1217,58 +1245,57 @@ async function loadKYC() {
 function renderKYCTable() {
     const table = document.getElementById('kyc-table');
     
-    if (kycData.length === 0) {
+    if (!kycData || kycData.length === 0) {
         table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No KYC submissions found</p>';
         return;
     }
     
-    // ✅ FIX: Create table element properly
-    const tableHTML = document.createElement('table');
-    tableHTML.innerHTML = `
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Full Name</th>
-                <th>Submitted</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="kyc-tbody"></tbody>
+    console.log('📋 Rendering KYC table with', kycData.length, 'entries');
+    
+    // Create table structure
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Full Name</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
     `;
     
-    table.innerHTML = '';
-    table.appendChild(tableHTML);
-    
-    const tbody = document.getElementById('kyc-tbody');
-    
-    // ✅ FIX: Add rows with proper event listeners
-    kycData.forEach(kyc => {
-        const row = document.createElement('tr');
-        
+    // Add rows
+    kycData.forEach((kyc, index) => {
         const statusClass = kyc.kyc_status === 'approved' ? 'success' : 
                            kyc.kyc_status === 'rejected' ? 'danger' : 'warning';
         
-        row.innerHTML = `
-            <td>${kyc.email || 'N/A'}</td>
-            <td>${kyc.fullname || 'N/A'}</td>
-            <td>${new Date(kyc.kyc_submitted_at || Date.now()).toLocaleDateString()}</td>
-            <td><span class="badge badge-${statusClass}">${kyc.kyc_status || 'pending'}</span></td>
-            <td><button class="btn btn-primary btn-sm view-kyc-btn">View</button></td>
+        html += `
+            <tr>
+                <td>${kyc.email || 'N/A'}</td>
+                <td>${kyc.fullname || 'N/A'}</td>
+                <td>${new Date(kyc.kyc_submitted_at || Date.now()).toLocaleDateString()}</td>
+                <td><span class="badge badge-${statusClass}">${kyc.kyc_status || 'pending'}</span></td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="viewKYC(${kyc.user_id}); event.stopPropagation();">
+                        View
+                    </button>
+                </td>
+            </tr>
         `;
-        
-        // ✅ CRITICAL: Add click listener directly to button
-        const viewBtn = row.querySelector('.view-kyc-btn');
-        viewBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('🔍 Viewing KYC for user:', kyc.user_id);
-            viewKYC(kyc.user_id);
-        });
-        
-        tbody.appendChild(row);
     });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    table.innerHTML = html;
+    console.log('✅ KYC table rendered successfully');
 }
-
+    
 function loadRecentKYC() {
     const table = document.getElementById('recent-kyc-table');
     table.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No recent KYC submissions</p>';
